@@ -12,38 +12,42 @@ document.addEventListener("DOMContentLoaded", () => {
       let wordsVisible = false;
       let timeouts = [];
 
-      const highlightWords = (text) => {
-        const rawWords = text.split(/\s+/);
-        const highlightCount = Math.min(
-          rawWords.length,
-          3 + Math.floor(Math.random() * 5)
-        );
-        const indices = new Set();
+      const highlightWords = (text, highlight = []) => {
+        const parts = text.split(/(\s+)/);
+        const highlightSet = new Set(highlight);
+        let wordIndex = 0;
 
-        while (indices.size < highlightCount) {
-          const index = Math.floor(Math.random() * rawWords.length);
-          if (rawWords[index].trim()) {
-            indices.add(index);
-          }
-        }
-
-        return rawWords
-          .map((word, i) => {
-            const content = word + (i < rawWords.length - 1 ? " " : "");
-            return indices.has(i)
-              ? `<span class="word highlight">${content}</span>`
-              : `<span class="word">${content}</span>`;
+        return parts
+          .map((part, i) => {
+            if (i % 2 === 1) {
+              return part;
+            }
+            if (!part) return part;
+            const cls = highlightSet.has(wordIndex)
+              ? "word highlight"
+              : "word";
+            const wrapped = `<span class="${cls}">${part}</span>`;
+            wordIndex++;
+            return wrapped;
           })
           .join("");
       };
 
       const setOverlayText = (projectName) => {
-        const nextText = projectTexts[projectName] || "";
-        if (nextText !== currentText) {
+        const entry = projectTexts[projectName];
+        let text = "";
+        let highlight = [];
+        if (typeof entry === "string") {
+          text = entry;
+        } else if (entry && typeof entry === "object") {
+          text = entry.text || "";
+          highlight = Array.isArray(entry.highlight) ? entry.highlight : [];
+        }
+        if (text !== currentText) {
           timeouts.forEach(clearTimeout);
           timeouts = [];
-          textOverlay.innerHTML = nextText ? highlightWords(nextText) : "";
-          currentText = nextText;
+          textOverlay.innerHTML = text ? highlightWords(text, highlight) : "";
+          currentText = text;
           const nonHighlights = textOverlay.querySelectorAll(
             "span.word:not(.highlight)"
           );
@@ -57,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
         timeouts = [];
 
         const spans = Array.from(
-          textOverlay.querySelectorAll('span.word:not(.highlight)')
+          textOverlay.querySelectorAll("span.word:not(.highlight)")
         );
         if (!spans.length) return;
 
@@ -124,4 +128,3 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Failed to load project texts", err);
     });
 });
-

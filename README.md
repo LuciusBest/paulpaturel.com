@@ -3,7 +3,7 @@
 Displays scroll-sensitive project descriptions that reveal or hide non-highlighted words on click.
 
 ## Overview
-The script observes `.project_container` elements and shows the paragraph for the most visible project in a fixed overlay. Each paragraph loads from `js/projectTexts.json` and has 3–7 randomly highlighted words.
+The script observes `.project_container` elements and shows the paragraph for the most visible project in a fixed overlay. Each paragraph loads from `js/projectTexts.json`, which provides the paragraph text and a list of zero-based word indices to highlight.
 
 ## How it works
 - paragraphs loaded via `fetch` at startup
@@ -12,7 +12,7 @@ The script observes `.project_container` elements and shows the paragraph for th
 - the overlay resets to the collapsed (highlight-only) state whenever the visible project changes
 
 ## Usage & customization
-- edit `js/projectTexts.json` to change paragraph texts
+- edit `js/projectTexts.json` to change paragraph texts and `highlight` indices
 - adjust highlight styling in `css/ui.css`
 - include the script with `<script src="js/dynamicTextOverlay.js" defer></script>`
 
