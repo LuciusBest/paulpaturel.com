@@ -6,52 +6,41 @@ document.addEventListener("DOMContentLoaded", () => {
   let toggleLetters = () => {};
 
   if (leftOverlay) {
-    const collapsed = "PAUL";
-    const expanded = "PATUREL";
-    let expandedState = false;
+    const states = ["PAUL", "PATUL", "PATURL", "PATUREL"];
+    const highlightSet = new Set(["P", "A", "U", "L"]);
+    const dt = 3200 / 3;
+    let currentIndex = 0;
+    let targetExpanded = false;
     let letterTimeouts = [];
 
-    const wrapLetters = (str) =>
-      str
+    const renderState = (index) => {
+      const str = states[index];
+      leftOverlay.innerHTML = str
         .split("")
-        .map((ch) => `<span class="letter">${ch}</span>`)
+        .map((ch) => {
+          const cls = highlightSet.has(ch) ? "char highlight" : "char";
+          return `<span class="${cls}">${ch}</span>`;
+        })
         .join("");
+    };
 
-    leftOverlay.innerHTML = wrapLetters(collapsed);
+    renderState(currentIndex);
 
     toggleLetters = () => {
       letterTimeouts.forEach(clearTimeout);
       letterTimeouts = [];
-
-      const current = expandedState ? expanded : collapsed;
-      const next = expandedState ? collapsed : expanded;
-      const currentSpans = Array.from(leftOverlay.querySelectorAll("span.letter"));
-      const steps = currentSpans.length + next.length;
-      if (!steps) return;
-      const dt = 3200 / steps;
-
-      currentSpans.forEach((span, idx) => {
+      targetExpanded = !targetExpanded;
+      const targetIndex = targetExpanded ? states.length - 1 : 0;
+      const step = targetIndex > currentIndex ? 1 : -1;
+      const steps = Math.abs(targetIndex - currentIndex);
+      for (let k = 1; k <= steps; k++) {
+        const idx = currentIndex + step * k;
         const id = setTimeout(() => {
-          span.style.display = "none";
-        }, (idx + 1) * dt);
+          renderState(idx);
+          currentIndex = idx;
+        }, k * dt);
         letterTimeouts.push(id);
-      });
-
-      const replaceTime = currentSpans.length * dt;
-      const replaceId = setTimeout(() => {
-        leftOverlay.innerHTML = wrapLetters(next);
-        const nextSpans = Array.from(leftOverlay.querySelectorAll("span.letter"));
-        nextSpans.forEach((s) => (s.style.display = "none"));
-        nextSpans.forEach((span, idx) => {
-          const id2 = setTimeout(() => {
-            span.style.display = "inline";
-          }, replaceTime + (idx + 1) * dt);
-          letterTimeouts.push(id2);
-        });
-      }, replaceTime);
-      letterTimeouts.push(replaceId);
-
-      expandedState = !expandedState;
+      }
     };
   }
 
