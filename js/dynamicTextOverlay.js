@@ -139,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (steps === 0) return;
 
     wordsVisible = !wordsVisible;
-    const dt = 1000 / steps;
+    const dt = 2500 / steps;
 
     targets.forEach((span, index) => {
       const id = setTimeout(() => {
@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  textOverlay.addEventListener('click', toggleWords);
+  document.addEventListener('click', toggleWords);
 
   const thresholds = Array.from({ length: 101 }, (_, i) => i / 100);
   const visibilityMap = new Map();
