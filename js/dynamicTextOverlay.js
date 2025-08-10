@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (leftOverlay) {
     const states = ["PAUL", "PATUL", "PATURL", "PATUREL"];
     const highlightSet = new Set(["P", "A", "U", "L"]);
-    const dt = 200;
+    const dt = 80;
     let currentIndex = 0;
     let targetExpanded = false;
     let letterTimeouts = [];
@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (steps === 0) return;
 
         wordsVisible = !wordsVisible;
-        const dt = 50;
+        const dt = 40;
 
         targets.forEach((span, index) => {
           const id = setTimeout(() => {

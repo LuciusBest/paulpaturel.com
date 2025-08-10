@@ -1,20 +1,13 @@
-#toper {
+#text_overlay_container_left {
     position: fixed;
     top: 0;
     left: 0;
-    height: 50px;
-    width: 100%;
-    /* background: white; */
+    height: auto;
+    width: 50%;
     z-index: 999;
-    display: flex;
-    align-items: center;
-    padding: 0 1rem;
-    font-size: 14px;
-    font-weight: bold;
-    /* border-bottom: 1px solid #ccc; */
-    color: white;
-    /* important pour bien réagir au mode de fusion */
-    mix-blend-mode: difference
+    padding: 3px;
+    font-size: 18px;
+    color: black;
 }
 
 #text_overlay_container {
@@ -26,30 +19,15 @@
     /* background: white; */
     z-index: 999;
     padding: 3px;
-    font-size: 14px;
+    font-size: 18px;
     color: white;
     /* mix-blend-mode: difference; */
-    opacity: 50%;
-    background-color: rgb(204, 204, 204);
-    color: black;
-}
-
-#text_overlay_container_left {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: auto;
-    width: 50%;
-    z-index: 999;
-    padding: 3px;
-    font-size: 14px;
-    opacity: 50%;
-    background-color: rgb(204, 204, 204);
+    background-color: rgba(204, 204, 204, 0.606);
     color: black;
 }
 
 .highlight {
-    color: yellow;
+    /* color: yellow; */
 }
 
 .word {
@@ -60,6 +38,7 @@
     display: inline;
 }
 
-html, body {
+html,
+body {
     cursor: pointer;
 }
