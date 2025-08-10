@@ -41,3 +41,7 @@
 .word {
     display: inline;
 }
+
+html, body {
+    cursor: pointer;
+}

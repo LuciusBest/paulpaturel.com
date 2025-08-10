@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .then((response) => response.json())
     .then((projectTexts) => {
       let currentText = "";
-      let wordsVisible = true;
+      let wordsVisible = false;
       let timeouts = [];
 
       const highlightWords = (text) => {
@@ -44,7 +44,11 @@ document.addEventListener("DOMContentLoaded", () => {
           timeouts = [];
           textOverlay.innerHTML = nextText ? highlightWords(nextText) : "";
           currentText = nextText;
-          wordsVisible = true;
+          const nonHighlights = textOverlay.querySelectorAll(
+            "span.word:not(.highlight)"
+          );
+          nonHighlights.forEach((span) => (span.style.display = "none"));
+          wordsVisible = false;
         }
       };
 
@@ -71,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (steps === 0) return;
 
         wordsVisible = !wordsVisible;
-        const dt = 4000 / steps;
+        const dt = 3200 / steps;
 
         targets.forEach((span, index) => {
           const id = setTimeout(() => {
