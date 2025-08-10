@@ -85,6 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentText = "";
   let wordsVisible = true;
+  let timeouts = [];
 
   const highlightWords = (text) => {
     const rawWords = text.split(/\s+/);
@@ -111,6 +112,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const setOverlayText = (projectName) => {
     const nextText = projectTexts[projectName] || "";
     if (nextText !== currentText) {
+      timeouts.forEach(clearTimeout);
+      timeouts = [];
       textOverlay.innerHTML = nextText ? highlightWords(nextText) : "";
       currentText = nextText;
       wordsVisible = true;
@@ -118,17 +121,35 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const toggleWords = () => {
-    const targets = textOverlay.querySelectorAll('span.word:not(.highlight)');
-    if (!targets.length) return;
-    targets.forEach((span, index) => {
-      setTimeout(() => {
-        span.style.display = wordsVisible ? 'none' : 'inline';
-      }, index * 100);
-    });
+    timeouts.forEach(clearTimeout);
+    timeouts = [];
+
+    const spans = Array.from(textOverlay.querySelectorAll('span.word:not(.highlight)'));
+    if (!spans.length) return;
+
+    const hiddenCount = spans.filter((s) => s.style.display === 'none').length;
+    wordsVisible = hiddenCount === 0;
+
+    const hide = wordsVisible;
+    const targets = spans.filter((span) =>
+      hide ? span.style.display !== 'none' : span.style.display === 'none'
+    );
+
+    const steps = targets.length;
+    if (steps === 0) return;
+
     wordsVisible = !wordsVisible;
+    const dt = 1000 / steps;
+
+    targets.forEach((span, index) => {
+      const id = setTimeout(() => {
+        span.style.display = hide ? 'none' : 'inline';
+      }, (index + 1) * dt);
+      timeouts.push(id);
+    });
   };
 
-  window.addEventListener('click', toggleWords);
+  textOverlay.addEventListener('click', toggleWords);
 
   const thresholds = Array.from({ length: 101 }, (_, i) => i / 100);
   const visibilityMap = new Map();
