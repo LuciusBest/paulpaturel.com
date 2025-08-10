@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "Aenean eleifend felis ut urna blandit, at faucibus leo aliquam.",
       "Vestibulum vitae ipsum vel velit iaculis tincidunt.",
       "Duis quis nulla sit amet est varius accumsan.",
-      "Mauris bibendum lacus auctor eros gravida, sit amet tincidunt lorem tempor.",
+      "<span class=\"highlight\">Mauris bibendum lacus auctor eros gravida</span>, sit amet tincidunt lorem tempor.",
       "Integer ut sapien at diam cursus vulputate.",
       "Etiam id risus id velit consequat gravida.",
       "Curabitur eget tellus sed mi facilisis convallis.",
@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "Aliquam maximus justo ac lectus consectetur tempor.",
       "Morbi accumsan lacus eu turpis tincidunt, id vehicula nibh fermentum.",
       "Suspendisse potenti.",
-      "Mauris scelerisque ligula non purus tempus, at tempus orci semper.",
+      "<span class=\"highlight\">Mauris scelerisque ligula non purus</span> tempus, at tempus orci semper.",
       "Praesent posuere est in augue aliquet, vitae ultricies felis euismod.",
       "Fusce vitae arcu at lorem eleifend interdum.",
       "Nullam tempor erat sed neque tristique, nec rhoncus neque malesuada.",
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "Integer porta elit quis libero elementum.",
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
       "Nullam sagittis velit sed sapien dignissim, quis ultrices metus cursus.",
-      "Donec venenatis magna et sem dapibus, sed lacinia ligula viverra.",
+      "<span class=\"highlight\">Donec venenatis magna et sem</span> dapibus, sed lacinia ligula viverra.",
       "Proin commodo nisl ac neque laoreet maximus.",
       "Cras ornare lectus at odio blandit, quis gravida arcu aliquet.",
       "Aenean auctor mi nec nisi consequat, eu sollicitudin eros mattis.",
@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
       "Sed sed dui bibendum, maximus sapien vel, tempor orci.",
       "Praesent non neque posuere, consequat est vel, dapibus turpis.",
-      "Fusce sagittis velit ac enim pretium, at cursus odio commodo.",
+      "<span class=\"highlight\">Fusce sagittis velit ac enim</span> pretium, at cursus odio commodo.",
       "Nam suscipit odio a elit hendrerit, eu laoreet urna sodales.",
       "Integer luctus nunc ac sem ultricies, at scelerisque quam fringilla.",
       "In laoreet leo nec bibendum elementum.",
@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "Sed tristique metus sed lorem euismod, eget tincidunt mi elementum.",
       "Praesent vel nisi efficitur, pellentesque nisl vel, gravida libero.",
       "Aliquam a urna vel orci fermentum tincidunt.",
-      "Curabitur auctor magna vitae turpis efficitur, a scelerisque tortor aliquam.",
+      "<span class=\"highlight\">Curabitur auctor magna vitae turpis</span> efficitur, a scelerisque tortor aliquam.",
       "Integer varius nisi non eros faucibus, quis imperdiet velit fermentum.",
       "Morbi porta urna vitae lacus ultricies, ut fermentum odio vulputate.",
       "Cras maximus odio nec risus varius, vitae rhoncus est efficitur.",
@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const setOverlayText = (projectName) => {
     const nextText = projectTexts[projectName] || "";
     if (nextText !== currentText) {
-      textOverlay.textContent = nextText;
+      textOverlay.innerHTML = nextText;
       currentText = nextText;
     }
   };

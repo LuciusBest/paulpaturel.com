@@ -35,3 +35,7 @@
     background-color: rgb(204, 204, 204);
     color: black;
 }
+
+.highlight {
+    color: yellow;
+}
