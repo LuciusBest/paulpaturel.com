@@ -123,9 +123,19 @@ document.addEventListener("DOMContentLoaded", () => {
     targets.forEach((span, index) => {
       setTimeout(() => {
         if (wordsVisible) {
+          span.addEventListener(
+            'transitionend',
+            () => {
+              if (span.classList.contains('hidden')) {
+                span.style.display = 'none';
+              }
+            },
+            { once: true }
+          );
           span.classList.add('hidden');
         } else {
-          span.classList.remove('hidden');
+          span.style.display = 'inline-block';
+          requestAnimationFrame(() => span.classList.remove('hidden'));
         }
       }, index * 100);
     });
