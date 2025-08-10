@@ -1,0 +1,21 @@
+# Système
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Fichiers temporaires / cache
+*.log
+
+# Originaux lourds (optionnel si LFS utilisé)
+*.mov
+*.mp4
+*.heic
+*.tif
+*.tiff
+*.psd
+*.ai
+
+# MacOS metadata
+._*
