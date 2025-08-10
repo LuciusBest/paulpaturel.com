@@ -34,11 +34,29 @@
     color: black;
 }
 
+#text_overlay_container_left {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: auto;
+    width: 50%;
+    z-index: 999;
+    padding: 3px;
+    font-size: 14px;
+    opacity: 50%;
+    background-color: rgb(204, 204, 204);
+    color: black;
+}
+
 .highlight {
     color: yellow;
 }
 
 .word {
+    display: inline;
+}
+
+.letter {
     display: inline;
 }
 

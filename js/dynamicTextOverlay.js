@@ -1,16 +1,68 @@
 document.addEventListener("DOMContentLoaded", () => {
   const textOverlay = document.getElementById("text_overlay_container");
-  if (!textOverlay) return;
+  const leftOverlay = document.getElementById("text_overlay_container_left");
+
+  let toggleWords = () => {};
+  let toggleLetters = () => {};
+
+  if (leftOverlay) {
+    const collapsed = "PAUL";
+    const expanded = "PATUREL";
+    let expandedState = false;
+    let letterTimeouts = [];
+
+    const wrapLetters = (str) =>
+      str
+        .split("")
+        .map((ch) => `<span class="letter">${ch}</span>`)
+        .join("");
+
+    leftOverlay.innerHTML = wrapLetters(collapsed);
+
+    toggleLetters = () => {
+      letterTimeouts.forEach(clearTimeout);
+      letterTimeouts = [];
+
+      const current = expandedState ? expanded : collapsed;
+      const next = expandedState ? collapsed : expanded;
+      const currentSpans = Array.from(leftOverlay.querySelectorAll("span.letter"));
+      const steps = currentSpans.length + next.length;
+      if (!steps) return;
+      const dt = 3200 / steps;
+
+      currentSpans.forEach((span, idx) => {
+        const id = setTimeout(() => {
+          span.style.display = "none";
+        }, (idx + 1) * dt);
+        letterTimeouts.push(id);
+      });
+
+      const replaceTime = currentSpans.length * dt;
+      const replaceId = setTimeout(() => {
+        leftOverlay.innerHTML = wrapLetters(next);
+        const nextSpans = Array.from(leftOverlay.querySelectorAll("span.letter"));
+        nextSpans.forEach((s) => (s.style.display = "none"));
+        nextSpans.forEach((span, idx) => {
+          const id2 = setTimeout(() => {
+            span.style.display = "inline";
+          }, replaceTime + (idx + 1) * dt);
+          letterTimeouts.push(id2);
+        });
+      }, replaceTime);
+      letterTimeouts.push(replaceId);
+
+      expandedState = !expandedState;
+    };
+  }
 
   const projectContainers = document.querySelectorAll(".project_container");
-  if (!projectContainers.length) return;
-
-  fetch("js/projectTexts.json")
-    .then((response) => response.json())
-    .then((projectTexts) => {
-      let currentText = "";
-      let wordsVisible = false;
-      let timeouts = [];
+  if (textOverlay && projectContainers.length) {
+    fetch("js/projectTexts.json")
+      .then((response) => response.json())
+      .then((projectTexts) => {
+        let currentText = "";
+        let wordsVisible = false;
+        let timeouts = [];
 
       const highlightWords = (text, highlight = []) => {
         const parts = text.split(/(\s+)/);
@@ -56,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       };
 
-      const toggleWords = () => {
+        toggleWords = () => {
         timeouts.forEach(clearTimeout);
         timeouts = [];
 
@@ -88,8 +140,6 @@ document.addEventListener("DOMContentLoaded", () => {
           timeouts.push(id);
         });
       };
-
-      document.addEventListener("click", toggleWords);
 
       const thresholds = Array.from({ length: 101 }, (_, i) => i / 100);
       const visibilityMap = new Map();
@@ -124,7 +174,13 @@ document.addEventListener("DOMContentLoaded", () => {
         observer.observe(container);
       });
     })
-    .catch((err) => {
-      console.error("Failed to load project texts", err);
-    });
+      .catch((err) => {
+        console.error("Failed to load project texts", err);
+      });
+  }
+
+  document.addEventListener("click", () => {
+    toggleWords();
+    toggleLetters();
+  });
 });
