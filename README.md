@@ -8,8 +8,8 @@ The script observes `.project_container` elements and shows the paragraph for th
 ## How it works
 - paragraphs loaded via `fetch` at startup
 - words wrapped in `<span class="word">`; highlighted words get `.highlight`
-- clicking anywhere sequentially hides or reveals non-highlighted words over 3200ms, using evenly spaced timeouts
-- the left overlay toggles letters of “PAUL”/“PATUREL” in the same 3.2s schedule
+- clicking anywhere sequentially hides or reveals non-highlighted words at 20 words per second (50 ms per word)
+- the left overlay toggles letters of “PAUL”/“PATUREL” at 200 ms per letter
 - the overlay resets to the collapsed (highlight-only) state whenever the visible project changes
 
 ## Usage & customization
