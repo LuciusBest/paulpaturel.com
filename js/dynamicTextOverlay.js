@@ -84,24 +84,28 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   let currentText = "";
+  let wordsVisible = true;
 
   const highlightWords = (text) => {
-    const words = text.split(/\s+/);
-    const highlightCount = Math.min(words.length, 3 + Math.floor(Math.random() * 5));
+    const rawWords = text.split(/\s+/);
+    const highlightCount = Math.min(rawWords.length, 3 + Math.floor(Math.random() * 5));
     const indices = new Set();
 
     while (indices.size < highlightCount) {
-      const index = Math.floor(Math.random() * words.length);
-      if (words[index].trim()) {
+      const index = Math.floor(Math.random() * rawWords.length);
+      if (rawWords[index].trim()) {
         indices.add(index);
       }
     }
 
-    indices.forEach((i) => {
-      words[i] = `<span class="highlight">${words[i]}</span>`;
-    });
-
-    return words.join(" ");
+    return rawWords
+      .map((word, i) => {
+        const content = word + (i < rawWords.length - 1 ? " " : "");
+        return indices.has(i)
+          ? `<span class="word highlight">${content}</span>`
+          : `<span class="word">${content}</span>`;
+      })
+      .join("");
   };
 
   const setOverlayText = (projectName) => {
@@ -109,8 +113,26 @@ document.addEventListener("DOMContentLoaded", () => {
     if (nextText !== currentText) {
       textOverlay.innerHTML = nextText ? highlightWords(nextText) : "";
       currentText = nextText;
+      wordsVisible = true;
     }
   };
+
+  const toggleWords = () => {
+    const targets = textOverlay.querySelectorAll('span.word:not(.highlight)');
+    if (!targets.length) return;
+    targets.forEach((span, index) => {
+      setTimeout(() => {
+        if (wordsVisible) {
+          span.classList.add('hidden');
+        } else {
+          span.classList.remove('hidden');
+        }
+      }, index * 100);
+    });
+    wordsVisible = !wordsVisible;
+  };
+
+  window.addEventListener('click', toggleWords);
 
   const thresholds = Array.from({ length: 101 }, (_, i) => i / 100);
   const visibilityMap = new Map();

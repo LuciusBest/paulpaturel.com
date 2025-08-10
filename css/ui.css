@@ -36,5 +36,13 @@
 
 .highlight {
     color: yellow;
-    display: inline;
+}
+
+.word {
+    display: inline-block;
+    transition: opacity 0.3s ease;
+}
+
+.word.hidden {
+    opacity: 0;
 }
