@@ -39,12 +39,5 @@
 }
 
 .word {
-    display: inline-block;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    transform-origin: left center;
-}
-
-.word.hidden {
-    opacity: 0;
-    transform: scaleX(0);
+    display: inline;
 }
