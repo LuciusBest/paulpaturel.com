@@ -1,3 +1,12 @@
+/*
+  scroll_navigation.js
+  - Gère l'indicateur de pagination horizontale par projet.
+  - Quand un .project_container est visible à ≥ 50 %, affiche/crée un footer
+    avec un compteur "courant/total" basé sur le défilement horizontal.
+  - Met à jour le compteur et ajuste la marge pour centrer visuellement le texte
+    par rapport à la largeur d'écran durant le défilement.
+*/
+
 document.addEventListener("DOMContentLoaded", () => {
   const projects = document.querySelectorAll(".project_container");
 

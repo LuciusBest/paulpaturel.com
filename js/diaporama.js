@@ -1,3 +1,11 @@
+/*
+  diaporama.js
+  - Diaporama automatique pour chaque ".wrapper--diaporama .diapo-frame".
+  - Fait défiler les <img> enfants en alternant la classe "active".
+  - Démarre sur la première image et avance toutes les 3 secondes.
+  - N'initialise rien si le cadre ne contient aucune image.
+*/
+
 document.addEventListener("DOMContentLoaded", () => {
   const slideshows = document.querySelectorAll(".wrapper--diaporama .diapo-frame");
 

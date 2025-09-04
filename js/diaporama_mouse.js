@@ -1,3 +1,11 @@
+/*
+  diaporama_mouse.js
+  - Sélection d'image pilotée par la position de la souris pour chaque ".wrapper--diaporama .diapo-frame".
+  - Projette la position horizontale du curseur sur l'index d'image et alterne
+    la classe "active" pour afficher l'image correspondante.
+  - Initialise en supposant le curseur centré à l'écran.
+*/
+
 document.addEventListener("DOMContentLoaded", () => {
   const diaporamas = document.querySelectorAll(".wrapper--diaporama .diapo-frame");
 

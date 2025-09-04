@@ -18,5 +18,12 @@
   "Relay": {
     "text": "Nam tempor, ipsum eu interdum lacinia, nibh mauris aliquet est, vitae convallis felis nibh non mauris. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus egestas justo sit amet sagittis pulvinar. Phasellus faucibus lorem vitae viverra fringilla. Sed tristique metus sed lorem euismod, eget tincidunt mi elementum. Praesent vel nisi efficitur, pellentesque nisl vel, gravida libero. Aliquam a urna vel orci fermentum tincidunt. Curabitur auctor magna vitae turpis efficitur, a scelerisque tortor aliquam. Integer varius nisi non eros faucibus, quis imperdiet velit fermentum. Morbi porta urna vitae lacus ultricies, ut fermentum odio vulputate. Cras maximus odio nec risus varius, vitae rhoncus est efficitur. Aenean luctus purus sed lacinia hendrerit. Suspendisse convallis ante a sem tristique, eget molestie tortor efficitur. Donec sed sapien vitae purus bibendum bibendum. Etiam quis eros at leo blandit tempor.",
     "highlight": [3, 8, 12, 18]
+  },
+  "CamilleLeprinceWEB": {
+    "text": "<tag>Website</tag> design for photographer Camille Leprince. <tag>2023</tag>"
+  },
+  "StencilPoster": {
+    "text": "Stencil poster series.",
+    "highlight": [0]
   }
 }

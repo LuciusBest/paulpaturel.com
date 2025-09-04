@@ -1,3 +1,16 @@
+/*
+  dynamicTextOverlay.js
+  - Affiche un texte contextuel superposé pour le .project_container le plus visible.
+    • Charge le texte et les mots à surligner depuis "js/projectTexts.json".
+    • Utilise IntersectionObserver avec des seuils fins pour suivre le projet le plus visible
+      et mettre à jour le texte en conséquence.
+  - Animation d'apparition des mots : au clic, alterne l'affichage des mots non surlignés
+    de manière échelonnée ; les mots surlignés restent visibles.
+  - Morphing du nom à gauche : au clic sur l'overlay gauche, anime lettre par lettre
+    entre les variantes compacte et complète (ex. « PAUL » ↔ « PATUREL »).
+  - Nettoie les timeouts lors des changements d'état et empêche la propagation d'événements si nécessaire.
+*/
+
 document.addEventListener("DOMContentLoaded", () => {
   const textOverlay = document.getElementById("text_overlay_container");
   const leftOverlay = document.getElementById("text_overlay_container_left");
@@ -74,6 +87,65 @@ document.addEventListener("DOMContentLoaded", () => {
           .join("");
       };
 
+      // Support inline <tag> ... </tag> to mark highlighted words
+      const renderFromTagged = (text) => {
+        let out = [];
+        let i = 0;
+        let depth = 0;
+        const len = text.length;
+
+        const pushWord = (word, highlighted) => {
+          if (!word) return;
+          const cls = highlighted ? "word highlight" : "word";
+          out.push(`<span class="${cls}">${word}</span>`);
+        };
+
+        while (i < len) {
+          if (text.startsWith("<tag>", i)) {
+            depth++;
+            i += 5;
+            continue;
+          }
+          if (text.startsWith("</tag>", i)) {
+            depth = Math.max(0, depth - 1);
+            i += 6;
+            continue;
+          }
+
+          const ch = text[i];
+          if (/\s/.test(ch)) {
+            let j = i + 1;
+            while (j < len && /\s/.test(text[j])) j++;
+            out.push(text.slice(i, j));
+            i = j;
+            continue;
+          }
+
+          let j = i + 1;
+          while (
+            j < len &&
+            !/\s/.test(text[j]) &&
+            !text.startsWith("<tag>", j) &&
+            !text.startsWith("</tag>", j)
+          ) {
+            j++;
+          }
+          const token = text.slice(i, j);
+          pushWord(token, depth > 0);
+          i = j;
+        }
+
+        return out.join("");
+      };
+
+      const renderWords = (text, highlight = []) => {
+        if (text && (text.includes("<tag>") || text.includes("</tag>"))) {
+          return renderFromTagged(text);
+        }
+        // fallback to legacy index-based highlighting
+        return highlightWords(text, highlight);
+      };
+
       const setOverlayText = (projectName) => {
         const entry = projectTexts[projectName];
         let text = "";
@@ -87,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (text !== currentText) {
           timeouts.forEach(clearTimeout);
           timeouts = [];
-          textOverlay.innerHTML = text ? highlightWords(text, highlight) : "";
+          textOverlay.innerHTML = text ? renderWords(text, highlight) : "";
           currentText = text;
           const nonHighlights = textOverlay.querySelectorAll(
             "span.word:not(.highlight)"

@@ -1,3 +1,10 @@
+/*
+  video_autoplay.js
+  - Lance automatiquement les vidéos avec l'attribut "autoplay" lorsqu'elles entrent dans le viewport.
+  - Utilise IntersectionObserver (seuil 0,1) pour détecter la visibilité.
+  - Appelle HTMLMediaElement.play() et ignore sans erreur les blocages de politique navigateur.
+*/
+
 document.addEventListener("DOMContentLoaded", () => {
   const videos = document.querySelectorAll("video[autoplay]");
 
