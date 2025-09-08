@@ -1,3 +1,7 @@
+.ui_text {
+    font-size: 15px;
+}
+
 #text_overlay_container_left {
     position: fixed;
     top: 0;
@@ -6,7 +10,7 @@
     width: 50%;
     z-index: 999;
     padding: 3px;
-    font-size: 18px;
+    /* font-size: 18px; */
     color: black;
 }
 
@@ -18,7 +22,7 @@
     width: 50%;
     z-index: 999;
     padding: 3px;
-    font-size: 18px;
+    /* font-size: 18px; */
     /* Container no longer has a solid background; backgrounds applied per word/tag */
     color: black;
 }
@@ -106,7 +110,7 @@ body {
 }
 
 /* Preserve left padding for the first visible word in full text to match chip padding */
-#text_overlay_container.is-fulltext > .word:first-child,
-#text_overlay_container.is-fulltext > .tag:first-child .word:first-child {
+#text_overlay_container.is-fulltext>.word:first-child,
+#text_overlay_container.is-fulltext>.tag:first-child .word:first-child {
     padding-left: 6px;
 }

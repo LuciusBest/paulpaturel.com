@@ -34,19 +34,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
           const pagination = footer.querySelector(".pagination");
 
-          project.addEventListener("scroll", () => {
+          const update = () => {
             const scrollLeft = project.scrollLeft;
             const scrollWidth = project.scrollWidth - project.clientWidth;
             const progress = scrollWidth > 0 ? scrollLeft / scrollWidth : 0;
+
             const currentIndex = Math.round(progress * (slides.length - 1)) + 1;
             pagination.textContent = `${currentIndex}/${slides.length}`;
 
-            // Adjusted positioning to center the pagination text relative to screen width
-            const offset = progress * 100; // percent from left
-            const halfTextWidth = pagination.offsetWidth / footer.offsetWidth * 100 / 2; // text width as % of container
-            const alignedOffset = Math.min(Math.max(offset - halfTextWidth, 0), 100 - halfTextWidth * 2);
-            pagination.style.marginLeft = `${alignedOffset}%`;
-          });
+            // Place pagination by pixels inside footer's content box
+            const styles = getComputedStyle(footer);
+            const padL = parseFloat(styles.paddingLeft) || 0;
+            const padR = parseFloat(styles.paddingRight) || 0;
+            const contentWidth = footer.clientWidth - padL - padR;
+            const textWidth = pagination.offsetWidth;
+
+            const center = progress * contentWidth;
+            const left = Math.min(
+              Math.max(center - textWidth / 2, 0),
+              Math.max(contentWidth - textWidth, 0)
+            );
+            pagination.style.marginLeft = `${left}px`;
+          };
+
+          project.addEventListener("scroll", update);
+          window.addEventListener("resize", update);
+          update();
         }
       });
     },
