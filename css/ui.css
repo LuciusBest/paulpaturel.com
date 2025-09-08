@@ -16,13 +16,10 @@
     left: 50%;
     height: auto;
     width: 50%;
-    /* background: white; */
     z-index: 999;
     padding: 3px;
     font-size: 18px;
-    color: white;
-    /* mix-blend-mode: difference; */
-    background-color: rgba(204, 204, 204, 0.606);
+    /* Container no longer has a solid background; backgrounds applied per word/tag */
     color: black;
 }
 
@@ -30,8 +27,16 @@
     /* color: yellow; */
 }
 
+.tag {
+    display: inline;
+    transition: background-color .2s ease, color .2s ease, border-radius .2s ease, opacity .2s ease;
+    will-change: background-color, color, border-radius, opacity;
+}
+
 .word {
     display: inline;
+    transition: background-color .2s ease, color .2s ease, border-radius .2s ease, opacity .2s ease;
+    will-change: background-color, color, border-radius, opacity;
 }
 
 .char {
@@ -41,4 +46,67 @@
 html,
 body {
     cursor: pointer;
+}
+
+/* Space tokens: preserve width of spaces so they can receive background */
+.space {
+    white-space: pre;
+    transition: background-color .2s ease, color .2s ease, border-radius .2s ease, opacity .2s ease;
+    will-change: background-color, color, border-radius, opacity;
+}
+
+/* Tags-only mode: show only highlighted words as white chips, hide spaces */
+#text_overlay_container.tags-only .space {
+    display: none;
+}
+
+#text_overlay_container.tags-only .word.highlight,
+#text_overlay_container.tags-only .tag {
+    display: inline-block;
+    background: #ffffff;
+    color: #000;
+    border-radius: 0px;
+    padding: 0 6px;
+    margin-right: 3px;
+    margin-bottom: 3px;
+}
+
+/* When using a tag wrapper, avoid double backgrounds on inner words in chips view */
+#text_overlay_container.tags-only .tag .word.highlight {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    display: inline;
+}
+
+/* Keep spaces visible inside tag wrapper in chips view */
+#text_overlay_container.tags-only .tag .space {
+    display: inline;
+}
+
+/* Hover fade for chips in tags-only mode */
+#text_overlay_container.tags-only .word.highlight:hover,
+#text_overlay_container.tags-only .tag:hover {
+    opacity: 0.7;
+}
+
+/* Full-text mode: give each word (and spaces) a white background for legibility */
+#text_overlay_container.is-fulltext .word,
+#text_overlay_container.is-fulltext .space {
+    background: #ffffff;
+    color: #000;
+}
+
+/* (Removed spaces-hidden strategy: spacing now handled inline per span) */
+
+/* Square edges in full text for smoother radius transition from chips */
+#text_overlay_container.is-fulltext .word,
+#text_overlay_container.is-fulltext .space {
+    border-radius: 0px;
+}
+
+/* Preserve left padding for the first visible word in full text to match chip padding */
+#text_overlay_container.is-fulltext > .word:first-child,
+#text_overlay_container.is-fulltext > .tag:first-child .word:first-child {
+    padding-left: 6px;
 }
