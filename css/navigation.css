@@ -17,7 +17,7 @@
     display: none;
     justify-content: flex-start;
     /* important pour que margin-left fonctionne */
-    align-items: center;
+    align-items: flex-end;
     font-size: 12px;
     color: white;
     mix-blend-mode: difference;
@@ -33,6 +33,7 @@
     background: #ffffff;
     color: #000000;
     font-size: 15px;
+    line-height: 20px;
     /* same as .ui_text */
     border-radius: 0px;
     padding: 0 6px;
