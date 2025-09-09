@@ -35,15 +35,23 @@ document.addEventListener("DOMContentLoaded", () => {
     progress: 0, // [0..1] used for horizontal positioning of the label
   };
 
-  const render = () => {
-    const current = Math.max(1, Math.min(state.total, state.index + 1));
-    pagination.textContent = `${current}/${state.total}`;
+  let rafScheduled = false;
+  let cachedContentWidth = 0;
 
-    // Position inside footer according to progress
+  const recomputeFooterMetrics = () => {
     const styles = getComputedStyle(footer);
     const padL = parseFloat(styles.paddingLeft) || 0;
     const padR = parseFloat(styles.paddingRight) || 0;
-    const contentWidth = footer.clientWidth - padL - padR;
+    cachedContentWidth = footer.clientWidth - padL - padR;
+  };
+
+  const render = () => {
+    rafScheduled = false;
+    const current = Math.max(1, Math.min(state.total, state.index + 1));
+    pagination.textContent = `${current}/${state.total}`;
+
+    // Position inside footer according to progress (use cached width)
+    const contentWidth = cachedContentWidth || footer.clientWidth;
     const textWidth = pagination.offsetWidth;
     const center = (isFinite(state.progress) ? state.progress : 0) * contentWidth;
     const left = Math.min(
@@ -51,6 +59,13 @@ document.addEventListener("DOMContentLoaded", () => {
       Math.max(contentWidth - textWidth, 0)
     );
     pagination.style.marginLeft = `${left}px`;
+  };
+
+  const scheduleRender = () => {
+    if (!rafScheduled) {
+      rafScheduled = true;
+      requestAnimationFrame(render);
+    }
   };
 
   const computeProjectProgress = () => {
@@ -158,11 +173,11 @@ document.addEventListener("DOMContentLoaded", () => {
           state.index = Math.max(0, Math.min(activeSlides.length - 1, idx));
           state.total = activeSlides.length;
         }
-        render();
+        scheduleRender();
       }
     };
-    const onResize = () => render();
-    project.addEventListener("scroll", onScroll);
+    const onResize = () => { recomputeFooterMetrics(); scheduleRender(); };
+    project.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
 
     // Initial state
@@ -170,6 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
     state.index = 0;
     state.total = Math.max(1, activeSlides.length);
     state.progress = computeProjectProgress();
+    recomputeFooterMetrics();
     render();
     footer.style.display = "flex";
 

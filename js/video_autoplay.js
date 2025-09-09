@@ -13,6 +13,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const video = entry.target;
       if (entry.isIntersecting) {
         video.play().catch(() => {}); // force la relance si autorisée
+      } else {
+        // Économise CPU/GPU hors écran sans changer l'UX
+        if (!video.paused) {
+          video.pause();
+        }
       }
     });
   }, {

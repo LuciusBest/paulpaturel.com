@@ -7,60 +7,121 @@
 */
 
 document.addEventListener("DOMContentLoaded", () => {
-  const diaporamas = document.querySelectorAll(".wrapper--diaporama .diapo-frame");
+  const frames = Array.from(document.querySelectorAll(".wrapper--diaporama .diapo-frame"));
+  if (!frames.length) return;
 
-  diaporamas.forEach((slideshow) => {
-    const images = slideshow.querySelectorAll("img");
-    if (images.length === 0) return;
+  // Prepare slideshows registry
+  const slideshows = frames
+    .map((el) => {
+      const images = Array.from(el.querySelectorAll("img"));
+      if (!images.length) return null;
 
-    let lastIndex = -1;
-
-    function emitChange(index) {
-      // Dispatch a bubbling event so outer scripts (pagination) can react
-      const ev = new CustomEvent("diapochange", {
-        bubbles: true,
-        detail: {
-          index, // 0-based
-          total: images.length,
-          source: "mouse",
-        },
-      });
-      slideshow.dispatchEvent(ev);
-    }
-
-    function applyActive(index) {
+      // Hint the browser for decoding and initial loading policy
       images.forEach((img, i) => {
-        const isActive = i === index;
-        img.classList.toggle("active", isActive);
-        if (isActive) {
-          img.setAttribute("aria-current", "true");
+        try { img.decoding = "async"; } catch (_) {}
+        if (i === 0) {
+          // First image eager for instant display when visible
+          try { img.loading = "eager"; } catch (_) {}
         } else {
-          img.removeAttribute("aria-current");
+          try { img.loading = "lazy"; } catch (_) {}
         }
       });
-    }
 
-    function updateFromMouse(x) {
-      const rect = slideshow.getBoundingClientRect();
-      const relativeX = x - rect.left;
-      const percent = Math.max(0, Math.min(1, rect.width > 0 ? relativeX / rect.width : 0));
-      const rawIndex = Math.floor(percent * images.length);
-      const index = Math.max(0, Math.min(images.length - 1, rawIndex));
+      return {
+        el,
+        images,
+        lastIndex: -1,
+      };
+    })
+    .filter(Boolean);
 
-      if (index !== lastIndex) {
-        lastIndex = index;
-        applyActive(index);
-        emitChange(index);
-      }
-    }
-
-    // Ensure there is a single active image at start (mouse assumed centered)
-    const initialX = window.innerWidth / 2;
-    updateFromMouse(initialX);
-
-    // Track mouse globally so the diaporama reacts as the cursor moves
-    window.addEventListener("mousemove", (e) => {
-      updateFromMouse(e.clientX);
+  // Helper to emit change events (consumed by pagination)
+  const emitChange = (el, total, index) => {
+    const ev = new CustomEvent("diapochange", {
+      bubbles: true,
+      detail: { index, total, source: "mouse" },
     });
-  });
+    el.dispatchEvent(ev);
+  };
+
+  const applyActive = (slideshow, index) => {
+    slideshow.images.forEach((img, i) => {
+      const isActive = i === index;
+      img.classList.toggle("active", isActive);
+      if (isActive) img.setAttribute("aria-current", "true");
+      else img.removeAttribute("aria-current");
+    });
+  };
+
+  // Active set controlled by IntersectionObserver
+  const activeSet = new Set();
+
+  // Compute index from a clientX for a given slideshow
+  const computeIndex = (slideshow, clientX) => {
+    const rect = slideshow.el.getBoundingClientRect();
+    const relativeX = clientX - rect.left;
+    const w = rect.width > 0 ? rect.width : 1;
+    const percent = Math.max(0, Math.min(1, relativeX / w));
+    const raw = Math.floor(percent * slideshow.images.length);
+    return Math.max(0, Math.min(slideshow.images.length - 1, raw));
+  };
+
+  // Mousemove batching via rAF
+  let lastClientX = window.innerWidth / 2;
+  let rafScheduled = false;
+  const updateAll = () => {
+    rafScheduled = false;
+    activeSet.forEach((slideshow) => {
+      const idx = computeIndex(slideshow, lastClientX);
+      if (idx !== slideshow.lastIndex) {
+        slideshow.lastIndex = idx;
+        applyActive(slideshow, idx);
+        emitChange(slideshow.el, slideshow.images.length, idx);
+      }
+    });
+  };
+
+  const onMouseMove = (e) => {
+    lastClientX = e.clientX;
+    if (!rafScheduled) {
+      rafScheduled = true;
+      requestAnimationFrame(updateAll);
+    }
+  };
+
+  // Observer: only process visible diaporamas; load their images eagerly on first entry
+  const visibility = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        const el = entry.target;
+        const ss = slideshows.find((s) => s.el === el);
+        if (!ss) return;
+        if (entry.isIntersecting) {
+          if (!activeSet.has(ss)) {
+            // Upgrade loading policy when entering viewport to avoid blanks on hover
+            ss.images.forEach((img) => {
+              try { img.loading = "eager"; } catch (_) {}
+            });
+          }
+          activeSet.add(ss);
+          // Initialize to current mouse position
+          const idx = computeIndex(ss, lastClientX);
+          if (idx !== ss.lastIndex) {
+            ss.lastIndex = idx;
+            applyActive(ss, idx);
+            emitChange(ss.el, ss.images.length, idx);
+          }
+        } else {
+          activeSet.delete(ss);
+        }
+      });
+    },
+    { threshold: 0.1 }
+  );
+
+  slideshows.forEach((ss) => visibility.observe(ss.el));
+
+  // Initial state assuming centered cursor
+  updateAll();
+  window.addEventListener("mousemove", onMouseMove, { passive: true });
 });
