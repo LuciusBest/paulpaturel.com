@@ -22,13 +22,100 @@ document.addEventListener("DOMContentLoaded", () => {
     const states = ["PAUL", "PATUL", "PATURL", "PATUREL"];
     const highlightSet = new Set(["P", "A", "U", "L"]);
     const dt = 80;
+    const BIO_DELAY = 450; // ms gap between name and bio animations
     let currentIndex = 0;
     let targetExpanded = false;
     let letterTimeouts = [];
+    let bioTimeouts = [];
+
+    // Build structure: name container + bio container
+    const nameEl = document.createElement("div");
+    nameEl.id = "left_name";
+    const bioEl = document.createElement("div");
+    bioEl.id = "left_bio";
+    leftOverlay.innerHTML = "";
+    leftOverlay.appendChild(nameEl);
+    leftOverlay.appendChild(bioEl);
+
+    const clearBioTimeouts = () => {
+      bioTimeouts.forEach(clearTimeout);
+      bioTimeouts = [];
+    };
+
+    // Simple word/space wrapper (no highlight), matching right overlay tokenization
+    const wrapWords = (text) => {
+      const parts = String(text).split(/(\s+)/);
+      return parts
+        .map((part, i) => {
+          if (i % 2 === 1) return `<span class="space">${part}</span>`;
+          if (!part) return "";
+          return `<span class="word">${part}</span>`;
+        })
+        .join("");
+    };
+
+    // Bio content, with explicit blank lines as requested
+    const bioSentence1 =
+      "Born in Paris, I moved to Lausanne to study at ECAL, where I am now based as a graphic designer.";
+    const bioSentence2 =
+      "I am available for commissions and collaborations, with a focus on typography, web design, and 3D.";
+
+    const renderBio = () => {
+      // Respect line skips exactly
+      const emailHTML = `<span class="word contact-chip">paulpaturel75@gmail.com</span>`;
+      const instaHTML = `<span class="word contact-chip">@_paul_pat_</span>`;
+      const html = [
+        // Next line after name
+        "<br>",
+        // First sentence
+        wrapWords(bioSentence1),
+        // Next line
+        "<br>",
+        // Second sentence
+        wrapWords(bioSentence2),
+        // Skip a line before Contact (blank line)
+        "<br>",
+        "<br>",
+        // Contact block
+        wrapWords("Contact"),
+        "<br>",
+        emailHTML,
+        "<br>",
+        instaHTML,
+      ].join("");
+      bioEl.innerHTML = html;
+      // Hide all words/spaces initially; they will reveal with animation
+      bioEl.querySelectorAll("span.word").forEach((s) => (s.style.display = "none"));
+      bioEl.querySelectorAll("span.space").forEach((s) => (s.style.display = "none"));
+    };
+
+    const animateBio = (show) => {
+      clearBioTimeouts();
+      const words = Array.from(bioEl.querySelectorAll("span.word"));
+      if (!words.length) return 0;
+      const dtBio = 40;
+      const targets = words.filter((w) =>
+        show ? w.style.display === "none" : w.style.display !== "none"
+      );
+      const ordered = show ? targets : targets.slice().reverse();
+      const duration = ordered.length * dtBio;
+      ordered.forEach((span, index) => {
+        const id = setTimeout(() => {
+          const reveal = show;
+          span.style.display = reveal ? "inline" : "none";
+          const prev = span.previousElementSibling;
+          if (prev && prev.classList && prev.classList.contains("space")) {
+            prev.style.display = reveal ? "inline" : "none";
+          }
+        }, (index + 1) * dtBio);
+        bioTimeouts.push(id);
+      });
+      return duration;
+    };
 
     const renderState = (index) => {
       const str = states[index];
-      leftOverlay.innerHTML = str
+      nameEl.innerHTML = str
         .split("")
         .map((ch) => {
           const cls = highlightSet.has(ch) ? "char highlight" : "char";
@@ -37,13 +124,13 @@ document.addEventListener("DOMContentLoaded", () => {
         .join("");
     };
 
+    // Initial rendering
     renderState(currentIndex);
+    renderBio();
 
-    toggleLetters = () => {
+    const animateLettersTo = (targetIndex, startDelay = 0) => {
       letterTimeouts.forEach(clearTimeout);
       letterTimeouts = [];
-      targetExpanded = !targetExpanded;
-      const targetIndex = targetExpanded ? states.length - 1 : 0;
       const step = targetIndex > currentIndex ? 1 : -1;
       const steps = Math.abs(targetIndex - currentIndex);
       for (let k = 1; k <= steps; k++) {
@@ -51,9 +138,40 @@ document.addEventListener("DOMContentLoaded", () => {
         const id = setTimeout(() => {
           renderState(idx);
           currentIndex = idx;
-        }, k * dt);
+        }, startDelay + k * dt);
         letterTimeouts.push(id);
       }
+      return steps * dt; // duration (without startDelay)
+    };
+
+    toggleLetters = () => {
+      // Clear any pending animations
+      letterTimeouts.forEach(clearTimeout);
+      letterTimeouts = [];
+      clearBioTimeouts();
+
+      // Toggle target state
+      const goingToExpanded = !targetExpanded;
+      const targetIndex = goingToExpanded ? states.length - 1 : 0;
+      const steps = Math.abs(targetIndex - currentIndex);
+      const totalLetterTime = steps * dt;
+
+      if (goingToExpanded) {
+        // 1) Morph name immediately to PATUREL
+        animateLettersTo(targetIndex, 0);
+        // 2) After a 0.7s gap from name completion, reveal the bio
+        const start = setTimeout(() => {
+          animateBio(true);
+        }, totalLetterTime + BIO_DELAY);
+        bioTimeouts.push(start);
+      } else {
+        // 1) Hide the bio first
+        const bioDuration = animateBio(false);
+        // 2) After a 0.7s gap from bio completion, morph the name back to PAUL
+        animateLettersTo(targetIndex, bioDuration + BIO_DELAY);
+      }
+
+      targetExpanded = goingToExpanded;
     };
   }
 
@@ -301,7 +419,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const dt = 40;
 
         const scheduleNonHighlightToggle = (startDelay) => {
-          targets.forEach((span, index) => {
+          // When collapsing (hiding), remove from the end first to keep the prefix longest
+          const ordered = hide ? targets.slice().reverse() : targets;
+          ordered.forEach((span, index) => {
             const id = setTimeout(() => {
               const show = !hide;
               span.style.display = show ? "inline" : "none";
@@ -318,7 +438,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }, startDelay + (index + 1) * dt);
             timeouts.push(id);
           });
-          return startDelay + (targets.length ? targets.length : 0) * dt;
+          return startDelay + (ordered.length ? ordered.length : 0) * dt;
         };
 
         if (currentlyFullText) {
@@ -399,13 +519,15 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  document.addEventListener("click", () => {
-    toggleWords();
+  // Global click routing: left half -> left overlay action, right half -> right overlay action
+  window.addEventListener("click", (e) => {
+    const mid = window.innerWidth / 2;
+    if (e.clientX < mid) {
+      // Left side: toggle the name morphing
+      if (typeof toggleLetters === "function") toggleLetters();
+    } else {
+      // Right side: toggle tags/fulltext
+      if (typeof toggleWords === "function") toggleWords();
+    }
   });
-  if (leftOverlay) {
-    leftOverlay.addEventListener("click", (e) => {
-      e.stopPropagation();
-      toggleLetters();
-    });
-  }
 });
