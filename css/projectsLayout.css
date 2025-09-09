@@ -165,3 +165,8 @@ video.media-contain,
     left: 50%;
     transform: translate(-50%, -50%);
 }
+
+/* Hidden by tag filter */
+.project_container.is-filtered {
+    display: none;
+}

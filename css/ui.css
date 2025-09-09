@@ -110,13 +110,27 @@ body {
 /* Hover fade for chips in tags-only mode */
 #text_overlay_container.tags-only .word.highlight:hover,
 #text_overlay_container.tags-only .tag:hover {
-    opacity: 0.7;
+    opacity: 0.6;
 }
 
 /* Full-text mode: give each word (and spaces) a white background for legibility */
 #text_overlay_container.is-fulltext .word,
 #text_overlay_container.is-fulltext .space {
     background: #ffffff;
+    color: #000;
+}
+
+/* Active state (yellow) for chips in both modes */
+#text_overlay_container .word.highlight.is-active,
+#text_overlay_container .tag.is-active {
+    background: #FFD400;
+    color: #000;
+}
+
+/* Ensure active state overrides full-text white background */
+#text_overlay_container.is-fulltext .word.highlight.is-active,
+#text_overlay_container.is-fulltext .tag.is-active {
+    background: #FFD400;
     color: #000;
 }
 
