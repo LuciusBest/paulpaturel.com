@@ -56,9 +56,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Bio content, with explicit blank lines as requested
     const bioSentence1 =
-      "Born in Paris, I moved to Lausanne to study at ECAL, where I am now based as a graphic designer.";
+      "Born in Paris, I moved to Lausanne to study at ECAL, <br>where I am now based as a graphic designer.";
     const bioSentence2 =
-      "I am available for commissions and collaborations, with a focus on typography, web design, and 3D.";
+      "I am available for commissions and collaborations, with a focus <br>on typography, web design, and 3D.";
 
     const renderBio = () => {
       // Respect line skips exactly

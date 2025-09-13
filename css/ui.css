@@ -1,7 +1,6 @@
 @font-face {
     font-family: 'IS-ArzierVF';
-    src: url('/font/IS-ArzierVF.ttf') format('ttf'),
-        url('/font/IS-ArzierVF.ttf') format('ttf');
+    src: url('../font/IS-Arzier-400.otf');
     font-weight: normal;
     font-style: normal;
 }
@@ -11,7 +10,8 @@ html,
 body {
     font-family: 'IS-ArzierVF', sans-serif;
     font-weight: 400;
-    font-feature-settings: "ss02";
+    font-feature-settings: "ss03";
+    line-height: 1.2;
 }
 
 .ui_text {
