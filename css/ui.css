@@ -1,5 +1,23 @@
+@font-face {
+    font-family: 'IS-ArzierVF';
+    src: url('/font/IS-ArzierVF.ttf') format('ttf'),
+        url('/font/IS-ArzierVF.ttf') format('ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Apply the font globally */
+html,
+body {
+    font-family: 'IS-ArzierVF', sans-serif;
+    font-weight: 400;
+    font-feature-settings: "ss02";
+}
+
 .ui_text {
     font-size: 15px;
+    font-family: 'IS-ArzierVF', sans-serif;
+    font-weight: 400;
 }
 
 #text_overlay_container_left {
@@ -12,9 +30,12 @@
     padding: 3px;
     /* Ensure legibility regardless of background */
     color: #ffffff;
-    mix-blend-mode: difference; /* "negative fusion" style: invert vs background */
-    -webkit-text-stroke: 0.5px rgba(0,0,0,0.35); /* subtle fallback edge */
-    text-shadow: 0 0 1px rgba(0,0,0,0.25); /* fallback halo on flat colors */
+    mix-blend-mode: difference;
+    /* "negative fusion" style: invert vs background */
+    -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.35);
+    /* subtle fallback edge */
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.25);
+    /* fallback halo on flat colors */
     user-select: none;
 }
 
@@ -29,7 +50,8 @@
 #text_overlay_container_left .contact-chip:focus {
     background: #ffffff;
     color: #000000;
-    mix-blend-mode: difference; /* ensure strong contrast via inversion over any backdrop */
+    mix-blend-mode: difference;
+    /* ensure strong contrast via inversion over any backdrop */
     outline: none;
 }
 

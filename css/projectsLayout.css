@@ -2,8 +2,10 @@
     box-sizing: border-box;
     height: 100dvh;
     width: 100dvw;
-    min-height: 100vh; /* fallback */
-    min-width: 100vw;  /* fallback */
+    min-height: 100vh;
+    /* fallback */
+    min-width: 100vw;
+    /* fallback */
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
@@ -28,8 +30,10 @@
 .slide {
     height: 100dvh;
     width: 100dvw;
-    min-height: 100vh; /* fallback */
-    min-width: 100vw;  /* fallback */
+    min-height: 100vh;
+    /* fallback */
+    min-width: 100vw;
+    /* fallback */
     display: flex;
     flex-direction: row;
     flex-shrink: 0;
