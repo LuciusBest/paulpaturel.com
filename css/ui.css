@@ -3,6 +3,7 @@
     src: url('../font/IS-Arzier-400.otf');
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
 }
 
 /* Apply the font globally */
