@@ -1,9 +1,10 @@
 ---
 deployment:
   tasks:
-    - export DEPLOY_PATH=/home/fizo1332/paulpaturel.com_public_html
-    - /bin/mkdir -p "$DEPLOY_PATH"
-    - /bin/rsync -a --delete \
-        --exclude='.git' \
-        --exclude='.cpanel.yml' \
-        ./ "$DEPLOY_PATH"/
+    - export DEPLOYPATH=/home/fizo1332/public_html
+    - /bin/mkdir -p "$DEPLOYPATH"
+    - /bin/rsync -av --delete \
+        --exclude='.git*' \
+        --exclude='.cpanel*' \
+        --exclude='media/' \
+        ./ "$DEPLOYPATH"/
