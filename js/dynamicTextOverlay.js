@@ -58,12 +58,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const bioSentence1 =
       "Born in Paris, I moved to Lausanne to study at ECAL, <br>where I am now based as a graphic designer.";
     const bioSentence2 =
-      "I am available for commissions and collaborations, with a focus <br>on typography, web design, and 3D.";
+      "I am available for commissions and collaborations, with a focus <br>on typography, web design, 3D, and print.";
 
     const renderBio = () => {
       // Respect line skips exactly
-      const emailHTML = `<span class="word contact-chip">paulpaturel75@gmail.com</span>`;
-      const instaHTML = `<span class="word contact-chip">@_paul_pat_</span>`;
+      const emailHTML = `<span class="word contact-chip" role="link" tabindex="0" data-url="mailto:paulpaturel75@gmail.com">paulpaturel75@gmail.com</span>`;
+      const instaHTML = `<span class="word contact-chip" role="link" tabindex="0" data-url="https://www.instagram.com/_paul_pat_/">@_paul_pat_</span>`;
       const html = [
         // Next line after name
         "<br>",
@@ -84,6 +84,28 @@ document.addEventListener("DOMContentLoaded", () => {
         instaHTML,
       ].join("");
       bioEl.innerHTML = html;
+      // Make contact chips behave like links without using <a> (avoids URL preview)
+      const chips = bioEl.querySelectorAll('.contact-chip[data-url]');
+      chips.forEach((chip) => {
+        const url = chip.getAttribute('data-url');
+        const open = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          try {
+            if (url && url.startsWith('mailto:')) {
+              window.location.href = url;
+            } else {
+              window.open(url, '_blank', 'noopener,noreferrer');
+            }
+          } catch (_) {}
+        };
+        chip.addEventListener('click', open);
+        chip.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            open(e);
+          }
+        });
+      });
       // Hide all words/spaces initially; they will reveal with animation
       bioEl.querySelectorAll("span.word").forEach((s) => (s.style.display = "none"));
       bioEl.querySelectorAll("span.space").forEach((s) => (s.style.display = "none"));
