@@ -1,0 +1,25 @@
+RewriteEngine On
+
+# 1) Redirect all traffic to canonical HTTPS hostname (non-www)
+#    This ensures one, consistent URL in Google: https://paulpaturel.com/
+RewriteCond %{HTTP_HOST} !^paulpaturel\.com$ [NC]
+RewriteRule ^ https://paulpaturel.com%{REQUEST_URI} [L,R=301]
+
+# 2) Enforce HTTPS on the canonical host.
+#    If behind a proxy/CDN setting X-Forwarded-Proto=https, do not loop.
+RewriteCond %{HTTP_HOST} ^paulpaturel\.com$ [NC]
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^ https://paulpaturel.com%{REQUEST_URI} [L,R=301]
+
+# 3) Security headers that reinforce HTTPS.
+#    HSTS tells browsers to always use HTTPS for this domain.
+<IfModule mod_headers.c>
+  # HSTS: one year. Add includeSubDomains + preload only if all subdomains are HTTPS.
+  Header always set Strict-Transport-Security "max-age=31536000"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set X-XSS-Protection "0"
+  Header set Content-Security-Policy "upgrade-insecure-requests"
+</IfModule>

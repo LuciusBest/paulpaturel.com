@@ -10,6 +10,41 @@ document.addEventListener("DOMContentLoaded", () => {
   const frames = Array.from(document.querySelectorAll(".wrapper--diaporama .diapo-frame"));
   if (!frames.length) return;
 
+  // Small utility: ensure an <img> is decoded (and mark it as loaded)
+  const isImgLoaded = (img) => img.complete && img.naturalWidth > 0;
+  const markLoaded = (img) => { img.dataset.loaded = "1"; };
+  const ensureLoaded = (img) => {
+    if (isImgLoaded(img) || img.dataset.loaded === "1") {
+      markLoaded(img);
+      return Promise.resolve(true);
+    }
+    if (img.__decodePromise) return img.__decodePromise;
+    try { img.loading = "eager"; } catch (_) {}
+    try { img.fetchPriority = "high"; } catch (_) {}
+    try { img.decoding = "async"; } catch (_) {}
+    // Decode if supported, otherwise wait for load
+    const viaDecode = typeof img.decode === "function"
+      ? img.decode().then(() => true).catch(() => false)
+      : Promise.resolve(false);
+    img.__decodePromise = viaDecode.then((ok) => {
+      if (ok) {
+        markLoaded(img);
+        return true;
+      }
+      if (isImgLoaded(img)) {
+        markLoaded(img);
+        return true;
+      }
+      return new Promise((resolve) => {
+        const onDone = () => { markLoaded(img); resolve(true); };
+        const onErr = () => { resolve(false); };
+        img.addEventListener("load", onDone, { once: true });
+        img.addEventListener("error", onErr, { once: true });
+      });
+    }).finally(() => { img.__decodePromise = null; });
+    return img.__decodePromise;
+  };
+
   // Prepare slideshows registry
   const slideshows = frames
     .map((el) => {
@@ -20,17 +55,22 @@ document.addEventListener("DOMContentLoaded", () => {
       images.forEach((img, i) => {
         try { img.decoding = "async"; } catch (_) {}
         if (i === 0) {
-          // First image eager for instant display when visible
+          // First image eager and pre-decoded for instant first paint
           try { img.loading = "eager"; } catch (_) {}
+          try { img.fetchPriority = "high"; } catch (_) {}
+          ensureLoaded(img);
         } else {
           try { img.loading = "lazy"; } catch (_) {}
+          try { img.fetchPriority = "low"; } catch (_) {}
         }
       });
 
       return {
         el,
         images,
-        lastIndex: -1,
+        // Index the user points to (requested), and the one currently visible
+        requestedIndex: -1,
+        visibleIndex: -1,
       };
     })
     .filter(Boolean);
@@ -45,12 +85,27 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const applyActive = (slideshow, index) => {
+    // If the target isn't loaded yet, keep current image visible, and schedule a swap
+    const target = slideshow.images[index];
+    const canShow = target && (target.dataset.loaded === "1" || (target.complete && target.naturalWidth > 0));
+    if (!canShow) {
+      // Start decoding; when ready, only swap if request still points to this index
+      ensureLoaded(target).then(() => {
+        if (slideshow.requestedIndex === index) {
+          applyActive(slideshow, index);
+        }
+      });
+      return;
+    }
+
+    // Swap now; crossfade handled by CSS
     slideshow.images.forEach((img, i) => {
       const isActive = i === index;
       img.classList.toggle("active", isActive);
       if (isActive) img.setAttribute("aria-current", "true");
       else img.removeAttribute("aria-current");
     });
+    slideshow.visibleIndex = index;
   };
 
   // Active set controlled by IntersectionObserver
@@ -73,10 +128,21 @@ document.addEventListener("DOMContentLoaded", () => {
     rafScheduled = false;
     activeSet.forEach((slideshow) => {
       const idx = computeIndex(slideshow, lastClientX);
-      if (idx !== slideshow.lastIndex) {
-        slideshow.lastIndex = idx;
+      if (idx !== slideshow.requestedIndex) {
+        slideshow.requestedIndex = idx;
+        // Hint network priority to the requested image
+        try { slideshow.images[idx].fetchPriority = "high"; } catch (_) {}
+        // Preload the requested and its neighbors to minimize future waits
+        const around = [idx - 1, idx, idx + 1].filter(i => i >= 0 && i < slideshow.images.length);
+        around.forEach(i => ensureLoaded(slideshow.images[i]));
+
+        // Only emit/index change when we actually swap the visible image
+        const before = slideshow.visibleIndex;
         applyActive(slideshow, idx);
-        emitChange(slideshow.el, slideshow.images.length, idx);
+        const after = slideshow.visibleIndex;
+        if (after !== before && after >= 0) {
+          emitChange(slideshow.el, slideshow.images.length, after);
+        }
       }
     });
   };
@@ -89,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // Observer: only process visible diaporamas; load their images eagerly on first entry
+  // Observer: only process visible diaporamas; prep initial decode on entry
   const visibility = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -98,18 +164,33 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!ss) return;
         if (entry.isIntersecting) {
           if (!activeSet.has(ss)) {
-            // Upgrade loading policy when entering viewport to avoid blanks on hover
-            ss.images.forEach((img) => {
-              try { img.loading = "eager"; } catch (_) {}
-            });
+            // Prime decode for the first few images for quick initial interactions
+            const toPrime = ss.images.slice(0, Math.min(3, ss.images.length));
+            toPrime.forEach((img) => ensureLoaded(img));
           }
           activeSet.add(ss);
           // Initialize to current mouse position
           const idx = computeIndex(ss, lastClientX);
-          if (idx !== ss.lastIndex) {
-            ss.lastIndex = idx;
-            applyActive(ss, idx);
-            emitChange(ss.el, ss.images.length, idx);
+          if (idx !== ss.requestedIndex) {
+            ss.requestedIndex = idx;
+            // Prefer showing requested if ready; otherwise keep current or fall back to first
+            const target = ss.images[idx];
+            const targetReady = target && (target.dataset.loaded === "1" || (target.complete && target.naturalWidth > 0));
+            let showIndex = -1;
+            if (targetReady) showIndex = idx;
+            else if (ss.visibleIndex >= 0) showIndex = ss.visibleIndex; // keep current image on screen
+            else showIndex = 0; // first-time entry fallback
+
+            // Kick off decoding for requested and neighbors
+            const around = [idx - 1, idx, idx + 1].filter(i => i >= 0 && i < ss.images.length);
+            around.forEach(i => ensureLoaded(ss.images[i]));
+
+            const before = ss.visibleIndex;
+            if (showIndex >= 0) applyActive(ss, showIndex);
+            const after = ss.visibleIndex;
+            if (after !== before && after >= 0) {
+              emitChange(ss.el, ss.images.length, after);
+            }
           }
         } else {
           activeSet.delete(ss);

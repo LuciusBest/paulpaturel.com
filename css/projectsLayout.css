@@ -10,6 +10,8 @@
     flex-direction: column;
     overflow-y: scroll;
     scroll-snap-type: y mandatory;
+    /* Prevent scroll chaining/bounce vertically to ancestor */
+    overscroll-behavior-y: contain;
     /* scroll-behavior: smooth; */
 }
 
@@ -25,6 +27,8 @@
     scroll-snap-align: start;
     scroll-snap-stop: always;
     background-color: black;
+    /* Avoid horizontal overscroll chaining and rubber-band effects */
+    overscroll-behavior-x: contain;
 }
 
 .slide {
@@ -40,6 +44,20 @@
     scroll-snap-type: x mandatory;
     scroll-snap-align: start;
     scroll-snap-stop: always;
+}
+
+/* Axis lock helper class injected by JS when a vertical gesture is detected.
+   Temporarily disable horizontal scrolling to avoid diagonal jitter. */
+.project_container.no-x-scroll {
+    overflow-x: hidden !important;
+}
+
+/* On touch devices, relax horizontal snap to avoid accidental side jumps
+   when the user scrolls vertically. Keeps vertical snap mandatory. */
+@media (pointer: coarse) {
+    .project_container {
+        scroll-snap-type: x proximity;
+    }
 }
 
 img {
@@ -117,6 +135,8 @@ img {
     height: 100%;
     object-fit: contain;
     opacity: 0;
+    transition: opacity 120ms linear;
+    will-change: opacity;
 }
 
 .diapo-frame img.active {
