@@ -56,6 +56,24 @@ body {
     outline: none;
 }
 
+/* Language toggle styles */
+#text_overlay_container_left .lang-option {
+    cursor: pointer;
+}
+#text_overlay_container_left .lang-option.inactive {
+    opacity: 0.5;
+}
+#text_overlay_container_left .lang-option:hover,
+#text_overlay_container_left .lang-option:focus {
+    background: #ffffff;
+    color: #000000;
+    mix-blend-mode: difference;
+    outline: none;
+}
+#text_overlay_container_left .lang-toggle {
+    white-space: nowrap;
+}
+
 /* Remove default hyperlink styling in left overlay */
 #text_overlay_container_left a,
 #text_overlay_container_left a:visited,

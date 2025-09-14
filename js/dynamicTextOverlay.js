@@ -17,6 +17,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let toggleWords = () => {};
   let toggleLetters = () => {};
+  // i18n state
+  let currentLang = (localStorage.getItem('pp.lang') || 'en');
+  let switchLanguage = () => {};
+  let refreshRightOverlayForLang = () => {};
+  try { document.documentElement.setAttribute('lang', currentLang); } catch (_) {}
 
   if (leftOverlay) {
     const states = ["PAUL", "PATUL", "PATURL", "PATUREL"];
@@ -54,34 +59,63 @@ document.addEventListener("DOMContentLoaded", () => {
         .join("");
     };
 
-    // Bio content, with explicit blank lines as requested
-    const bioSentence1 =
-      "Born in Paris, I moved to Lausanne to study at ECAL, <br>where I am now based as a graphic designer.";
-    const bioSentence2 =
-      "I am available for commissions and collaborations, with a focus <br>on typography, web design, 3D, and print.";
+    // Bio content in both languages
+    const bioCopy = {
+      en: {
+        s1:
+          "Born in Paris, I moved to Lausanne to study at ECAL, <br>where I am now based as a graphic designer.",
+        s2:
+          "I am available for commissions and collaborations, with a focus <br>on typography, web design, 3D, and print.",
+        contact: "Contact",
+      },
+      fr: {
+        s1:
+          "Né à Paris, j’ai déménagé à Lausanne pour étudier à l’ECAL, <br>où je suis désormais basé en tant que designer graphique.",
+        s2:
+          "Je suis disponible pour des commandes et des collaborations, avec un intérêt <br>pour la typographie, le web, la 3D et l’impression.",
+        contact: "Contact",
+      },
+    };
+
+    const langToggleHTML = () => {
+      const enActive = currentLang === 'en';
+      const frActive = currentLang === 'fr';
+      return [
+        '<span class="lang-toggle" role="group" aria-label="Language">',
+        `<span class="word lang-option ${enActive ? 'active' : 'inactive'}" data-lang="en" role="button" tabindex="0">EN</span>`,
+        '<span class="space">  </span>',
+        `<span class="word lang-option ${frActive ? 'active' : 'inactive'}" data-lang="fr" role="button" tabindex="0">FR</span>`,
+        '</span>'
+      ].join("");
+    };
 
     const renderBio = () => {
       // Respect line skips exactly
       const emailHTML = `<span class="word contact-chip" role="link" tabindex="0" data-url="mailto:paulpaturel75@gmail.com">paulpaturel75@gmail.com</span>`;
       const instaHTML = `<span class="word contact-chip" role="link" tabindex="0" data-url="https://www.instagram.com/_paul_pat_/">@_paul_pat_</span>`;
+      const copy = bioCopy[currentLang] || bioCopy.en;
       const html = [
         // Next line after name
         "<br>",
         // First sentence
-        wrapWords(bioSentence1),
+        wrapWords(copy.s1),
         // Next line
         "<br>",
         // Second sentence
-        wrapWords(bioSentence2),
-        // Skip a line before Contact (blank line)
+        wrapWords(copy.s2),
+        // Blank line after BIO (no top toggle)
         "<br>",
         "<br>",
         // Contact block
-        wrapWords("Contact"),
+        wrapWords(copy.contact),
         "<br>",
         emailHTML,
         "<br>",
         instaHTML,
+        // Blank line after Contact, then EN FR again
+        "<br>",
+        "<br>",
+        langToggleHTML(),
       ].join("");
       bioEl.innerHTML = html;
       // Make contact chips behave like links without using <a> (avoids URL preview)
@@ -104,6 +138,20 @@ document.addEventListener("DOMContentLoaded", () => {
           if (e.key === 'Enter' || e.key === ' ') {
             open(e);
           }
+        });
+      });
+      // Language toggle: click/keyboard handlers
+      const langOpts = bioEl.querySelectorAll('.lang-option[data-lang]');
+      langOpts.forEach((el) => {
+        const lang = el.getAttribute('data-lang');
+        const activate = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof switchLanguage === 'function') switchLanguage(lang);
+        };
+        el.addEventListener('click', activate);
+        el.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') activate(e);
         });
       });
       // Hide all words/spaces initially; they will reveal with animation
@@ -149,6 +197,19 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initial rendering
     renderState(currentIndex);
     renderBio();
+
+    // Language switching: update currentLang, persist, re-render bio and reveal if expanded
+    switchLanguage = (lang) => {
+      if (!lang || lang === currentLang) return;
+      currentLang = (lang === 'fr' ? 'fr' : 'en');
+      try { localStorage.setItem('pp.lang', currentLang); } catch (_) {}
+      try { document.documentElement.setAttribute('lang', currentLang); } catch (_) {}
+      const wasExpanded = targetExpanded;
+      renderBio();
+      if (wasExpanded) setTimeout(() => animateBio(true), 10);
+      // Ask right overlay to refresh its text for the new language
+      try { refreshRightOverlayForLang(); } catch (_) {}
+    };
 
     const animateLettersTo = (targetIndex, startDelay = 0) => {
       letterTimeouts.forEach(clearTimeout);
@@ -199,15 +260,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const projectContainers = document.querySelectorAll(".project_container");
   if (textOverlay && projectContainers.length) {
-    fetch("js/projectTexts.json")
-      .then((response) => response.json())
-      .then((projectTexts) => {
+    const fetchJSON = (url) => fetch(url).then((r) => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    });
+    Promise.all([
+      fetchJSON("js/projectTexts.json").catch(() => ({})),
+      fetchJSON("js/projectTexts.fr.json").catch(() => ({})),
+    ])
+      .then(([projectTextsEN, projectTextsFR]) => {
+        const byLang = { en: projectTextsEN || {}, fr: projectTextsFR || {} };
         let currentText = "";
         let wordsVisible = false;
         let timeouts = [];
         let formatTimeout = null;
         let formatTimeouts = [];
         const HIGHLIGHT_DT = 100; // ms between each highlighted word transformation
+        let lastProjectName = "";
 
         // Format a tag token depending on the display mode (no '#')
         const capitalizeFirst = (s) =>
@@ -365,7 +434,12 @@ document.addEventListener("DOMContentLoaded", () => {
       };
 
       const setOverlayText = (projectName) => {
-        const entry = projectTexts[projectName];
+        lastProjectName = projectName;
+        const dict = byLang[currentLang] && Object.keys(byLang[currentLang]).length
+          ? byLang[currentLang]
+          : byLang.en;
+        const wasFull = textOverlay.classList.contains('is-fulltext');
+        const entry = dict[projectName];
         let text = "";
         let highlight = [];
         if (typeof entry === "string") {
@@ -380,16 +454,23 @@ document.addEventListener("DOMContentLoaded", () => {
           clearFormatTimers();
           textOverlay.innerHTML = text ? renderWords(text, highlight) : "";
           currentText = text;
-          const nonHighlights = textOverlay.querySelectorAll(
-            "span.word:not(.highlight)"
-          );
-          nonHighlights.forEach((span) => (span.style.display = "none"));
-          wordsVisible = false;
-          // Ensure highlighted words are formatted for tags-only initially
-          updateHighlightText(false);
-          // Initial mode: tags-only (chip style)
-          textOverlay.classList.add("tags-only");
-          textOverlay.classList.remove("is-fulltext");
+          const nonHighlights = textOverlay.querySelectorAll("span.word:not(.highlight)");
+          const spaces = textOverlay.querySelectorAll('span.space');
+          if (wasFull) {
+            // Preserve full-text mode across language switches
+            nonHighlights.forEach((span) => (span.style.display = "inline"));
+            spaces.forEach((sp) => (sp.style.display = 'inline'));
+            updateHighlightText(true);
+            textOverlay.classList.remove("tags-only");
+            textOverlay.classList.add("is-fulltext");
+            wordsVisible = true;
+          } else {
+            nonHighlights.forEach((span) => (span.style.display = "none"));
+            wordsVisible = false;
+            updateHighlightText(false);
+            textOverlay.classList.add("tags-only");
+            textOverlay.classList.remove("is-fulltext");
+          }
         }
       };
 
@@ -535,6 +616,10 @@ document.addEventListener("DOMContentLoaded", () => {
         visibilityMap.set(container, 0);
         observer.observe(container);
       });
+      // Provide a hook for the left overlay language switcher to refresh the right overlay
+      refreshRightOverlayForLang = () => {
+        setOverlayText(lastProjectName || "");
+      };
     })
       .catch((err) => {
         console.error("Failed to load project texts", err);
