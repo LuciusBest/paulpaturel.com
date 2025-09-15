@@ -1,0 +1,144 @@
+@font-face {
+    font-family: 'Cosma';
+    src: url('../fonts/Cosma-VF.woff2') format('woff2-variations');
+    font-weight: 100 900;
+}
+
+@font-face {
+    font-family: 'Cosma-Static';
+    src: url('../fonts/Cosma-Regular.woff2') format('woff2');
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: black;
+    color: rgb(0, 128, 255);
+    overflow: hidden;
+    height: 100vh;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: none;
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.letter {
+    font-family: 'Cosma', sans-serif;
+    font-size: 20vw;
+    outline: none;
+    cursor: pointer;
+    text-shadow: 0 0 15px rgb(0, 128, 255);
+    text-align: center;
+    max-width: 90vw;
+    white-space: nowrap;
+    padding: 5vh 0;
+    transition: text-shadow 0.5s ease, font-size 0.3s ease-out, font-variation-settings 0.3s ease-out;
+    line-height: 0.87;
+    -webkit-user-modify: read-write;
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+.text-input {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: transparent;
+    border: 1px solid greenyellow;
+    color: greenyellow;
+    padding: 5px 10px;
+    font-size: 16px;
+    text-align: center;
+}
+
+footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.footer-column {
+    flex: 1;
+    text-align: center;
+    font-family: 'Cosma', sans-serif;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.footer-button {
+    background: transparent;
+    border: 1px solid currentColor;
+    color: inherit;
+    padding: 8px 16px;
+    font-family: 'Cosma', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.footer-button:hover {
+    background-color: currentColor;
+    color: var(--bg-color);
+}
+
+/* Style de sélection par défaut (power-signal) */
+::selection {
+    background-color: #0080FF;
+    color: #000000;
+    border-radius: 4px;
+}
+
+::-moz-selection {
+    background-color: #0080FF;
+    color: #000000;
+    border-radius: 4px;
+}
+
+/* Styles de sélection pour chaque thème */
+body[data-theme="monochrome-mix"] ::selection {
+    background-color: #000000;
+    color: #FFFFFF;
+    border-radius: 4px;
+}
+
+body[data-theme="pop-peak"] ::selection {
+    background-color: #FF0B0B;
+    color: #FFFFFF;
+    border-radius: 4px;
+}
+
+body[data-theme="studio-depth"] ::selection {
+    background-color: #000000;
+    color: #848C76;
+    border-radius: 4px;
+}
+
+body[data-theme="mp3-shell"] ::selection {
+    background-color: #E0E0E0;
+    color: #000000;
+    border-radius: 4px;
+}
+
+.cursor-stats {
+    position: fixed;
+    pointer-events: none;
+    color: inherit;
+    font-family: 'Cosma', sans-serif;
+    font-size: 14px;
+    line-height: 1.2;
+    transform: translate(10px, 10px);
+    z-index: 1000;
+    cursor: none;
+    transition: color 0.5s ease;
+}

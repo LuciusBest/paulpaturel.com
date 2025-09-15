@@ -217,3 +217,8 @@ video.media-contain,
     object-fit: contain;
     background: transparent;           /* avoid letterbox inside the element */
 }
+
+/* COSMA: visible placeholder background */
+.project_container[data-project="COSMA"] .wrapper--centered {
+    background-color: #1e90ff; /* blue */
+}
