@@ -40,6 +40,12 @@ body {
     user-select: none;
 }
 
+/* Slight left indent for left overlay text without shifting layout */
+#left_name,
+#left_bio {
+    margin-left: 3px;
+}
+
 /* Hover chip for email/instagram with white background and difference blend */
 #text_overlay_container_left .contact-chip {
     transition: background-color .2s ease, color .2s ease, opacity .2s ease;
