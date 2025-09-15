@@ -173,7 +173,23 @@
   tester.addEventListener('click', (e) => { e.stopPropagation(); });
 
   // Text input and window resize
-  letter.addEventListener('input', () => { lastFontSize = null; dbg('input'); requestFit('input'); });
+  letter.addEventListener('input', () => {
+    // If the user edits the content, automatically switch to MANUAL mode
+    if (tester.dataset.mode === 'auto') {
+      try {
+        const btn = tester.querySelector('.cosma-topbar .cosma-mode-toggle');
+        if (btn) {
+          btn.classList.remove('is-auto');
+          btn.setAttribute('aria-pressed', 'false');
+          const label = btn.querySelector('.label');
+          if (label) label.textContent = 'MANUAL';
+        }
+      } catch (_) {}
+      tester.dataset.mode = 'manual';
+      autoToken++; // stop any running auto loop
+    }
+    lastFontSize = null; dbg('input'); requestFit('input');
+  });
   // Also stop click propagation when editing the text itself
   letter.addEventListener('click', (e) => e.stopPropagation());
   window.addEventListener('resize', () => { dbg('resize'); requestFit('resize'); });
@@ -188,6 +204,18 @@
     mo.observe(letter, { childList: true, characterData: true, subtree: true });
   } catch (_) {}
 
+  // Build a top bar for the Manual/Auto toggle
+  const topbar = document.createElement('div');
+  topbar.className = 'cosma-topbar';
+  // Default to AUTO mode visually and semantically
+  topbar.innerHTML = `
+    <button type="button" class="cosma-mode-toggle is-auto" aria-pressed="true" aria-label="Toggle auto sizing" style="pointer-events:auto">
+      <span class="dot" aria-hidden="true"></span>
+      <span class="label">AUTO</span>
+    </button>`;
+  tester.dataset.mode = 'auto';
+  tester.appendChild(topbar);
+
   // Build bottom sliders for axes control
   const controls = document.createElement('div');
   controls.className = 'cosma-controls';
@@ -195,9 +223,9 @@
   const initD = Math.round(clamp(width, 50, 300));
   const initO = Math.round(clamp(opticalSize, 0, 100));
   controls.innerHTML = `
-    <div class="cosma-row"><span class="cosma-label">weight</span><input id="cosma-wght" class="cosma-slider" type="range" min="100" max="900" step="1" value="${initW}" data-axis="wght"><span class="cosma-val" data-for="wght">${initW}</span></div>
-    <div class="cosma-row"><span class="cosma-label">width</span><input id="cosma-wdth" class="cosma-slider" type="range" min="50" max="300" step="1" value="${initD}" data-axis="wdth"><span class="cosma-val" data-for="wdth">${initD}</span></div>
-    <div class="cosma-row"><span class="cosma-label">contrast</span><input id="cosma-opsz" class="cosma-slider" type="range" min="0" max="100" step="1" value="${initO}" data-axis="opsz"><span class="cosma-val" data-for="opsz">${initO}</span></div>
+    <div class="cosma-row"><span class="cosma-label">WGHT</span><input id="cosma-wght" class="cosma-slider" type="range" min="100" max="900" step="1" value="${initW}" data-axis="wght"><span class="cosma-val" data-for="wght">${initW}</span></div>
+    <div class="cosma-row"><span class="cosma-label">WDTH</span><input id="cosma-wdth" class="cosma-slider" type="range" min="50" max="300" step="1" value="${initD}" data-axis="wdth"><span class="cosma-val" data-for="wdth">${initD}</span></div>
+    <div class="cosma-row"><span class="cosma-label">CTRST</span><input id="cosma-opsz" class="cosma-slider" type="range" min="0" max="100" step="1" value="${initO}" data-axis="opsz"><span class="cosma-val" data-for="opsz">${initO}</span></div>
   `;
   tester.appendChild(controls);
 
@@ -215,6 +243,115 @@
     input.style.setProperty('--p', `${Math.max(0, Math.min(100, p))}%`);
   };
 
+  // Animate numeric readouts to follow slider fill smoothly
+  let isDragging = false;
+  const getNumAnimDuration = () => (isDragging ? 0 : (tester.dataset.mode === 'auto' ? 880 : 300));
+  const numAnimRAF = { wght: 0, wdth: 0, opsz: 0 };
+  const animateNumeric = (axis, toVal, duration = getNumAnimDuration()) => {
+    const out = controls.querySelector(`.cosma-val[data-for="${axis}"]`);
+    if (!out) return;
+    const fromVal = parseFloat(out.textContent) || 0;
+    if (!isFinite(toVal)) return;
+    try { cancelAnimationFrame(numAnimRAF[axis]); } catch (_) {}
+    if (!duration || duration <= 0) { out.textContent = String(Math.round(toVal)); return; }
+    const start = performance.now();
+    const step = (now) => {
+      const t = Math.max(0, Math.min(1, (now - start) / duration));
+      const v = fromVal + (toVal - fromVal) * t;
+      out.textContent = String(Math.round(v));
+      if (t < 1) numAnimRAF[axis] = requestAnimationFrame(step);
+    };
+    numAnimRAF[axis] = requestAnimationFrame(step);
+  };
+
+  // --- AUTO/MANUAL demo player helpers ---
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const placeCaretAtEnd = (el) => {
+    try {
+      el.focus();
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      range.collapse(false);
+      const sel = window.getSelection && window.getSelection();
+      if (sel) { sel.removeAllRanges(); sel.addRange(range); }
+    } catch (_) {}
+  };
+  const htmlToPlain = (html) => String(html || '').replace(/<br\s*\/?\s*>/gi, '\n');
+  const plainToHTML = (text) => String(text || '').replace(/\n/g, '<br>');
+  const setLetterHTML = (html) => {
+    // Programmatic content update; rely on MutationObserver for fit
+    letter.innerHTML = html;
+    // In AUTO mode, keep the caret visible at the paragraph end
+    if (tester.dataset.mode === 'auto') placeCaretAtEnd(letter);
+  };
+  const getSliders = () => ({
+    wght: controls.querySelector('#cosma-wght'),
+    wdth: controls.querySelector('#cosma-wdth'),
+    opsz: controls.querySelector('#cosma-opsz'),
+  });
+  const setAxis = (axis, value) => {
+    const s = getSliders()[axis];
+    if (!s) return;
+    s.value = String(value);
+    try { s.dispatchEvent(new Event('input', { bubbles: true })); } catch (_) {}
+  };
+  const applyAxesObj = (axes) => {
+    if (!axes) return;
+    if (typeof axes.wght === 'number') setAxis('wght', axes.wght);
+    if (typeof axes.wdth === 'number') setAxis('wdth', axes.wdth);
+    if (typeof axes.opsz === 'number') setAxis('opsz', axes.opsz);
+  };
+  // Slow down typing/erasing by ~30%
+  const ERASE_STEP_MS = 39; // was ~30ms per char
+  const TYPE_STEP_MS = 65;  // was ~50ms per char
+
+  async function eraseByChar(stepMs = 52) {
+    const plain = htmlToPlain(letter.innerHTML);
+    for (let i = plain.length; i >= 0; i--) {
+      setLetterHTML(plainToHTML(plain.slice(0, i)));
+      await sleep(stepMs);
+    }
+  }
+  async function typeByChar(targetHTML, stepMs = 78) {
+    const target = htmlToPlain(targetHTML);
+    for (let i = 0; i <= target.length; i++) {
+      setLetterHTML(plainToHTML(target.slice(0, i)));
+      await sleep(stepMs);
+    }
+  }
+
+  const demoSets = [
+    { textHTML: 'Cosma <br> Typeface', axes: { wght: 400, wdth: 50, opsz: 0 } },
+    { textHTML: 'LILAS <br> 75020', axes: { wght: 900, wdth: 150, opsz: 0 } },
+    { textHTML: 'Playstation', axes: { wght: 500, wdth: 50, opsz: 100 } },
+    { textHTML: 'HYPERDRIVE', axes: { wght: 500, wdth: 115, opsz: 50 } },
+  ];
+  let autoToken = 0;
+  async function runAutoLoop(token) {
+    // Step 1: load default set immediately
+    let idx = 0;
+    applyAxesObj(demoSets[idx].axes);
+    setLetterHTML(demoSets[idx].textHTML);
+    await sleep(5000); // Step 2: wait 5s
+    while (token === autoToken) {
+      const next = (idx + 1) % demoSets.length;
+      // Step 3: erase letter by letter
+      await eraseByChar(ERASE_STEP_MS);
+      if (token !== autoToken) break;
+      // Step 4: change to next style
+      applyAxesObj(demoSets[next].axes);
+      // Ensure content is empty before typing
+      setLetterHTML('');
+      if (token !== autoToken) break;
+      // Step 5: type next text letter by letter
+      await typeByChar(demoSets[next].textHTML, TYPE_STEP_MS);
+      if (token !== autoToken) break;
+      idx = next;
+      // Step 2 again for subsequent sets
+      await sleep(5000);
+    }
+  }
+
   const updateAxisFromInput = (ev) => {
     const t = ev.target;
     if (!t || t.tagName !== 'INPUT') return;
@@ -225,19 +362,68 @@
     else if (axis === 'wdth') width = clamp(val, 50, 300);
     else if (axis === 'opsz') opticalSize = clamp(val, 0, 100);
     setSliderVisual(t);
-    const out = controls.querySelector(`.cosma-val[data-for="${axis}"]`);
-    if (out) out.textContent = String(Math.round(val));
+    animateNumeric(axis, val);
     applyVariations();
     dbg('axis change', { axis, val });
     requestFit('axis');
   };
   controls.addEventListener('input', updateAxisFromInput);
 
+  // Drag responsiveness: disable transitions during active slider drag
+  const startDrag = () => {
+    if (isDragging) return;
+    isDragging = true;
+    tester.classList.add('is-dragging');
+  };
+  const endDrag = () => {
+    if (!isDragging) return;
+    isDragging = false;
+    tester.classList.remove('is-dragging');
+  };
+  // Pointer events to detect drag start/end
+  ['pointerdown','mousedown','touchstart'].forEach((type) => {
+    controls.addEventListener(type, (ev) => {
+      if (ev && ev.target && ev.target.classList && ev.target.classList.contains('cosma-slider')) startDrag();
+    });
+  });
+  ['pointerup','mouseup','touchend','touchcancel','pointercancel','mouseleave'].forEach((type) => {
+    window.addEventListener(type, endDrag, { passive: true });
+  });
+
+  // Mode toggle behavior (UI only; does not alter fitting logic yet)
+  const modeBtn = topbar.querySelector('.cosma-mode-toggle');
+  if (modeBtn) {
+    modeBtn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      const isAuto = modeBtn.classList.toggle('is-auto');
+      modeBtn.setAttribute('aria-pressed', String(isAuto));
+      const label = modeBtn.querySelector('.label');
+      if (label) label.textContent = isAuto ? 'AUTO' : 'MANUAL';
+      // Optionally expose state for future logic
+      tester.dataset.mode = isAuto ? 'auto' : 'manual';
+      // Start/stop the automatic demo sequence
+      if (isAuto) {
+        autoToken++;
+        const token = autoToken;
+        runAutoLoop(token);
+      } else {
+        autoToken++; // invalidate any running loop
+      }
+    });
+  }
+
   // Initialize slider visual fill
   ['#cosma-wght', '#cosma-wdth', '#cosma-opsz'].forEach((sel) => {
     const el = controls.querySelector(sel);
     setSliderVisual(el);
   });
+
+  // If default mode is AUTO, start the loop after controls are ready
+  if (tester.dataset.mode === 'auto') {
+    autoToken++;
+    const token = autoToken;
+    runAutoLoop(token);
+  }
 
   // Disable coordinate overlay from original mini-site (not implemented here)
   // Ensure initial state (readable on white)
