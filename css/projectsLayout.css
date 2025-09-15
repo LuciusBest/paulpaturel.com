@@ -197,14 +197,16 @@ video.media-contain,
 
 /* --- Camille Leprince video: enable interaction + hover scale --- */
 .project_container[data-project="CamilleLeprinceWEB"] video {
-    pointer-events: auto;          /* allow click */
+    pointer-events: auto;
+    /* allow click */
     transition: transform 200ms ease-in-out;
     will-change: transform;
     cursor: pointer;
 }
 
 .project_container[data-project="CamilleLeprinceWEB"] video:hover {
-    transform: scale(1.015);       /* +1.5% on hover */
+    transform: scale(1.015);
+    /* +1.5% on hover */
 }
 
 /* For Camille: shrink-wrap the video box to its rendered content
@@ -212,13 +214,226 @@ video.media-contain,
 .project_container[data-project="CamilleLeprinceWEB"] .wrapper--centered video.media-contain {
     width: auto;
     height: auto;
-    max-width: calc(100dvw - 100px);   /* wrapper has 50px padding on each side */
+    max-width: calc(100dvw - 100px);
+    /* wrapper has 50px padding on each side */
     max-height: calc(100dvh - 100px);
     object-fit: contain;
-    background: transparent;           /* avoid letterbox inside the element */
+    background: transparent;
+    /* avoid letterbox inside the element */
 }
 
-/* COSMA: visible placeholder background */
+/* COSMA: inherit default wrapper background (no override) */
+
+/* COSMA: embedded tester styles (scoped) */
+@font-face {
+    font-family: 'Cosma';
+    src: url('../CosmaWebTypeTester/fonts/Cosma-VF.woff2') format('woff2-variations');
+    font-weight: 100 900;
+    font-display: swap;
+}
+
 .project_container[data-project="COSMA"] .wrapper--centered {
-    background-color: #1e90ff; /* blue */
+    background-color: #ffffff;
+    /* project background: white */
+}
+
+.project_container[data-project="COSMA"] .cosma-tester {
+    position: relative;
+    width: 80%;
+    /* leave 10% margin on each side */
+    margin: 0 10%;
+    height: 100%;
+    display: grid;             /* center content above controls */
+    grid-template-rows: 1fr auto;
+    align-items: center;
+    justify-items: center;
+    background-color: #ffffff;
+    /* inner container: white */
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+    color: #000000;
+    /* readable on white */
+    overflow: hidden; /* clip content to rounded corners */
+}
+
+.project_container[data-project="COSMA"] .cosma-stage {
+    align-self: stretch;
+    justify-self: stretch;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* keep text centered */
+}
+
+.project_container[data-project="COSMA"] .cosma-letter {
+    font-family: 'Cosma', system-ui, sans-serif;
+    font-size: 25vh; /* default; JS treats this as the max cap */
+    line-height: 0.94; /* +7% line spacing for readability */
+    outline: none;
+    cursor: text;
+    text-align: center;
+    white-space: normal; /* wrap multiple lines */
+    overflow-wrap: anywhere; /* ensure long tokens can break */
+    padding: 0; /* avoid padding interfering with fit calculations */
+    transition: font-variation-settings 600ms ease, font-size 160ms ease-out, text-shadow 200ms ease;
+    will-change: font-variation-settings, font-size;
+    -webkit-user-modify: read-write;
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+.project_container[data-project="COSMA"] .cosma-footer {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+}
+
+.project_container[data-project="COSMA"] .cosma-footer-column {
+    flex: 1;
+    text-align: center;
+    font-family: 'Cosma', system-ui, sans-serif;
+    font-size: 1.2rem;
+}
+
+/* Bottom sliders (do not break layout) */
+.project_container[data-project="COSMA"] .cosma-controls {
+    position: static;          /* flow as second grid row */
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 20px 12px;      /* 20px side margins, 12px bottom */
+    display: flex;
+    flex-direction: column;
+    /* stacked vertically */
+    gap: 2.5px;
+    /* reduced again by 50% */
+    align-items: stretch;
+    background: transparent;
+    /* no overlay background */
+    opacity: 0.4;
+    /* 40% when not hovered */
+    transition: opacity 160ms ease;
+}
+
+.project_container[data-project="COSMA"] .cosma-controls:hover {
+    opacity: 1;
+}
+
+.project_container[data-project="COSMA"] .cosma-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.project_container[data-project="COSMA"] .cosma-label {
+    width: 48px;
+    text-transform: lowercase;
+    font-family: 'Cosma', system-ui, sans-serif;
+    font-size: 12px;
+    /* +2px */
+    color: #000;
+    user-select: none;
+    font-weight: 400;
+    font-variation-settings: 'wght' 400, 'wdth' 50, 'opsz' 0;
+}
+
+.project_container[data-project="COSMA"] .cosma-val {
+    width: 48px;
+    text-align: right;
+    font-family: 'Cosma', system-ui, sans-serif;
+    font-size: 12px;
+    /* +2px */
+    color: #000;
+    user-select: none;
+    font-weight: 400;
+    font-variation-settings: 'wght' 400, 'wdth' 50, 'opsz' 0;
+}
+
+.project_container[data-project="COSMA"] .cosma-controls .cosma-slider {
+    width: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    /* track styled via pseudo-elements */
+    height: 10px;
+    /* fallback height */
+    flex: 1;
+}
+
+/* WebKit track + thumb */
+.project_container[data-project="COSMA"] .cosma-controls .cosma-slider::-webkit-slider-runnable-track {
+    height: 10px;
+    background:
+        linear-gradient(#000, #000) left/var(--p, 50%) 100% no-repeat,
+        linear-gradient(#d0d0d0, #d0d0d0) left/100% 100% no-repeat;
+    border-radius: 0;
+    /* squared */
+    transition: background-size 180ms ease;
+}
+
+.project_container[data-project="COSMA"] .cosma-controls .cosma-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    box-shadow: none;
+    margin-top: -2px;
+    /* center on 10px track */
+    opacity: 0;
+    /* invisible thumb => looks like a line */
+}
+
+/* Firefox track + thumb */
+.project_container[data-project="COSMA"] .cosma-controls .cosma-slider::-moz-range-track {
+    height: 10px;
+    background:
+        linear-gradient(#000, #000) left/var(--p, 50%) 100% no-repeat,
+        linear-gradient(#d0d0d0, #d0d0d0) left/100% 100% no-repeat;
+    border-radius: 0;
+    /* squared */
+    transition: background-size 180ms ease;
+}
+
+.project_container[data-project="COSMA"] .cosma-controls .cosma-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    box-shadow: none;
+    opacity: 0;
+    /* invisible */
+}
+
+/* Scoped selection styling per theme */
+.project_container[data-project="COSMA"] .cosma-tester ::selection {
+    background-color: #0080FF;
+    color: #000000;
+}
+
+.project_container[data-project="COSMA"] .cosma-tester[data-theme="monochrome-mix"] ::selection {
+    background-color: #000000;
+    color: #FFFFFF;
+}
+
+.project_container[data-project="COSMA"] .cosma-tester[data-theme="pop-peak"] ::selection {
+    background-color: #FF0B0B;
+    color: #FFFFFF;
+}
+
+.project_container[data-project="COSMA"] .cosma-tester[data-theme="studio-depth"] ::selection {
+    background-color: #000000;
+    color: #848C76;
+}
+
+.project_container[data-project="COSMA"] .cosma-tester[data-theme="mp3-shell"] ::selection {
+    background-color: #E0E0E0;
+    color: #000000;
 }

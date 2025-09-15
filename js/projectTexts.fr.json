@@ -19,5 +19,8 @@
   },
   "Relay": {
     "text": "<tag>Police de caractères</tag> et <tag>spécimen typographique</tag> développés sous la supervision d’Aurèle Sack. 2024"
+  },
+  "COSMA": {
+    "text": "<tag>Cosma</tag> est un <tag>testeur</tag> de <tag>police variable</tag> intégré, qui met en évidence les axes <tag>weight</tag>, <tag>width</tag> et <tag>contrast</tag> via un mot éditable. Trois curseurs minimaux pilotent <tag>wght</tag> (100–900), <tag>wdth</tag> (50–300) et <tag>opsz</tag> (0–100) avec transitions fluides et ajustement responsive. L’interface est volontairement sobre : conteneur <tag>web</tag> blanc arrondi avec ombre légère, texte centré, libellés réglés en Cosma 400/50/0. Conçu comme un <tag>outil</tag> en <tag>JavaScript</tag> et <tag>CSS</tag>, strictement encapsulé pour ne pas interférer avec la navigation du site ni le texte contextuel à droite. <tag>2025</tag>"
   }
 }

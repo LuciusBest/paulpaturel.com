@@ -1,0 +1,1005 @@
+{
+  "runId": "RUN-mfl0ak69-rauaxh",
+  "when": "2025-09-15T10:53:49.299Z",
+  "tests": [
+    {
+      "id": "RUN-mfl0ak69-rauaxh-T1",
+      "name": "init",
+      "fontSize": 288,
+      "within": true,
+      "overW": false,
+      "overH": false,
+      "centerOK": true,
+      "pass": true,
+      "testIndex": 0
+    },
+    {
+      "id": "RUN-mfl0ak69-rauaxh-T2",
+      "name": "width=300",
+      "fontSize": 119.905,
+      "within": true,
+      "overW": false,
+      "overH": false,
+      "maxOK": true,
+      "pass": true,
+      "testIndex": 1
+    },
+    {
+      "id": "RUN-mfl0ak69-rauaxh-T3",
+      "name": "width=50",
+      "fontSize": 288,
+      "within": true,
+      "maxOK": true,
+      "pass": true,
+      "testIndex": 2
+    },
+    {
+      "id": "RUN-mfl0ak69-rauaxh-T4",
+      "name": "long-text",
+      "fontSize": 45,
+      "within": false,
+      "overW": true,
+      "overH": false,
+      "maxOK": true,
+      "pass": false,
+      "testIndex": 3
+    },
+    {
+      "id": "RUN-mfl0ak69-rauaxh-T5",
+      "name": "wght=900,wdth=300",
+      "fontSize": 116.139,
+      "within": true,
+      "overW": false,
+      "overH": false,
+      "maxOK": true,
+      "pass": true,
+      "testIndex": 4
+    },
+    {
+      "id": "RUN-mfl0ak69-rauaxh-T6",
+      "name": "wght+1+1",
+      "fontSize": 116.14,
+      "within": true,
+      "tooSmall": false,
+      "dropRatio": 0.403,
+      "pass": true,
+      "testIndex": 5
+    },
+    {
+      "id": "RUN-mfl0ak69-rauaxh-T7",
+      "name": "wdth+1+1",
+      "fontSize": 116.14,
+      "within": true,
+      "tooSmall": false,
+      "dropRatio": 0.403,
+      "pass": true,
+      "testIndex": 6
+    }
+  ],
+  "logs": [
+    {
+      "logId": "L0",
+      "t": 1757933627571,
+      "raw": "[COSMA] delayed fit [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T1"
+    },
+    {
+      "logId": "L1",
+      "t": 1757933627624,
+      "raw": "[COSMA] fit start [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T1"
+    },
+    {
+      "logId": "L2",
+      "t": 1757933627624,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T1"
+    },
+    {
+      "logId": "L3",
+      "t": 1757933627624,
+      "raw": "[COSMA] fit result (at cap) [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T1"
+    },
+    {
+      "logId": "L4",
+      "t": 1757933627654,
+      "raw": "[COSMA] delayed fit [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T1"
+    },
+    {
+      "logId": "L5",
+      "t": 1757933627705,
+      "raw": "[COSMA] fit start [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T1"
+    },
+    {
+      "logId": "L6",
+      "t": 1757933627705,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T1"
+    },
+    {
+      "logId": "L7",
+      "t": 1757933627705,
+      "raw": "[COSMA] fit result (at cap) [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T1"
+    },
+    {
+      "logId": "L8",
+      "t": 1757933627727,
+      "raw": "[COSMA] axis change [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L9",
+      "t": 1757933627778,
+      "raw": "[COSMA] fit start [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L10",
+      "t": 1757933627780,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L11",
+      "t": 1757933627782,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L12",
+      "t": 1757933627784,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L13",
+      "t": 1757933627786,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L14",
+      "t": 1757933627788,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L15",
+      "t": 1757933627792,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L16",
+      "t": 1757933627794,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L17",
+      "t": 1757933627795,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L18",
+      "t": 1757933627796,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L19",
+      "t": 1757933627797,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L20",
+      "t": 1757933627798,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L21",
+      "t": 1757933627800,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L22",
+      "t": 1757933627801,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L23",
+      "t": 1757933627803,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L24",
+      "t": 1757933627804,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L25",
+      "t": 1757933627805,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L26",
+      "t": 1757933627806,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L27",
+      "t": 1757933627808,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L28",
+      "t": 1757933627808,
+      "raw": "[COSMA] fit result (shrink) [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L29",
+      "t": 1757933627853,
+      "raw": "[COSMA] delayed fit [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L30",
+      "t": 1757933627905,
+      "raw": "[COSMA] fit start [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L31",
+      "t": 1757933627905,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L32",
+      "t": 1757933627907,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L33",
+      "t": 1757933627908,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L34",
+      "t": 1757933627909,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L35",
+      "t": 1757933627910,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L36",
+      "t": 1757933627911,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L37",
+      "t": 1757933627911,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L38",
+      "t": 1757933627913,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L39",
+      "t": 1757933627913,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L40",
+      "t": 1757933627914,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L41",
+      "t": 1757933627915,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L42",
+      "t": 1757933627916,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L43",
+      "t": 1757933627916,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L44",
+      "t": 1757933627916,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L45",
+      "t": 1757933627916,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L46",
+      "t": 1757933627916,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L47",
+      "t": 1757933627916,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L48",
+      "t": 1757933627917,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L49",
+      "t": 1757933627917,
+      "raw": "[COSMA] fit result (grow unchanged) [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T2"
+    },
+    {
+      "logId": "L50",
+      "t": 1757933627975,
+      "raw": "[COSMA] axis change [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T3"
+    },
+    {
+      "logId": "L51",
+      "t": 1757933628026,
+      "raw": "[COSMA] fit start [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T3"
+    },
+    {
+      "logId": "L52",
+      "t": 1757933628027,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T3"
+    },
+    {
+      "logId": "L53",
+      "t": 1757933628027,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T3"
+    },
+    {
+      "logId": "L54",
+      "t": 1757933628028,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T3"
+    },
+    {
+      "logId": "L55",
+      "t": 1757933628028,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T3"
+    },
+    {
+      "logId": "L56",
+      "t": 1757933628029,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T3"
+    },
+    {
+      "logId": "L57",
+      "t": 1757933628029,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T3"
+    },
+    {
+      "logId": "L58",
+      "t": 1757933628029,
+      "raw": "[COSMA] fit result (grow to cap) [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T3"
+    },
+    {
+      "logId": "L59",
+      "t": 1757933628222,
+      "raw": "[COSMA] input",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L60",
+      "t": 1757933628284,
+      "raw": "[COSMA] fit start [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L61",
+      "t": 1757933628284,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L62",
+      "t": 1757933628287,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L63",
+      "t": 1757933628288,
+      "raw": "[COSMA] fit result (min enforced) [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L64",
+      "t": 1757933628350,
+      "raw": "[COSMA] fit start [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L65",
+      "t": 1757933628351,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L66",
+      "t": 1757933628351,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L67",
+      "t": 1757933628351,
+      "raw": "[COSMA] fit result (min enforced) [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L68",
+      "t": 1757933628354,
+      "raw": "[COSMA] delayed fit [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L69",
+      "t": 1757933628405,
+      "raw": "[COSMA] fit start [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L70",
+      "t": 1757933628405,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L71",
+      "t": 1757933628405,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L72",
+      "t": 1757933628405,
+      "raw": "[COSMA] fit result (min enforced) [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L73",
+      "t": 1757933628522,
+      "raw": "[COSMA] fit start [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L74",
+      "t": 1757933628522,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L75",
+      "t": 1757933628523,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L76",
+      "t": 1757933628524,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L77",
+      "t": 1757933628526,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L78",
+      "t": 1757933628527,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L79",
+      "t": 1757933628528,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L80",
+      "t": 1757933628529,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L81",
+      "t": 1757933628530,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L82",
+      "t": 1757933628530,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L83",
+      "t": 1757933628532,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L84",
+      "t": 1757933628532,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L85",
+      "t": 1757933628533,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L86",
+      "t": 1757933628533,
+      "raw": "[COSMA] fit result (grow to cap) [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T4"
+    },
+    {
+      "logId": "L87",
+      "t": 1757933628718,
+      "raw": "[COSMA] axis change [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T5"
+    },
+    {
+      "logId": "L88",
+      "t": 1757933628718,
+      "raw": "[COSMA] axis change [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T5"
+    },
+    {
+      "logId": "L89",
+      "t": 1757933628769,
+      "raw": "[COSMA] fit start [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T5"
+    },
+    {
+      "logId": "L90",
+      "t": 1757933628771,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T5"
+    },
+    {
+      "logId": "L91",
+      "t": 1757933628772,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T5"
+    },
+    {
+      "logId": "L92",
+      "t": 1757933628773,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T5"
+    },
+    {
+      "logId": "L93",
+      "t": 1757933628773,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T5"
+    },
+    {
+      "logId": "L94",
+      "t": 1757933628774,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T5"
+    },
+    {
+      "logId": "L95",
+      "t": 1757933628775,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T5"
+    },
+    {
+      "logId": "L96",
+      "t": 1757933628775,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T5"
+    },
+    {
+      "logId": "L97",
+      "t": 1757933628776,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T5"
+    },
+    {
+      "logId": "L98",
+      "t": 1757933628777,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T5"
+    },
+    {
+      "logId": "L99",
+      "t": 1757933628777,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T5"
+    },
+    {
+      "logId": "L100",
+      "t": 1757933628778,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T5"
+    },
+    {
+      "logId": "L101",
+      "t": 1757933628778,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T5"
+    },
+    {
+      "logId": "L102",
+      "t": 1757933628779,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T5"
+    },
+    {
+      "logId": "L103",
+      "t": 1757933628780,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T5"
+    },
+    {
+      "logId": "L104",
+      "t": 1757933628780,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T5"
+    },
+    {
+      "logId": "L105",
+      "t": 1757933628781,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T5"
+    },
+    {
+      "logId": "L106",
+      "t": 1757933628782,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T5"
+    },
+    {
+      "logId": "L107",
+      "t": 1757933628782,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T5"
+    },
+    {
+      "logId": "L108",
+      "t": 1757933628782,
+      "raw": "[COSMA] fit result (shrink) [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T5"
+    },
+    {
+      "logId": "L109",
+      "t": 1757933628965,
+      "raw": "[COSMA] axis change [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T6"
+    },
+    {
+      "logId": "L110",
+      "t": 1757933628965,
+      "raw": "[COSMA] axis change [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T6"
+    },
+    {
+      "logId": "L111",
+      "t": 1757933629016,
+      "raw": "[COSMA] fit start [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T6"
+    },
+    {
+      "logId": "L112",
+      "t": 1757933629016,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T6"
+    },
+    {
+      "logId": "L113",
+      "t": 1757933629017,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T6"
+    },
+    {
+      "logId": "L114",
+      "t": 1757933629018,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T6"
+    },
+    {
+      "logId": "L115",
+      "t": 1757933629019,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T6"
+    },
+    {
+      "logId": "L116",
+      "t": 1757933629020,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T6"
+    },
+    {
+      "logId": "L117",
+      "t": 1757933629020,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T6"
+    },
+    {
+      "logId": "L118",
+      "t": 1757933629021,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T6"
+    },
+    {
+      "logId": "L119",
+      "t": 1757933629022,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T6"
+    },
+    {
+      "logId": "L120",
+      "t": 1757933629022,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T6"
+    },
+    {
+      "logId": "L121",
+      "t": 1757933629023,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T6"
+    },
+    {
+      "logId": "L122",
+      "t": 1757933629023,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T6"
+    },
+    {
+      "logId": "L123",
+      "t": 1757933629024,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T6"
+    },
+    {
+      "logId": "L124",
+      "t": 1757933629024,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T6"
+    },
+    {
+      "logId": "L125",
+      "t": 1757933629024,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T6"
+    },
+    {
+      "logId": "L126",
+      "t": 1757933629025,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T6"
+    },
+    {
+      "logId": "L127",
+      "t": 1757933629025,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T6"
+    },
+    {
+      "logId": "L128",
+      "t": 1757933629025,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T6"
+    },
+    {
+      "logId": "L129",
+      "t": 1757933629025,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T6"
+    },
+    {
+      "logId": "L130",
+      "t": 1757933629025,
+      "raw": "[COSMA] fit result (grow unchanged) [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T6"
+    },
+    {
+      "logId": "L131",
+      "t": 1757933629132,
+      "raw": "[COSMA] axis change [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T7"
+    },
+    {
+      "logId": "L132",
+      "t": 1757933629132,
+      "raw": "[COSMA] axis change [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T7"
+    },
+    {
+      "logId": "L133",
+      "t": 1757933629183,
+      "raw": "[COSMA] fit start [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T7"
+    },
+    {
+      "logId": "L134",
+      "t": 1757933629184,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T7"
+    },
+    {
+      "logId": "L135",
+      "t": 1757933629185,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T7"
+    },
+    {
+      "logId": "L136",
+      "t": 1757933629185,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T7"
+    },
+    {
+      "logId": "L137",
+      "t": 1757933629185,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T7"
+    },
+    {
+      "logId": "L138",
+      "t": 1757933629186,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T7"
+    },
+    {
+      "logId": "L139",
+      "t": 1757933629186,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T7"
+    },
+    {
+      "logId": "L140",
+      "t": 1757933629186,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T7"
+    },
+    {
+      "logId": "L141",
+      "t": 1757933629186,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T7"
+    },
+    {
+      "logId": "L142",
+      "t": 1757933629187,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T7"
+    },
+    {
+      "logId": "L143",
+      "t": 1757933629187,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T7"
+    },
+    {
+      "logId": "L144",
+      "t": 1757933629187,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T7"
+    },
+    {
+      "logId": "L145",
+      "t": 1757933629187,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T7"
+    },
+    {
+      "logId": "L146",
+      "t": 1757933629188,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T7"
+    },
+    {
+      "logId": "L147",
+      "t": 1757933629188,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T7"
+    },
+    {
+      "logId": "L148",
+      "t": 1757933629188,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T7"
+    },
+    {
+      "logId": "L149",
+      "t": 1757933629188,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T7"
+    },
+    {
+      "logId": "L150",
+      "t": 1757933629189,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T7"
+    },
+    {
+      "logId": "L151",
+      "t": 1757933629189,
+      "raw": "[COSMA] fitsWithin [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T7"
+    },
+    {
+      "logId": "L152",
+      "t": 1757933629189,
+      "raw": "[COSMA] fit result (grow unchanged) [object Object]",
+      "testId": "RUN-mfl0ak69-rauaxh-T7"
+    }
+  ],
+  "counts": {
+    "tests": 7,
+    "logs": 153,
+    "passes": 6,
+    "fails": 1
+  }
+}
