@@ -16,7 +16,7 @@ body {
 }
 
 .ui_text {
-    font-size: 15px;
+    font-size: 16px;
     font-family: 'IS-ArzierVF', sans-serif;
     font-weight: 400;
 }
@@ -38,6 +38,8 @@ body {
     text-shadow: 0 0 1px rgba(0, 0, 0, 0.25);
     /* fallback halo on flat colors */
     user-select: none;
+    pointer-events: none;
+    /* don't block hovers/clicks beneath */
 }
 
 /* Slight left indent for left overlay text without shifting layout */
@@ -51,6 +53,8 @@ body {
     transition: background-color .2s ease, color .2s ease, opacity .2s ease;
     border-radius: 0px;
     cursor: pointer;
+    pointer-events: auto;
+    /* re-enable interaction inside left overlay */
 }
 
 #text_overlay_container_left .contact-chip:hover,
@@ -65,6 +69,7 @@ body {
 /* Language toggle styles */
 #text_overlay_container_left .lang-option {
     cursor: pointer;
+    pointer-events: auto;
 }
 
 #text_overlay_container_left .lang-option.inactive {
@@ -104,6 +109,8 @@ body {
     /* font-size: 18px; */
     /* Container no longer has a solid background; backgrounds applied per word/tag */
     color: black;
+    pointer-events: none;
+    /* don't block underlying content */
 }
 
 .highlight {
@@ -152,6 +159,7 @@ body {
     padding: 0 6px;
     margin-right: 3px;
     margin-bottom: 3px;
+    pointer-events: auto;
 }
 
 /* When using a tag wrapper, avoid double backgrounds on inner words in chips view */
@@ -187,6 +195,12 @@ body {
     color: #000;
 }
 
+/* Ensure interactive tokens in right overlay can receive pointer events even if parent ignores them */
+#text_overlay_container .word.highlight,
+#text_overlay_container .tag.highlight {
+    pointer-events: auto;
+}
+
 /* Ensure active state overrides full-text white background */
 #text_overlay_container.is-fulltext .word.highlight.is-active,
 #text_overlay_container.is-fulltext .tag.is-active {
@@ -206,4 +220,46 @@ body {
 #text_overlay_container.is-fulltext>.word:first-child,
 #text_overlay_container.is-fulltext>.tag:first-child .word:first-child {
     padding-left: 6px;
+}
+
+/* --- Custom Arrow Cursor (IS-Arzier) --- */
+.use-arrow-cursor {
+    cursor: none !important;
+    /* hide system cursor only on target */
+}
+
+#cursor_arrow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translate(-50%, -50%);
+    z-index: 2000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 120ms ease;
+    font-family: 'IS-ArzierVF', sans-serif;
+    font-weight: 400;
+    font-size: 25px;
+    /* cursor size */
+    line-height: 1;
+    color: #ffffff;
+    mix-blend-mode: difference;
+    /* visible on any background */
+    -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.35);
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.25);
+    user-select: none;
+    will-change: transform, opacity;
+}
+
+#cursor_arrow .cursor-arrow-glyph {
+    font-size: 16px;
+    /* arrow size */
+    vertical-align: middle;
+}
+
+#cursor_arrow .cursor-arrow-text {
+    font-size: 16px;
+    /* see text size */
+    margin-left: 4px;
+    vertical-align: middle;
 }

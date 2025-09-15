@@ -194,3 +194,26 @@ video.media-contain,
 .project_container.is-filtered {
     display: none;
 }
+
+/* --- Camille Leprince video: enable interaction + hover scale --- */
+.project_container[data-project="CamilleLeprinceWEB"] video {
+    pointer-events: auto;          /* allow click */
+    transition: transform 200ms ease-in-out;
+    will-change: transform;
+    cursor: pointer;
+}
+
+.project_container[data-project="CamilleLeprinceWEB"] video:hover {
+    transform: scale(1.015);       /* +1.5% on hover */
+}
+
+/* For Camille: shrink-wrap the video box to its rendered content
+   so hover only triggers on the visible video, not the padded area */
+.project_container[data-project="CamilleLeprinceWEB"] .wrapper--centered video.media-contain {
+    width: auto;
+    height: auto;
+    max-width: calc(100dvw - 100px);   /* wrapper has 50px padding on each side */
+    max-height: calc(100dvh - 100px);
+    object-fit: contain;
+    background: transparent;           /* avoid letterbox inside the element */
+}
