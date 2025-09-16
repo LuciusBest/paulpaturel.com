@@ -10,6 +10,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const frames = Array.from(document.querySelectorAll(".wrapper--diaporama .diapo-frame"));
   if (!frames.length) return;
 
+  const signalUiActivity = () => {
+    try {
+      window.dispatchEvent(new CustomEvent("ui:activity", { detail: { source: "diapo" } }));
+    } catch (_) {
+      try {
+        window.dispatchEvent(new Event("ui:activity"));
+      } catch (_) {}
+    }
+  };
+
   // Small utility: ensure an <img> is decoded (and mark it as loaded)
   const isImgLoaded = (img) => img.complete && img.naturalWidth > 0;
   const markLoaded = (img) => { img.dataset.loaded = "1"; };
@@ -50,6 +60,11 @@ document.addEventListener("DOMContentLoaded", () => {
     .map((el) => {
       const images = Array.from(el.querySelectorAll("img"));
       if (!images.length) return null;
+
+      const activityTargets = ["pointermove", "pointerdown", "mousemove", "mousedown", "touchstart", "touchmove"];
+      activityTargets.forEach((evt) => {
+        el.addEventListener(evt, signalUiActivity, { passive: true });
+      });
 
       // Hint the browser for decoding and initial loading policy
       images.forEach((img, i) => {

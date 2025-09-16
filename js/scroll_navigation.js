@@ -11,6 +11,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const mainContainer = document.querySelector(".main_container");
 
+  const IDLE_CLASS = "ui-idle";
+  const IDLE_DELAY = 3000;
+  let idleTimer = null;
+
+  const body = document.body;
+
+  const clearIdleTimer = () => {
+    if (idleTimer !== null) {
+      clearTimeout(idleTimer);
+      idleTimer = null;
+    }
+  };
+
+  const enterIdleState = () => {
+    if (body && !body.classList.contains(IDLE_CLASS)) {
+      body.classList.add(IDLE_CLASS);
+    }
+  };
+
+  const scheduleIdleState = () => {
+    clearIdleTimer();
+    idleTimer = window.setTimeout(enterIdleState, IDLE_DELAY);
+  };
+
+  const exitIdleState = () => {
+    if (body && body.classList.contains(IDLE_CLASS)) {
+      body.classList.remove(IDLE_CLASS);
+    }
+    scheduleIdleState();
+  };
+
+  const onScrollActivity = () => {
+    exitIdleState();
+  };
+
+  document.addEventListener("scroll", onScrollActivity, {
+    capture: true,
+    passive: true,
+  });
+
+  window.addEventListener("ui:activity", exitIdleState);
+
+  scheduleIdleState();
+
   // Persistent footer (single DOM node)
   const footer = document.createElement("div");
   footer.className = "project-footer";
@@ -129,18 +173,23 @@ document.addEventListener("DOMContentLoaded", () => {
   let rafScheduled = false;
   let cachedContentWidth = 0;
   let cachedRailHeight = 0;
-  let cachedFooterHeight = 0;
+  let cachedRailPaddingTop = 0;
 
   const recomputeFooterMetrics = () => {
     const styles = getComputedStyle(track);
     const padL = parseFloat(styles.paddingLeft) || 0;
     const padR = parseFloat(styles.paddingRight) || 0;
     cachedContentWidth = track.clientWidth - padL - padR;
-    cachedFooterHeight = footer.offsetHeight || cachedFooterHeight || 0;
   };
 
   const recomputeVerticalMetrics = () => {
     cachedRailHeight = verticalRail.clientHeight;
+    try {
+      const styles = getComputedStyle(verticalRail);
+      cachedRailPaddingTop = parseFloat(styles.paddingTop) || 0;
+    } catch (_) {
+      cachedRailPaddingTop = 0;
+    }
   };
 
   const updateHorizontalIndicator = () => {
@@ -163,10 +212,11 @@ document.addEventListener("DOMContentLoaded", () => {
     verticalIndex.textContent = `${current}/${verticalState.total}`;
 
     const railHeight = cachedRailHeight || verticalRail.clientHeight;
-    const footerHeight = cachedFooterHeight || footer.offsetHeight || 0;
+    const padTop = cachedRailPaddingTop;
     const indicatorHeight =
       verticalIndicatorGroup.offsetHeight || verticalIndex.offsetHeight;
-    const usableHeight = Math.max(railHeight - indicatorHeight - footerHeight, 0);
+    // Allow the indicator to travel so its bottom lines up with the rail's bottom edge.
+    const usableHeight = Math.max(railHeight - padTop - indicatorHeight, 0);
     const progress = isFinite(verticalState.progress) ? verticalState.progress : 0;
     const top = progress * usableHeight;
     verticalIndicatorGroup.style.transform = `translateY(${top}px)`;
