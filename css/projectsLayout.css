@@ -282,7 +282,6 @@ video.media-contain,
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #FF0B0B;
     /* keep text centered */
 }
 
@@ -309,6 +308,7 @@ video.media-contain,
     -webkit-font-smoothing: antialiased;
     text-rendering: geometricPrecision;
     contain: paint;
+    transform: none; /* keep perfectly centered in stage */
     /* Smoother axis and size transitions for interactive adjustments */
     transition:
         font-variation-settings 320ms cubic-bezier(0.2, 0, 0, 1),
@@ -377,28 +377,33 @@ video.media-contain,
 .project_container[data-project="COSMA"] .cosma-mode-toggle {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px; /* reduce space between dot and text by 2px */
     background: transparent;
     border: none;
     padding: 4px 0;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
-    color: #d7d7d7;
-    /* label same color as dot */
+    color: #000; /* text is always black */
+    opacity: 0.5; /* manual state look */
 }
 
 .project_container[data-project="COSMA"] .cosma-mode-toggle .dot {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #d7d7d7;
-    /* light grey */
+    background: rgba(0, 0, 0, 0.5); /* 50% black */
     transition: width 200ms cubic-bezier(0.2, 0, 0, 1), height 200ms cubic-bezier(0.2, 0, 0, 1), background-color 200ms ease;
 }
 
 .project_container[data-project="COSMA"] .cosma-mode-toggle.is-auto .dot {
-    width: 12px;
-    height: 12px;
+    width: 11px;  /* big circle 1px smaller */
+    height: 11px; /* big circle 1px smaller */
+    background: #000; /* solid black in AUTO */
+}
+
+/* AUTO state: full opacity for the whole control */
+.project_container[data-project="COSMA"] .cosma-mode-toggle.is-auto {
+    opacity: 1;
 }
 
 .project_container[data-project="COSMA"] .cosma-mode-toggle .label {

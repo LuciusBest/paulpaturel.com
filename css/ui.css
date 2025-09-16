@@ -138,6 +138,43 @@ body {
     cursor: pointer;
 }
 
+/* --- Phase de chargement (utilisant le nom de gauche) --- */
+/* Bloque le scroll et toute interaction */
+body.is-loading {
+    overflow: hidden;
+}
+
+/* Rien de cliquable pendant le loading */
+body.is-loading *,
+body.is-loading *::before,
+body.is-loading *::after {
+    pointer-events: none !important;
+}
+
+/* Masque noir entre le contenu et le nom (z-index < 999) */
+#loading-mask {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    background: #000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 700ms ease, visibility 0s linear 700ms; /* fade-out in 0.7s */
+    pointer-events: none; /* don’t block clicks after loading */
+}
+/* Show quickly during loading */
+body.is-loading #loading-mask {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 120ms ease;
+}
+
+/* Pendant le loading: cacher l’overlay droit et la bio */
+body.is-loading #text_overlay_container { display: none !important; }
+body.is-loading #left_bio { display: none !important; }
+body.is-loading .project-footer { display: none !important; }
+body.is-loading #cursor_arrow { display: none !important; }
+
 /* Space tokens: preserve width of spaces so they can receive background */
 .space {
     white-space: pre;

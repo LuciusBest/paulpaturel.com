@@ -224,9 +224,9 @@
   topbar.className = 'cosma-topbar';
   // Default to AUTO mode visually and semantically
   topbar.innerHTML = `
-    <button type="button" class="cosma-mode-toggle is-auto" aria-pressed="true" aria-label="Toggle auto sizing" style="pointer-events:auto">
+    <button type="button" class="cosma-mode-toggle is-auto" aria-pressed="true" aria-label="Toggle demo" style="pointer-events:auto">
       <span class="dot" aria-hidden="true"></span>
-      <span class="label">AUTO</span>
+      <span class="label">DEMO</span>
     </button>`;
   tester.dataset.mode = 'auto';
   tester.appendChild(topbar);
@@ -343,8 +343,23 @@
 
   // --- AUTO/MANUAL demo player helpers ---
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  // Only focus the editable area when the COSMA project is actually visible.
+  // Focusing an offscreen contenteditable can cause the page to snap back
+  // to that section (due to scroll-snap + UA focus behavior).
+  const isTesterVisible = (minVisibleRatio = 0.5) => {
+    try {
+      const rect = container.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight || 1;
+      const h = Math.max(1, rect.height);
+      const visible = Math.max(0, Math.min(rect.bottom, vh) - Math.max(rect.top, 0));
+      const ratio = visible / h;
+      return ratio >= minVisibleRatio;
+    } catch (_) { return false; }
+  };
+
   const placeCaretAtEnd = (el) => {
     try {
+      if (!isTesterVisible(0.5)) return; // defer caret placement when offscreen
       el.focus();
       const range = document.createRange();
       range.selectNodeContents(el);
@@ -418,7 +433,7 @@
     { textHTML: 'LILAS <br> 75020', axes: { wght: 900, wdth: 150, opsz: 0 } },
     { textHTML: 'Playstation', axes: { wght: 500, wdth: 50, opsz: 100 } },
     { textHTML: 'HYPERDRIVE', axes: { wght: 500, wdth: 115, opsz: 50 } },
-    { textHTML: 'Not only he had a vynil collection...<br>But he paid the bills out of it.<br>Vince was the real deal', axes: { wght: 600, wdth: 60, opsz: 40 } },
+    { textHTML: 'Not only he had a vynil collection...<br>But he paid the bills out of it.<br>Vince was the real deal.', axes: { wght: 600, wdth: 60, opsz: 40 } },
     { textHTML: 'Roland Jupiter-8<br>Sequential Six-Trak <br>Oberheim OB-XA<br>Ensoniq ESQ-1/SQ-80<br>Yamaha CS-70M', axes: { wght: 200, wdth: 50, opsz: 0 } },
     { textHTML: 'Edwin van der Sar – GK<br>Michael Reiziger – RB<br>Danny Blind – CB<br>Frank de Boer – DM<br>Frank Rijkaard – LB<br>Clarence Seedorf – CM<br>Edgar Davids – RW<br>Finidi George – CM<br>Jar Litmanen – CF<br>Marc Overmars – AM<br>Ronald de Boer – LW<br>', axes: { wght: 300, wdth: 110, opsz: 0 } },
     { textHTML: 'SUBOSCILLATOR', axes: { wght: 900, wdth: 50, opsz: 30 } },
@@ -517,7 +532,7 @@
       const isAuto = modeBtn.classList.toggle('is-auto');
       modeBtn.setAttribute('aria-pressed', String(isAuto));
       const label = modeBtn.querySelector('.label');
-      if (label) label.textContent = isAuto ? 'AUTO' : 'MANUAL';
+      if (label) label.textContent = 'DEMO';
       // Optionally expose state for future logic
       tester.dataset.mode = isAuto ? 'auto' : 'manual';
       // Start/stop the automatic demo sequence
