@@ -86,17 +86,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const frActive = currentLang === 'fr';
       return [
         '<span class="lang-toggle" role="group" aria-label="Language">',
-        `<span class="word lang-option ${enActive ? 'active' : 'inactive'}" data-lang="en" role="button" tabindex="0">EN</span>`,
+        `<span class="word lang-option ${enActive ? 'active' : 'inactive'}" data-lang="en" role="button" tabindex="0" data-no-custom-cursor="true">EN</span>`,
         '<span class="space">  </span>',
-        `<span class="word lang-option ${frActive ? 'active' : 'inactive'}" data-lang="fr" role="button" tabindex="0">FR</span>`,
+        `<span class="word lang-option ${frActive ? 'active' : 'inactive'}" data-lang="fr" role="button" tabindex="0" data-no-custom-cursor="true">FR</span>`,
         '</span>'
       ].join("");
     };
 
     const renderBio = () => {
       // Respect line skips exactly
-      const emailHTML = `<span class="word contact-chip" role="link" tabindex="0" data-url="mailto:paulpaturel75@gmail.com">paulpaturel75@gmail.com</span>`;
-      const instaHTML = `<span class="word contact-chip" role="link" tabindex="0" data-url="https://www.instagram.com/_paul_pat_/">@_paul_pat_</span>`;
+      const emailHTML = `<span class="word contact-chip" role="link" tabindex="0" data-no-custom-cursor="true" data-url="mailto:paulpaturel75@gmail.com">paulpaturel75@gmail.com</span>`;
+      const instaHTML = `<span class="word contact-chip" role="link" tabindex="0" data-no-custom-cursor="true" data-url="https://www.instagram.com/_paul_pat_/">@_paul_pat_</span>`;
       const copy = bioCopy[currentLang] || bioCopy.en;
       const html = [
         // Next line after name
@@ -120,6 +120,21 @@ document.addEventListener("DOMContentLoaded", () => {
         "<br>",
         "<br>",
         langToggleHTML(),
+        // Meta paragraph under EN/FR with extra spacing
+        "<br>",
+        "<br>",
+        '<span class="left-meta">',
+          // Line 1: version
+          wrapWords('V0.0 released 16/09/2025.'),
+          '<br>',
+          // Line 2: font credit
+          wrapWords('Font → Arzier by '),
+          // Linked author token
+          '<span class="word contact-chip" role="link" tabindex="0" data-no-custom-cursor="true" data-url="https://hugoscholl.ch/">Hugo Scholl</span>',
+          '<span class="space"> </span>',
+          // "- Interscript." as tokenized words
+          wrapWords('- Interscript.'),
+        '</span>',
       ].join("");
       bioEl.innerHTML = html;
       // Make contact chips behave like links without using <a> (avoids URL preview)
@@ -344,12 +359,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const activateOpen = (e) => {
       try { if (e) { e.preventDefault(); e.stopPropagation(); } } catch (_) {}
       if (targetExpanded) collapseLeftBio(); else openLeftBio();
+      // If this came from a pointer click, drop focus so spacebar scrolls won't retrigger
+      const pointerClick = e && e.type === 'click' && typeof e.detail === 'number' && e.detail > 0;
+      if (pointerClick) {
+        try { nameEl.blur(); } catch (_) {}
+      }
     };
     try {
       nameEl.addEventListener('click', activateOpen);
       nameEl.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') activateOpen(e);
       });
+    } catch (_) {}
+
+    // Ensure the name does not stay auto-focused when the page loads
+    try {
+      if (document.activeElement === nameEl) nameEl.blur();
     } catch (_) {}
 
     // Click anywhere in the bio text to collapse it (chips/lang stopPropagation so they won't close)

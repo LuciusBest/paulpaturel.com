@@ -39,7 +39,7 @@ body {
     top: 0;
     left: 0;
     height: auto;
-    width: 50%;
+    width: 35%;
     z-index: 999;
     padding: var(--ui-padding-block);
     margin-top: var(--ui-space-half);
@@ -82,7 +82,7 @@ body {
 
 /* Hover chip for email/instagram with white background and difference blend */
 #text_overlay_container_left .contact-chip {
-    transition: background-color .2s ease, color .2s ease, opacity .2s ease;
+    transition: background-color .25s ease, color .25s ease, opacity .25s ease;
     border-radius: 0px;
     cursor: pointer;
     pointer-events: auto;
@@ -91,8 +91,8 @@ body {
 
 #text_overlay_container_left .contact-chip:hover,
 #text_overlay_container_left .contact-chip:focus {
-    background: #ffffff;
-    color: #000000;
+    background: #000000;
+    color: #ffffff;
     mix-blend-mode: normal;
     /* ensure strong contrast via inversion over any backdrop */
     outline: none;
@@ -117,6 +117,7 @@ body {
 #text_overlay_container_left .lang-option {
     cursor: pointer;
     pointer-events: auto;
+    transition: background-color .25s ease, color .25s ease;
 }
 
 #text_overlay_container_left .lang-option.inactive {
@@ -125,8 +126,8 @@ body {
 
 #text_overlay_container_left .lang-option:hover,
 #text_overlay_container_left .lang-option:focus {
-    background: #ffffff;
-    color: #000000;
+    background: #000000;
+    color: #ffffff;
     mix-blend-mode: normal;
     outline: none;
 }
@@ -145,12 +146,55 @@ body {
     text-decoration: none;
 }
 
+/* Meta line under EN/FR: small, negative fusion, no white backgrounds */
+#text_overlay_container_left .left-meta {
+    font-size: 12px;
+    line-height: 0.9;
+    mix-blend-mode: difference;
+    color: #ffffff;
+    pointer-events: auto;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
+}
+
+/* Ensure difference blending on the meta block and its descendants (no white background) */
+#text_overlay_container_left .left-meta,
+#text_overlay_container_left .left-meta * {
+    mix-blend-mode: difference;
+}
+
+#text_overlay_container_left .left-meta .word,
+#text_overlay_container_left .left-meta .space,
+#text_overlay_container_left .left-meta .char {
+    background: transparent;
+    color: inherit;
+    mix-blend-mode: inherit;
+}
+
+#text_overlay_container_left .left-meta a {
+    color: inherit;
+    text-decoration: none;
+    pointer-events: auto;
+    cursor: pointer;
+    mix-blend-mode: inherit;
+}
+
+#text_overlay_container_left .left-meta a:hover,
+#text_overlay_container_left .left-meta a:focus,
+#text_overlay_container_left .left-meta .contact-chip:hover,
+#text_overlay_container_left .left-meta .contact-chip:focus {
+    background: #000000;
+    color: #ffffff;
+    mix-blend-mode: normal;
+    outline: none;
+}
+
 #text_overlay_container {
     position: fixed;
     top: 0;
-    left: 50%;
+    left: 35%;
     height: auto;
-    width: 50%;
+    width: 65%;
     z-index: 999;
     padding: var(--ui-padding-block);
     margin-top: var(--ui-space-half);
@@ -259,6 +303,8 @@ body.is-loading #cursor_arrow {
     margin-right: var(--ui-chip-gap);
     margin-bottom: var(--ui-chip-gap);
     pointer-events: auto;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 /* Plus/Minus control chip — styled like a tag chip in both modes */
@@ -316,6 +362,8 @@ body.is-loading #cursor_arrow {
 #text_overlay_container .tag.highlight {
     pointer-events: auto;
     cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 /* Ensure active state overrides full-text white background */

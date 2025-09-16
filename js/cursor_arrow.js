@@ -25,7 +25,20 @@ document.addEventListener('DOMContentLoaded', () => {
     arrow.style.top = `${e.clientY}px`;
   };
 
+  const shouldSkip = (el) => {
+    if (!el) return false;
+    try {
+      return el.closest('[data-no-custom-cursor]') != null;
+    } catch (_) {
+      return false;
+    }
+  };
+
   const activate = (el) => {
+    if (shouldSkip(el)) {
+      if (activeEl) deactivate(activeEl);
+      return;
+    }
     if (activeEl === el) return;
     if (activeEl) activeEl.classList.remove('use-arrow-cursor');
     activeEl = el;

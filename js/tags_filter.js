@@ -165,6 +165,13 @@
 
       node.addEventListener('click', onActivate);
       node.addEventListener('keydown', onActivate);
+
+      // Wake idle UI on hover/focus over interactive chips
+      const wake = () => {
+        try { window.dispatchEvent(new Event('ui:activity')); } catch (_) {}
+      };
+      node.addEventListener('pointerover', wake);
+      node.addEventListener('focus', wake);
     });
 
     // Reflect current activeTag
