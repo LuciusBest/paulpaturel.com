@@ -103,29 +103,42 @@
     };
 
     const minPx = Math.max(12, 0.05 * window.innerHeight); // 5vh minimum
+    // Grow to fill but never exceed the CSS default cap (baseFontSize)
+    const cap = Math.max(minPx, 0.25 * window.innerHeight); // 25vh cap computed each fit
+
+    // Helper: set font-size and mapped line-height together
+    const applySizeAndLine = (fs) => {
+      letter.style.fontSize = `${fs}px`;
+      lastFontSize = fs;
+      // Map line-height: at min -> 1.05, at cap -> 0.95 (interpolate)
+      const lo = 1.05, hi = 0.95;
+      const denom = Math.max(1, (cap - minPx));
+      let t = (fs - minPx) / denom;
+      t = Math.max(0, Math.min(1, t));
+      const lh = lo + (hi - lo) * t;
+      letter.style.lineHeight = lh.toFixed(3);
+    };
 
     if (!fitsWithin(current)) {
       // Shrink to fit
       if (!fitsWithin(minPx)) {
-        letter.style.fontSize = `${minPx}px`;
-        lastFontSize = minPx;
+        applySizeAndLine(minPx);
         dbg('fit result (min enforced)', { seq, fs: minPx });
         return;
       }
       const fitted = binSearch(minPx, Math.max(minPx + 1, current));
-      letter.style.fontSize = `${fitted}px`;
-      lastFontSize = fitted;
+      applySizeAndLine(fitted);
       dbg('fit result (shrink)', { seq, fs: fitted });
       return;
     }
 
-    // Grow to fill but never exceed the CSS default cap (baseFontSize)
-    const cap = Math.max(minPx, 0.25 * window.innerHeight); // 25vh cap computed each fit
     if (current >= cap) {
       const clamped = Math.min(current, cap);
       if (clamped !== current) {
-        letter.style.fontSize = `${clamped}px`;
-        lastFontSize = clamped;
+        applySizeAndLine(clamped);
+      } else {
+        // Ensure line-height is up to date even if size unchanged
+        applySizeAndLine(current);
       }
       dbg('fit result (at cap)', { seq, fs: lastFontSize, cap });
       return;
@@ -139,18 +152,18 @@
       hi = Math.min(cap, hi * 1.2);
     }
     if (hi >= cap && fitsWithin(cap)) {
-      letter.style.fontSize = `${cap}px`;
-      lastFontSize = cap;
+      applySizeAndLine(cap);
       dbg('fit result (grow to cap)', { seq, fs: cap });
       return;
     }
     hi = Math.max(lo + 1, Math.min(hi, cap));
     const target = binSearch(lo, hi);
     if (lastFontSize == null || Math.abs(target - lastFontSize) > 0.5) {
-      letter.style.fontSize = `${target}px`;
-      lastFontSize = target;
+      applySizeAndLine(target);
       dbg('fit result (grow bin)', { seq, fs: target });
     } else {
+      // Even if unchanged, ensure line-height mapping is consistent
+      applySizeAndLine(lastFontSize);
       dbg('fit result (grow unchanged)', { seq, fs: lastFontSize });
     }
   };
@@ -188,6 +201,8 @@
       tester.dataset.mode = 'manual';
       autoToken++; // stop any running auto loop
     }
+    // Ensure it stays editable when user erased everything
+    ensureEditableWhenEmpty();
     lastFontSize = null; dbg('input'); requestFit('input');
   });
   // Also stop click propagation when editing the text itself
@@ -223,9 +238,9 @@
   const initD = Math.round(clamp(width, 50, 300));
   const initO = Math.round(clamp(opticalSize, 0, 100));
   controls.innerHTML = `
-    <div class="cosma-row"><span class="cosma-label">WGHT</span><input id="cosma-wght" class="cosma-slider" type="range" min="100" max="900" step="1" value="${initW}" data-axis="wght"><span class="cosma-val" data-for="wght">${initW}</span></div>
-    <div class="cosma-row"><span class="cosma-label">WDTH</span><input id="cosma-wdth" class="cosma-slider" type="range" min="50" max="300" step="1" value="${initD}" data-axis="wdth"><span class="cosma-val" data-for="wdth">${initD}</span></div>
-    <div class="cosma-row"><span class="cosma-label">CTRST</span><input id="cosma-opsz" class="cosma-slider" type="range" min="0" max="100" step="1" value="${initO}" data-axis="opsz"><span class="cosma-val" data-for="opsz">${initO}</span></div>
+    <div class="cosma-row"><span class="cosma-label">WGHT</span><input id="cosma-wght" class="cosma-slider" type="range" min="100" max="900" step="1" value="${initW}" data-axis="wght"><span class="cosma-val" data-for="wght" contenteditable="true" spellcheck="false">${initW}</span></div>
+    <div class="cosma-row"><span class="cosma-label">WDTH</span><input id="cosma-wdth" class="cosma-slider" type="range" min="50" max="300" step="1" value="${initD}" data-axis="wdth"><span class="cosma-val" data-for="wdth" contenteditable="true" spellcheck="false">${initD}</span></div>
+    <div class="cosma-row"><span class="cosma-label">CTRST</span><input id="cosma-opsz" class="cosma-slider" type="range" min="0" max="100" step="1" value="${initO}" data-axis="opsz"><span class="cosma-val" data-for="opsz" contenteditable="true" spellcheck="false">${initO}</span></div>
   `;
   tester.appendChild(controls);
 
@@ -241,6 +256,68 @@
     const val = parseFloat(input.value);
     const p = isFinite(val) && max > min ? ((val - min) / (max - min)) * 100 : 0;
     input.style.setProperty('--p', `${Math.max(0, Math.min(100, p))}%`);
+  };
+
+  // Numeric editor support for value readouts
+  const AXIS_LIMITS = {
+    wght: { min: 100, max: 900 },
+    wdth: { min: 50, max: 300 },
+    opsz: { min: 0, max: 100 },
+  };
+  const clampAxis = (axis, v) => {
+    const lim = AXIS_LIMITS[axis];
+    if (!lim) return v;
+    return Math.max(lim.min, Math.min(lim.max, v));
+  };
+  const setAxisFromNumber = (axis, v) => {
+    if (!isFinite(v)) return;
+    const vv = Math.round(clampAxis(axis, v));
+    const slider = controls.querySelector(`#cosma-${axis}`);
+    if (slider) {
+      slider.value = String(vv);
+      setSliderVisual(slider);
+    }
+    // Update state variables
+    if (axis === 'wght') weight = vv; else if (axis === 'wdth') width = vv; else if (axis === 'opsz') opticalSize = vv;
+    // Reflect in numeric readout smoothly (unless dragging)
+    animateNumeric(axis, vv);
+    applyVariations();
+    requestFit('axis-num');
+  };
+
+  const attachNumericEditors = () => {
+    controls.querySelectorAll('.cosma-val').forEach((out) => {
+      const axis = out.getAttribute('data-for');
+      out.setAttribute('role', 'spinbutton');
+      out.setAttribute('aria-label', axis || 'value');
+      out.setAttribute('aria-live', 'polite');
+      // Filter to digits on input (allow empty while editing)
+      out.addEventListener('beforeinput', (ev) => {
+        if (!ev.data) return; // deletions etc.
+        if (!/[0-9]/.test(ev.data)) ev.preventDefault();
+      });
+      const commit = () => {
+        const num = parseInt((out.textContent || '').replace(/\D+/g, ''), 10);
+        if (isFinite(num)) setAxisFromNumber(axis, num);
+        // Normalize text to clamped value
+        const lim = AXIS_LIMITS[axis] || { min: 0, max: 100 };
+        const vv = Math.round(clampAxis(axis, isFinite(num) ? num : lim.min));
+        out.textContent = String(vv);
+      };
+      out.addEventListener('blur', commit);
+      out.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter') { ev.preventDefault(); out.blur(); }
+        if (ev.key === 'ArrowUp' || ev.key === 'ArrowRight') { ev.preventDefault(); const cur = parseInt(out.textContent || '0', 10) || 0; setAxisFromNumber(axis, cur + 1); }
+        if (ev.key === 'ArrowDown' || ev.key === 'ArrowLeft') { ev.preventDefault(); const cur = parseInt(out.textContent || '0', 10) || 0; setAxisFromNumber(axis, cur - 1); }
+      });
+      // Prevent clicks from bubbling to page
+      out.addEventListener('click', (ev) => ev.stopPropagation());
+      out.addEventListener('input', () => {
+        // Live-update aria value
+        const num = parseInt((out.textContent || '').replace(/\D+/g, ''), 10);
+        if (isFinite(num)) out.setAttribute('aria-valuenow', String(num));
+      });
+    });
   };
 
   // Animate numeric readouts to follow slider fill smoothly
@@ -278,9 +355,22 @@
   };
   const htmlToPlain = (html) => String(html || '').replace(/<br\s*\/?\s*>/gi, '\n');
   const plainToHTML = (text) => String(text || '').replace(/\n/g, '<br>');
+  const isTrulyEmpty = () => (letter.textContent || '').replace(/\s+/g, '') === '';
+  const ensureEditableWhenEmpty = () => {
+    if (isTrulyEmpty()) {
+      letter.innerHTML = '<br>';
+      placeCaretAtEnd(letter);
+    }
+  };
   const setLetterHTML = (html) => {
     // Programmatic content update; rely on MutationObserver for fit
-    letter.innerHTML = html;
+    const text = String(html || '');
+    if (text === '') {
+      letter.innerHTML = '';
+      ensureEditableWhenEmpty();
+    } else {
+      letter.innerHTML = text;
+    }
     // In AUTO mode, keep the caret visible at the paragraph end
     if (tester.dataset.mode === 'auto') placeCaretAtEnd(letter);
   };
@@ -305,16 +395,19 @@
   const ERASE_STEP_MS = 39; // was ~30ms per char
   const TYPE_STEP_MS = 65;  // was ~50ms per char
 
-  async function eraseByChar(stepMs = 52) {
+  const shouldAbort = (token) => (tester.dataset.mode !== 'auto' || token !== autoToken);
+  async function eraseByChar(stepMs = 52, token = autoToken) {
     const plain = htmlToPlain(letter.innerHTML);
     for (let i = plain.length; i >= 0; i--) {
+      if (shouldAbort(token)) break;
       setLetterHTML(plainToHTML(plain.slice(0, i)));
       await sleep(stepMs);
     }
   }
-  async function typeByChar(targetHTML, stepMs = 78) {
+  async function typeByChar(targetHTML, stepMs = 78, token = autoToken) {
     const target = htmlToPlain(targetHTML);
     for (let i = 0; i <= target.length; i++) {
+      if (shouldAbort(token)) break;
       setLetterHTML(plainToHTML(target.slice(0, i)));
       await sleep(stepMs);
     }
@@ -325,31 +418,57 @@
     { textHTML: 'LILAS <br> 75020', axes: { wght: 900, wdth: 150, opsz: 0 } },
     { textHTML: 'Playstation', axes: { wght: 500, wdth: 50, opsz: 100 } },
     { textHTML: 'HYPERDRIVE', axes: { wght: 500, wdth: 115, opsz: 50 } },
+    { textHTML: 'Not only he had a vynil collection...<br>But he paid the bills out of it.<br>Vince was the real deal', axes: { wght: 600, wdth: 60, opsz: 40 } },
+    { textHTML: 'Roland Jupiter-8<br>Sequential Six-Trak <br>Oberheim OB-XA<br>Ensoniq ESQ-1/SQ-80<br>Yamaha CS-70M', axes: { wght: 200, wdth: 50, opsz: 0 } },
+    { textHTML: 'Edwin van der Sar – GK<br>Michael Reiziger – RB<br>Danny Blind – CB<br>Frank de Boer – DM<br>Frank Rijkaard – LB<br>Clarence Seedorf – CM<br>Edgar Davids – RW<br>Finidi George – CM<br>Jar Litmanen – CF<br>Marc Overmars – AM<br>Ronald de Boer – LW<br>', axes: { wght: 300, wdth: 110, opsz: 0 } },
+    { textHTML: 'SUBOSCILLATOR', axes: { wght: 900, wdth: 50, opsz: 30 } },
   ];
+  // Random traversal state for AUTO mode
   let autoToken = 0;
+  let demoOrder = [];
+  let demoPos = 0;
+  let lastDemoIndex = null;
+  const makeOrder = (n, avoidStart = null) => {
+    const arr = Array.from({ length: n }, (_, i) => i);
+    for (let i = n - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    if (n > 1 && avoidStart != null && arr[0] === avoidStart) {
+      // Ensure we don't repeat the last demo consecutively across cycles
+      [arr[0], arr[1]] = [arr[1], arr[0]];
+    }
+    return arr;
+  };
+  const nextDemoIndex = () => {
+    if (!demoOrder || demoOrder.length !== demoSets.length || demoPos >= demoOrder.length) {
+      demoOrder = makeOrder(demoSets.length, lastDemoIndex);
+      demoPos = 0;
+    }
+    const idx = demoOrder[demoPos++];
+    lastDemoIndex = idx;
+    return idx;
+  };
+
   async function runAutoLoop(token) {
-    // Step 1: load default set immediately
-    let idx = 0;
-    applyAxesObj(demoSets[idx].axes);
-    setLetterHTML(demoSets[idx].textHTML);
-    await sleep(5000); // Step 2: wait 5s
+    // First, erase whatever is currently in the editor
+    tester.classList.add('is-typing');
+    await eraseByChar(ERASE_STEP_MS, token);
     while (token === autoToken) {
-      const next = (idx + 1) % demoSets.length;
-      // Step 3: erase letter by letter
-      await eraseByChar(ERASE_STEP_MS);
-      if (token !== autoToken) break;
-      // Step 4: change to next style
-      applyAxesObj(demoSets[next].axes);
-      // Ensure content is empty before typing
+      const idx = nextDemoIndex();
+      // Apply style for the chosen demo and type it in
+      applyAxesObj(demoSets[idx].axes);
       setLetterHTML('');
       if (token !== autoToken) break;
-      // Step 5: type next text letter by letter
-      await typeByChar(demoSets[next].textHTML, TYPE_STEP_MS);
+      await typeByChar(demoSets[idx].textHTML, TYPE_STEP_MS, token);
       if (token !== autoToken) break;
-      idx = next;
-      // Step 2 again for subsequent sets
+      tester.classList.remove('is-typing');
       await sleep(5000);
+      tester.classList.add('is-typing');
+      await eraseByChar(ERASE_STEP_MS, token);
+      if (token !== autoToken) break;
     }
+    tester.classList.remove('is-typing');
   }
 
   const updateAxisFromInput = (ev) => {
@@ -404,10 +523,14 @@
       // Start/stop the automatic demo sequence
       if (isAuto) {
         autoToken++;
+        // Start a fresh randomized order that doesn't repeat the last item
+        demoOrder = makeOrder(demoSets.length, lastDemoIndex);
+        demoPos = 0;
         const token = autoToken;
         runAutoLoop(token);
       } else {
         autoToken++; // invalidate any running loop
+        tester.classList.remove('is-typing'); // stop typing visuals immediately
       }
     });
   }
@@ -417,10 +540,15 @@
     const el = controls.querySelector(sel);
     setSliderVisual(el);
   });
+  // Enable direct numeric editing of axis values
+  attachNumericEditors();
 
   // If default mode is AUTO, start the loop after controls are ready
   if (tester.dataset.mode === 'auto') {
     autoToken++;
+    // Initialize a randomized non-repeating order for the first cycle
+    demoOrder = makeOrder(demoSets.length, lastDemoIndex);
+    demoPos = 0;
     const token = autoToken;
     runAutoLoop(token);
   }
