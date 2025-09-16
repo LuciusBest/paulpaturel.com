@@ -308,7 +308,11 @@ video.media-contain,
     -webkit-font-smoothing: antialiased;
     text-rendering: geometricPrecision;
     contain: paint;
-    transform: none; /* keep perfectly centered in stage */
+    transform: none;
+    /* keep perfectly centered in stage */
+    position: relative;
+    top: 20px;
+    /* drop baseline significantly */
     /* Smoother axis and size transitions for interactive adjustments */
     transition:
         font-variation-settings 320ms cubic-bezier(0.2, 0, 0, 1),
@@ -377,28 +381,35 @@ video.media-contain,
 .project_container[data-project-key="COSMA"] .cosma-mode-toggle {
     display: inline-flex;
     align-items: center;
-    gap: 6px; /* reduce space between dot and text by 2px */
+    gap: 6px;
+    /* reduce space between dot and text by 2px */
     background: transparent;
     border: none;
     padding: 4px 0;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
-    color: #000; /* text is always black */
-    opacity: 0.5; /* manual state look */
+    color: #000;
+    /* text is always black */
+    opacity: 0.5;
+    /* manual state look */
 }
 
 .project_container[data-project-key="COSMA"] .cosma-mode-toggle .dot {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: rgba(0, 0, 0, 0.5); /* 50% black */
+    background: rgba(0, 0, 0, 0.5);
+    /* 50% black */
     transition: width 200ms cubic-bezier(0.2, 0, 0, 1), height 200ms cubic-bezier(0.2, 0, 0, 1), background-color 200ms ease;
 }
 
 .project_container[data-project-key="COSMA"] .cosma-mode-toggle.is-auto .dot {
-    width: 11px;  /* big circle 1px smaller */
-    height: 11px; /* big circle 1px smaller */
-    background: #000; /* solid black in AUTO */
+    width: 11px;
+    /* big circle 1px smaller */
+    height: 11px;
+    /* big circle 1px smaller */
+    background: #000;
+    /* solid black in AUTO */
 }
 
 /* AUTO state: full opacity for the whole control */
@@ -418,8 +429,8 @@ video.media-contain,
     letter-spacing: 0.02em;
     /* +2% spacing */
     transition: color 160ms ease, opacity 160ms ease;
-    transform: translateY(1px);
-    /* lower baseline by 2px */
+    transform: translateY(3px);
+    /* drop DEMO baseline by another pixel */
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -461,8 +472,8 @@ video.media-contain,
     font-variation-settings: 'wght' 400, 'wdth' 50, 'opsz' 0;
     letter-spacing: 0.02em;
     /* +2% spacing */
-    transform: translateY(1px);
-    /* lower baseline by 2px */
+    transform: translateY(2px);
+    /* drop baseline an extra pixel */
 }
 
 .project_container[data-project-key="COSMA"] .cosma-val {
@@ -477,8 +488,8 @@ video.media-contain,
     font-variation-settings: 'wght' 400, 'wdth' 50, 'opsz' 0;
     letter-spacing: 0.02em;
     /* +2% spacing */
-    transform: translateY(1px);
-    /* lower baseline by 2px */
+    transform: translateY(2px);
+    /* drop baseline an extra pixel */
 }
 
 .project_container[data-project-key="COSMA"] .cosma-controls .cosma-slider {

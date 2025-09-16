@@ -371,12 +371,35 @@
   const placeCaretAtEnd = (el) => {
     try {
       if (!isTesterVisible(0.5)) return; // defer caret placement when offscreen
-      el.focus();
-      const range = document.createRange();
-      range.selectNodeContents(el);
-      range.collapse(false);
-      const sel = window.getSelection && window.getSelection();
-      if (sel) { sel.removeAllRanges(); sel.addRange(range); }
+      const activeEl = document.activeElement;
+      const alreadyFocused = activeEl === el;
+      // Avoid forcing focus during the auto demo so scroll-snap stays locked.
+      const allowFocus = tester.dataset.mode !== 'auto' || alreadyFocused;
+      if (!alreadyFocused && allowFocus) {
+        try {
+          el.focus({ preventScroll: true });
+        } catch (_) {
+          el.focus();
+        }
+      }
+      if (allowFocus || alreadyFocused) {
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        range.collapse(false);
+        const sel = window.getSelection && window.getSelection();
+        if (sel) {
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      }
+      // Some browsers drop focus during selection updates; refocus without scrolling.
+      if (allowFocus && !alreadyFocused && document.activeElement !== el) {
+        try {
+          el.focus({ preventScroll: true });
+        } catch (_) {
+          el.focus();
+        }
+      }
     } catch (_) {}
   };
   const htmlToPlain = (html) => String(html || '').replace(/<br\s*\/?\s*>/gi, '\n');
