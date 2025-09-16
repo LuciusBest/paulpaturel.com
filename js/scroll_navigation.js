@@ -9,15 +9,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const projects = document.querySelectorAll(".project_container");
   if (!projects.length) return;
 
+  const mainContainer = document.querySelector(".main_container");
+
   // Persistent footer (single DOM node)
   const footer = document.createElement("div");
   footer.className = "project-footer";
+  const track = document.createElement("div");
+  track.className = "project-footer-track";
+  footer.appendChild(track);
   const pagination = document.createElement("span");
   pagination.className = "pagination";
   pagination.textContent = "1/1";
-  footer.appendChild(pagination);
+  track.appendChild(pagination);
   document.body.appendChild(footer);
   footer.style.display = "none";
+
+  const verticalRail = document.createElement("div");
+  verticalRail.className = "project-vertical-rail";
+  const verticalIndex = document.createElement("span");
+  verticalIndex.className = "vertical-index";
+  verticalIndex.textContent = `1/${projects.length}`;
+  verticalRail.appendChild(verticalIndex);
+  document.body.appendChild(verticalRail);
+  verticalRail.style.display = "none";
 
   // Current bindings/state
   let activeProject = null;
@@ -35,36 +49,80 @@ document.addEventListener("DOMContentLoaded", () => {
     progress: 0, // [0..1] used for horizontal positioning of the label
   };
 
-  let rafScheduled = false;
-  let cachedContentWidth = 0;
-
-  const recomputeFooterMetrics = () => {
-    const styles = getComputedStyle(footer);
-    const padL = parseFloat(styles.paddingLeft) || 0;
-    const padR = parseFloat(styles.paddingRight) || 0;
-    cachedContentWidth = footer.clientWidth - padL - padR;
+  const verticalState = {
+    index: 0,
+    total: Math.max(1, projects.length),
+    progress: 0,
   };
 
-  const render = () => {
-    rafScheduled = false;
+  let rafScheduled = false;
+  let cachedContentWidth = 0;
+  let cachedRailHeight = 0;
+
+  const recomputeFooterMetrics = () => {
+    const styles = getComputedStyle(track);
+    const padL = parseFloat(styles.paddingLeft) || 0;
+    const padR = parseFloat(styles.paddingRight) || 0;
+    cachedContentWidth = track.clientWidth - padL - padR;
+  };
+
+  const recomputeVerticalMetrics = () => {
+    cachedRailHeight = verticalRail.clientHeight;
+  };
+
+  const updateHorizontalIndicator = () => {
     const current = Math.max(1, Math.min(state.total, state.index + 1));
     pagination.textContent = `${current}/${state.total}`;
 
-    // Position inside footer according to progress (use cached width)
-    const contentWidth = cachedContentWidth || footer.clientWidth;
+    const contentWidth = cachedContentWidth || track.clientWidth;
     const textWidth = pagination.offsetWidth;
-    const center = (isFinite(state.progress) ? state.progress : 0) * contentWidth;
+    const progress = isFinite(state.progress) ? state.progress : 0;
+    const center = progress * contentWidth;
     const left = Math.min(
       Math.max(center - textWidth / 2, 0),
       Math.max(contentWidth - textWidth, 0)
     );
-    pagination.style.marginLeft = `${left}px`;
+    pagination.style.left = `${left}px`;
+  };
+
+  const updateVerticalIndicator = () => {
+    const current = Math.max(1, Math.min(verticalState.total, verticalState.index + 1));
+    verticalIndex.textContent = `${current}/${verticalState.total}`;
+
+    const railHeight = cachedRailHeight || verticalRail.clientHeight;
+    const usableHeight = Math.max(railHeight - verticalIndex.offsetHeight, 0);
+    const progress = isFinite(verticalState.progress) ? verticalState.progress : 0;
+    const top = progress * usableHeight;
+    verticalIndex.style.transform = `translateY(${top}px)`;
+  };
+
+  const render = () => {
+    rafScheduled = false;
+    updateHorizontalIndicator();
+    updateVerticalIndicator();
   };
 
   const scheduleRender = () => {
     if (!rafScheduled) {
       rafScheduled = true;
       requestAnimationFrame(render);
+    }
+  };
+
+  const computeVerticalProgress = () => {
+    if (!mainContainer) return 0;
+    const scrollRange = mainContainer.scrollHeight - mainContainer.clientHeight;
+    return scrollRange > 0 ? mainContainer.scrollTop / scrollRange : 0;
+  };
+
+  const updateVerticalFromScroll = () => {
+    verticalState.total = Math.max(1, projects.length);
+    verticalState.progress = computeVerticalProgress();
+    if (verticalState.total > 1) {
+      const idx = Math.round(verticalState.progress * (verticalState.total - 1));
+      verticalState.index = Math.max(0, Math.min(verticalState.total - 1, idx));
+    } else {
+      verticalState.index = 0;
     }
   };
 
@@ -133,6 +191,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     activeProject = project;
     activeSlides = Array.from(project.querySelectorAll(".slide"));
+    const projectIndex = Array.from(projects).indexOf(project);
+    if (projectIndex >= 0) {
+      verticalState.index = projectIndex;
+      verticalState.total = Math.max(1, projects.length);
+      verticalState.progress = computeVerticalProgress();
+      render();
+    }
 
     // Observe which slide is most visible inside this horizontal scroller
     const slideRatios = new Map();
@@ -176,7 +241,12 @@ document.addEventListener("DOMContentLoaded", () => {
         scheduleRender();
       }
     };
-    const onResize = () => { recomputeFooterMetrics(); scheduleRender(); };
+    const onResize = () => {
+      recomputeFooterMetrics();
+      recomputeVerticalMetrics();
+      updateVerticalFromScroll();
+      scheduleRender();
+    };
     project.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
 
@@ -186,8 +256,14 @@ document.addEventListener("DOMContentLoaded", () => {
     state.total = Math.max(1, activeSlides.length);
     state.progress = computeProjectProgress();
     recomputeFooterMetrics();
+    if (verticalRail.style.display !== "block") {
+      verticalRail.style.display = "block";
+      recomputeVerticalMetrics();
+    } else {
+      recomputeVerticalMetrics();
+    }
     render();
-    footer.style.display = "flex";
+    footer.style.display = "block";
 
     detachProjectHandlers = () => {
       project.removeEventListener("scroll", onScroll);
@@ -220,9 +296,20 @@ document.addEventListener("DOMContentLoaded", () => {
       } else if (!activeProject && mostVisible) {
         bindProject(mostVisible);
       }
+      updateVerticalFromScroll();
+      scheduleRender();
     },
     { root: null, threshold: 0.5 }
   );
 
   projects.forEach((project) => globalObserver.observe(project));
+
+  if (mainContainer) {
+    const onMainScroll = () => {
+      updateVerticalFromScroll();
+      scheduleRender();
+    };
+    mainContainer.addEventListener("scroll", onMainScroll, { passive: true });
+    updateVerticalFromScroll();
+  }
 });
