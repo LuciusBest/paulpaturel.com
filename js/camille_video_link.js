@@ -3,7 +3,9 @@
 // - Prevent propagation to avoid triggering bio/full-text toggles
 
 document.addEventListener('DOMContentLoaded', () => {
-  const camilleVideo = document.querySelector('.project_container[data-project="CamilleLeprinceWEB"] video');
+  const camilleVideo =
+    document.querySelector('.project_container[data-project-key="CamilleLeprinceWEB"] video') ||
+    document.querySelector('.project_container[data-project="CamilleLeprinceWEB"] video');
   if (!camilleVideo) return;
 
   const goToCamille = (e) => {

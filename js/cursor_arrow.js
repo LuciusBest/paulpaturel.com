@@ -1,7 +1,14 @@
 // Custom right-arrow cursor using IS-Arzier font on links and Camille video
 
 document.addEventListener('DOMContentLoaded', () => {
-  const SELECTOR = 'a[href], [role="link"], .contact-chip[data-url], [data-link-cursor], .project_container[data-project=\"CamilleLeprinceWEB\"] video';
+  const SELECTOR = [
+    'a[href]',
+    '[role="link"]',
+    '.contact-chip[data-url]',
+    '[data-link-cursor]',
+    '.project_container[data-project-key=\"CamilleLeprinceWEB\"] video',
+    '.project_container[data-project=\"CamilleLeprinceWEB\"] video'
+  ].join(', ');
   let activeEl = null;
   let arrow = document.getElementById('cursor_arrow');
   if (!arrow) {

@@ -3,9 +3,20 @@
   // Debug logging
   const DEBUG = false;
   const dbg = (...args) => { try { if (DEBUG) console.log('[COSMA]', ...args); } catch (_) {} };
-  const container = document.querySelector(
-    '.project_container[data-project="COSMA"] .wrapper--centered'
-  );
+  let container =
+    document.querySelector('.project_container[data-project-key="COSMA"] .wrapper--centered') ||
+    document.querySelector('.project_container[data-project="COSMA"] .wrapper--centered');
+  if (!container) {
+    const fallbackProject = Array.from(
+      document.querySelectorAll('.project_container[data-project]')
+    ).find((el) => {
+      const value = (el.getAttribute('data-project') || '').toLowerCase();
+      return value.includes('cosma');
+    });
+    if (fallbackProject) {
+      container = fallbackProject.querySelector('.wrapper--centered');
+    }
+  }
   if (!container) { dbg('no COSMA container found'); return; }
 
   const tester = container.querySelector('.cosma-tester');

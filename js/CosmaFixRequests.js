@@ -25,7 +25,7 @@
   const now = () => Date.now();
 
   function getCosmaRefs() {
-    const tester = $('.project_container[data-project="COSMA"] .cosma-tester');
+    const tester = $('.project_container[data-project*="cosma" i] .cosma-tester');
     const stage = tester && tester.querySelector('.cosma-stage');
     const letter = tester && tester.querySelector('.cosma-letter');
     const sWght = tester && tester.querySelector('#cosma-wght');

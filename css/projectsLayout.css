@@ -182,7 +182,7 @@ video.media-contain,
 
 /* --- Project-specific adjustments --- */
 /* Relay: scale diaporama images to 80% of container */
-.project_container[data-project="Relay"] .diapo-frame img {
+.project_container[data-project-key="Relay"] .diapo-frame img {
     width: 80%;
     height: 80%;
     top: 50%;
@@ -196,7 +196,7 @@ video.media-contain,
 }
 
 /* --- Camille Leprince video: enable interaction + hover scale --- */
-.project_container[data-project="CamilleLeprinceWEB"] video {
+.project_container[data-project-key="CamilleLeprinceWEB"] video {
     pointer-events: auto;
     /* allow click */
     transition: transform 200ms ease-in-out;
@@ -204,14 +204,14 @@ video.media-contain,
     cursor: pointer;
 }
 
-.project_container[data-project="CamilleLeprinceWEB"] video:hover {
+.project_container[data-project-key="CamilleLeprinceWEB"] video:hover {
     transform: scale(1.015);
     /* +1.5% on hover */
 }
 
 /* For Camille: shrink-wrap the video box to its rendered content
    so hover only triggers on the visible video, not the padded area */
-.project_container[data-project="CamilleLeprinceWEB"] .wrapper--centered video.media-contain {
+.project_container[data-project-key="CamilleLeprinceWEB"] .wrapper--centered video.media-contain {
     width: auto;
     height: auto;
     max-width: calc(100dvw - 100px);
@@ -232,12 +232,12 @@ video.media-contain,
     font-display: swap;
 }
 
-.project_container[data-project="COSMA"] .wrapper--centered {
+.project_container[data-project-key="COSMA"] .wrapper--centered {
     background-color: #ffffff;
     /* project background: white */
 }
 
-.project_container[data-project="COSMA"] .cosma-tester {
+.project_container[data-project-key="COSMA"] .cosma-tester {
     position: relative;
     width: 80%;
     /* leave 10% margin on each side */
@@ -259,7 +259,7 @@ video.media-contain,
 }
 
 /* COSMA: top bar to host the mode toggle at the top center */
-.project_container[data-project="COSMA"] .cosma-topbar {
+.project_container[data-project-key="COSMA"] .cosma-topbar {
     position: absolute;
     top: 8px;
     left: 0;
@@ -274,7 +274,7 @@ video.media-contain,
     /* container ignores, button re-enables */
 }
 
-.project_container[data-project="COSMA"] .cosma-stage {
+.project_container[data-project-key="COSMA"] .cosma-stage {
     align-self: stretch;
     justify-self: stretch;
     width: 100%;
@@ -285,7 +285,7 @@ video.media-contain,
     /* keep text centered */
 }
 
-.project_container[data-project="COSMA"] .cosma-letter {
+.project_container[data-project-key="COSMA"] .cosma-letter {
     font-family: 'Cosma', system-ui, sans-serif;
     font-size: 25vh;
     /* default; JS treats this as the max cap */
@@ -322,12 +322,12 @@ video.media-contain,
 
 /* Respect reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
-    .project_container[data-project="COSMA"] .cosma-letter {
+    .project_container[data-project-key="COSMA"] .cosma-letter {
         transition: none;
     }
 }
 
-.project_container[data-project="COSMA"] .cosma-footer {
+.project_container[data-project-key="COSMA"] .cosma-footer {
     position: absolute;
     left: 0;
     bottom: 0;
@@ -338,7 +338,7 @@ video.media-contain,
     pointer-events: none;
 }
 
-.project_container[data-project="COSMA"] .cosma-footer-column {
+.project_container[data-project-key="COSMA"] .cosma-footer-column {
     flex: 1;
     text-align: center;
     font-family: 'Cosma', system-ui, sans-serif;
@@ -346,7 +346,7 @@ video.media-contain,
 }
 
 /* Bottom sliders (do not break layout) */
-.project_container[data-project="COSMA"] .cosma-controls {
+.project_container[data-project-key="COSMA"] .cosma-controls {
     position: static;
     /* flow as second grid row */
     box-sizing: border-box;
@@ -367,14 +367,14 @@ video.media-contain,
 }
 
 /* COSMA: mode toggle (Manual/Auto) */
-.project_container[data-project="COSMA"] .cosma-mode-row {
+.project_container[data-project-key="COSMA"] .cosma-mode-row {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-bottom: 2px;
 }
 
-.project_container[data-project="COSMA"] .cosma-mode-toggle {
+.project_container[data-project-key="COSMA"] .cosma-mode-toggle {
     display: inline-flex;
     align-items: center;
     gap: 6px; /* reduce space between dot and text by 2px */
@@ -387,7 +387,7 @@ video.media-contain,
     opacity: 0.5; /* manual state look */
 }
 
-.project_container[data-project="COSMA"] .cosma-mode-toggle .dot {
+.project_container[data-project-key="COSMA"] .cosma-mode-toggle .dot {
     width: 7px;
     height: 7px;
     border-radius: 50%;
@@ -395,18 +395,18 @@ video.media-contain,
     transition: width 200ms cubic-bezier(0.2, 0, 0, 1), height 200ms cubic-bezier(0.2, 0, 0, 1), background-color 200ms ease;
 }
 
-.project_container[data-project="COSMA"] .cosma-mode-toggle.is-auto .dot {
+.project_container[data-project-key="COSMA"] .cosma-mode-toggle.is-auto .dot {
     width: 11px;  /* big circle 1px smaller */
     height: 11px; /* big circle 1px smaller */
     background: #000; /* solid black in AUTO */
 }
 
 /* AUTO state: full opacity for the whole control */
-.project_container[data-project="COSMA"] .cosma-mode-toggle.is-auto {
+.project_container[data-project-key="COSMA"] .cosma-mode-toggle.is-auto {
     opacity: 1;
 }
 
-.project_container[data-project="COSMA"] .cosma-mode-toggle .label {
+.project_container[data-project-key="COSMA"] .cosma-mode-toggle .label {
     font-family: 'Cosma', system-ui, sans-serif;
     font-size: 12px;
     font-weight: 400;
@@ -424,32 +424,32 @@ video.media-contain,
 
 @media (prefers-reduced-motion: reduce) {
 
-    .project_container[data-project="COSMA"] .cosma-mode-toggle .dot,
-    .project_container[data-project="COSMA"] .cosma-mode-toggle .label {
+    .project_container[data-project-key="COSMA"] .cosma-mode-toggle .dot,
+    .project_container[data-project-key="COSMA"] .cosma-mode-toggle .label {
         transition: none;
     }
 }
 
-.project_container[data-project="COSMA"] .cosma-controls:hover {
+.project_container[data-project-key="COSMA"] .cosma-controls:hover {
     opacity: 1;
 }
 
 /* In AUTO mode: make container and all rows fully opaque */
-.project_container[data-project="COSMA"] .cosma-tester[data-mode="auto"] .cosma-controls {
+.project_container[data-project-key="COSMA"] .cosma-tester[data-mode="auto"] .cosma-controls {
     opacity: 1;
 }
 
-.project_container[data-project="COSMA"] .cosma-tester[data-mode="auto"] .cosma-row {
+.project_container[data-project-key="COSMA"] .cosma-tester[data-mode="auto"] .cosma-row {
     opacity: 1;
 }
 
-.project_container[data-project="COSMA"] .cosma-row {
+.project_container[data-project-key="COSMA"] .cosma-row {
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.project_container[data-project="COSMA"] .cosma-label {
+.project_container[data-project-key="COSMA"] .cosma-label {
     width: 48px;
     text-transform: uppercase;
     font-family: 'Cosma', system-ui, sans-serif;
@@ -465,7 +465,7 @@ video.media-contain,
     /* lower baseline by 2px */
 }
 
-.project_container[data-project="COSMA"] .cosma-val {
+.project_container[data-project-key="COSMA"] .cosma-val {
     width: 48px;
     text-align: right;
     font-family: 'Cosma', system-ui, sans-serif;
@@ -481,7 +481,7 @@ video.media-contain,
     /* lower baseline by 2px */
 }
 
-.project_container[data-project="COSMA"] .cosma-controls .cosma-slider {
+.project_container[data-project-key="COSMA"] .cosma-controls .cosma-slider {
     width: 100%;
     appearance: none;
     -webkit-appearance: none;
@@ -493,7 +493,7 @@ video.media-contain,
 }
 
 /* WebKit track + thumb */
-.project_container[data-project="COSMA"] .cosma-controls .cosma-slider::-webkit-slider-runnable-track {
+.project_container[data-project-key="COSMA"] .cosma-controls .cosma-slider::-webkit-slider-runnable-track {
     height: 10px;
     background:
         linear-gradient(#000, #000) left/var(--p, 50%) 100% no-repeat,
@@ -503,7 +503,7 @@ video.media-contain,
     transition: background-size 300ms ease;
 }
 
-.project_container[data-project="COSMA"] .cosma-controls .cosma-slider::-webkit-slider-thumb {
+.project_container[data-project-key="COSMA"] .cosma-controls .cosma-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     width: 14px;
     height: 14px;
@@ -518,7 +518,7 @@ video.media-contain,
 }
 
 /* Firefox track + thumb */
-.project_container[data-project="COSMA"] .cosma-controls .cosma-slider::-moz-range-track {
+.project_container[data-project-key="COSMA"] .cosma-controls .cosma-slider::-moz-range-track {
     height: 10px;
     background:
         linear-gradient(#000, #000) left/var(--p, 50%) 100% no-repeat,
@@ -529,30 +529,30 @@ video.media-contain,
 }
 
 /* AUTO mode: slower, longer track fill to feel animated */
-.project_container[data-project="COSMA"] .cosma-tester[data-mode="auto"] .cosma-controls .cosma-slider::-webkit-slider-runnable-track {
+.project_container[data-project-key="COSMA"] .cosma-tester[data-mode="auto"] .cosma-controls .cosma-slider::-webkit-slider-runnable-track {
     transition: background-size 880ms ease;
 }
 
-.project_container[data-project="COSMA"] .cosma-tester[data-mode="auto"] .cosma-controls .cosma-slider::-moz-range-track {
+.project_container[data-project-key="COSMA"] .cosma-tester[data-mode="auto"] .cosma-controls .cosma-slider::-moz-range-track {
     transition: background-size 880ms ease;
 }
 
 /* While dragging, disable transitions for immediate feedback */
-.project_container[data-project="COSMA"] .cosma-tester.is-dragging .cosma-controls .cosma-slider::-webkit-slider-runnable-track,
-.project_container[data-project="COSMA"] .cosma-tester.is-dragging .cosma-controls .cosma-slider::-moz-range-track {
+.project_container[data-project-key="COSMA"] .cosma-tester.is-dragging .cosma-controls .cosma-slider::-webkit-slider-runnable-track,
+.project_container[data-project-key="COSMA"] .cosma-tester.is-dragging .cosma-controls .cosma-slider::-moz-range-track {
     transition: none !important;
 }
 
-.project_container[data-project="COSMA"] .cosma-tester.is-dragging .cosma-letter {
+.project_container[data-project-key="COSMA"] .cosma-tester.is-dragging .cosma-letter {
     transition: none !important;
 }
 
 /* While auto typing/erasing, minimize visual artifacts */
-.project_container[data-project="COSMA"] .cosma-tester.is-typing .cosma-letter {
+.project_container[data-project-key="COSMA"] .cosma-tester.is-typing .cosma-letter {
     transition: none !important;
 }
 
-.project_container[data-project="COSMA"] .cosma-controls .cosma-slider::-moz-range-thumb {
+.project_container[data-project-key="COSMA"] .cosma-controls .cosma-slider::-moz-range-thumb {
     width: 14px;
     height: 14px;
     background: transparent;
@@ -564,27 +564,27 @@ video.media-contain,
 }
 
 /* Scoped selection styling per theme */
-.project_container[data-project="COSMA"] .cosma-tester ::selection {
+.project_container[data-project-key="COSMA"] .cosma-tester ::selection {
     background-color: #0080FF;
     color: #000000;
 }
 
-.project_container[data-project="COSMA"] .cosma-tester[data-theme="monochrome-mix"] ::selection {
+.project_container[data-project-key="COSMA"] .cosma-tester[data-theme="monochrome-mix"] ::selection {
     background-color: #000000;
     color: #FFFFFF;
 }
 
-.project_container[data-project="COSMA"] .cosma-tester[data-theme="pop-peak"] ::selection {
+.project_container[data-project-key="COSMA"] .cosma-tester[data-theme="pop-peak"] ::selection {
     background-color: #FF0B0B;
     color: #FFFFFF;
 }
 
-.project_container[data-project="COSMA"] .cosma-tester[data-theme="studio-depth"] ::selection {
+.project_container[data-project-key="COSMA"] .cosma-tester[data-theme="studio-depth"] ::selection {
     background-color: #000000;
     color: #848C76;
 }
 
-.project_container[data-project="COSMA"] .cosma-tester[data-theme="mp3-shell"] ::selection {
+.project_container[data-project-key="COSMA"] .cosma-tester[data-theme="mp3-shell"] ::selection {
     background-color: #E0E0E0;
     color: #000000;
 }

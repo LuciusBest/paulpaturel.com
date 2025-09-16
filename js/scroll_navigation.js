@@ -26,12 +26,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const verticalRail = document.createElement("div");
   verticalRail.className = "project-vertical-rail";
+  const verticalIndicatorGroup = document.createElement("div");
+  verticalIndicatorGroup.className = "vertical-indicator-group";
+  const verticalProjectName = document.createElement("span");
+  verticalProjectName.className = "vertical-project-name";
+  verticalProjectName.textContent = "";
   const verticalIndex = document.createElement("span");
   verticalIndex.className = "vertical-index";
   verticalIndex.textContent = `1/${projects.length}`;
-  verticalRail.appendChild(verticalIndex);
+  verticalIndicatorGroup.appendChild(verticalProjectName);
+  verticalIndicatorGroup.appendChild(verticalIndex);
+  verticalRail.appendChild(verticalIndicatorGroup);
   document.body.appendChild(verticalRail);
   verticalRail.style.display = "none";
+
+  const isProjectVisible = (project) => {
+    if (!project) return false;
+    if (project.classList.contains("is-filtered")) return false;
+    if (project.offsetParent !== null) return true;
+    try {
+      const style = window.getComputedStyle(project);
+      if (!style) return false;
+      if (style.display === "none" || style.visibility === "hidden") return false;
+    } catch (_) {
+      return false;
+    }
+    return true;
+  };
+
+  const getVisibleProjects = () => Array.from(projects).filter(isProjectVisible);
 
   // Current bindings/state
   let activeProject = null;
@@ -51,19 +74,69 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const verticalState = {
     index: 0,
-    total: Math.max(1, projects.length),
+    total: Math.max(1, getVisibleProjects().length || 0),
     progress: 0,
   };
+
+  const tidy = (str) => String(str || "").replace(/\s+/g, " ").trim();
+
+  const deriveProjectLabel = (projectEl) => {
+    if (!projectEl) return "";
+    const explicit =
+      projectEl.getAttribute("data-project-label") ||
+      projectEl.getAttribute("data-project-name");
+    if (explicit) return tidy(explicit);
+    const raw = tidy(projectEl.getAttribute("data-project"));
+    if (!raw) return "";
+    const hasSpace = /\s/.test(raw);
+    const hasSeparator = /[-_]/.test(raw);
+    let label = raw;
+    if (!hasSpace || hasSeparator) {
+      label = raw
+        .replace(/[_-]+/g, " ")
+        .replace(/([a-z])([A-Z])/g, "$1 $2")
+        .replace(/([A-Z])([A-Z][a-z])/g, "$1 $2");
+      label = tidy(label);
+      label = label
+        .split(" ")
+        .map((word) =>
+          /^[A-Z0-9]+$/.test(word)
+            ? word
+            : word.charAt(0).toUpperCase() + word.slice(1)
+        )
+        .join(" ");
+    }
+    return tidy(label);
+  };
+
+  const setProjectName = (label) => {
+    const text = tidy(label);
+    if (!text) {
+      verticalProjectName.textContent = "";
+      verticalProjectName.style.display = "none";
+      verticalProjectName.setAttribute("aria-hidden", "true");
+    } else {
+      verticalProjectName.textContent = text;
+      verticalProjectName.style.display = "inline-block";
+      verticalProjectName.removeAttribute("aria-hidden");
+    }
+  };
+
+  if (projects[0]) {
+    setProjectName(deriveProjectLabel(projects[0]));
+  }
 
   let rafScheduled = false;
   let cachedContentWidth = 0;
   let cachedRailHeight = 0;
+  let cachedFooterHeight = 0;
 
   const recomputeFooterMetrics = () => {
     const styles = getComputedStyle(track);
     const padL = parseFloat(styles.paddingLeft) || 0;
     const padR = parseFloat(styles.paddingRight) || 0;
     cachedContentWidth = track.clientWidth - padL - padR;
+    cachedFooterHeight = footer.offsetHeight || cachedFooterHeight || 0;
   };
 
   const recomputeVerticalMetrics = () => {
@@ -90,10 +163,13 @@ document.addEventListener("DOMContentLoaded", () => {
     verticalIndex.textContent = `${current}/${verticalState.total}`;
 
     const railHeight = cachedRailHeight || verticalRail.clientHeight;
-    const usableHeight = Math.max(railHeight - verticalIndex.offsetHeight, 0);
+    const footerHeight = cachedFooterHeight || footer.offsetHeight || 0;
+    const indicatorHeight =
+      verticalIndicatorGroup.offsetHeight || verticalIndex.offsetHeight;
+    const usableHeight = Math.max(railHeight - indicatorHeight - footerHeight, 0);
     const progress = isFinite(verticalState.progress) ? verticalState.progress : 0;
     const top = progress * usableHeight;
-    verticalIndex.style.transform = `translateY(${top}px)`;
+    verticalIndicatorGroup.style.transform = `translateY(${top}px)`;
   };
 
   const render = () => {
@@ -116,11 +192,13 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const updateVerticalFromScroll = () => {
-    verticalState.total = Math.max(1, projects.length);
+    const visibleProjects = getVisibleProjects();
+    const visibleCount = visibleProjects.length;
+    verticalState.total = Math.max(1, visibleCount);
     verticalState.progress = computeVerticalProgress();
-    if (verticalState.total > 1) {
-      const idx = Math.round(verticalState.progress * (verticalState.total - 1));
-      verticalState.index = Math.max(0, Math.min(verticalState.total - 1, idx));
+    if (visibleCount > 1) {
+      const idx = Math.round(verticalState.progress * (visibleCount - 1));
+      verticalState.index = Math.max(0, Math.min(visibleCount - 1, idx));
     } else {
       verticalState.index = 0;
     }
@@ -191,13 +269,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     activeProject = project;
     activeSlides = Array.from(project.querySelectorAll(".slide"));
-    const projectIndex = Array.from(projects).indexOf(project);
+    setProjectName(deriveProjectLabel(project));
+    const visibleProjects = getVisibleProjects();
+    const totalVisible = visibleProjects.length;
+    const projectIndex = visibleProjects.indexOf(project);
+    verticalState.total = Math.max(1, totalVisible);
     if (projectIndex >= 0) {
       verticalState.index = projectIndex;
-      verticalState.total = Math.max(1, projects.length);
-      verticalState.progress = computeVerticalProgress();
-      render();
+    } else {
+      verticalState.index = Math.max(0, Math.min(verticalState.total - 1, verticalState.index));
     }
+    verticalState.progress = computeVerticalProgress();
+    render();
 
     // Observe which slide is most visible inside this horizontal scroller
     const slideRatios = new Map();
@@ -264,6 +347,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     render();
     footer.style.display = "block";
+    recomputeFooterMetrics();
 
     detachProjectHandlers = () => {
       project.removeEventListener("scroll", onScroll);
@@ -280,6 +364,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const chooseMostVisibleProject = () => {
     let best = { el: null, ratio: 0 };
     ratios.forEach((ratio, el) => {
+      if (!isProjectVisible(el)) return;
       if (ratio > best.ratio) best = { el, ratio };
     });
     return best.el;
@@ -312,4 +397,35 @@ document.addEventListener("DOMContentLoaded", () => {
     mainContainer.addEventListener("scroll", onMainScroll, { passive: true });
     updateVerticalFromScroll();
   }
+
+  const onFilterChange = () => {
+    const visibleProjects = getVisibleProjects();
+    if (!visibleProjects.length) {
+      activeProject = null;
+      setProjectName("");
+      verticalState.index = 0;
+      verticalState.total = 1;
+      verticalState.progress = 0;
+      scheduleRender();
+      return;
+    }
+    if (!activeProject || !isProjectVisible(activeProject)) {
+      bindProject(visibleProjects[0]);
+      return;
+    }
+    const idx = visibleProjects.indexOf(activeProject);
+    if (idx >= 0) {
+      verticalState.index = idx;
+    }
+    verticalState.total = Math.max(1, visibleProjects.length);
+    verticalState.progress = computeVerticalProgress();
+    recomputeVerticalMetrics();
+    scheduleRender();
+  };
+
+  try {
+    window.addEventListener("projects:filter-change", onFilterChange);
+  } catch (_) {}
+
+  onFilterChange();
 });

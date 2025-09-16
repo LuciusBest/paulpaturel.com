@@ -66,12 +66,19 @@
     z-index: 1000;
 }
 
-.project-vertical-rail .vertical-index {
+.project-vertical-rail .vertical-indicator-group {
     position: absolute;
     right: 0;
-    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
     will-change: transform;
+}
+
+.project-vertical-rail .vertical-index,
+.project-vertical-rail .vertical-project-name {
+    white-space: nowrap;
     background: #ffffff;
     color: #000000;
     font-size: 15px;
@@ -80,4 +87,8 @@
     padding: 0 6px;
     mix-blend-mode: normal;
     display: inline-block;
+}
+
+.project-vertical-rail .vertical-project-name {
+    text-align: right;
 }

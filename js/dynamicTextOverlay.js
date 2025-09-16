@@ -364,6 +364,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const projectContainers = document.querySelectorAll(".project_container");
+  const getProjectKey = (el) => {
+    if (!el) return "";
+    const key = el.getAttribute("data-project-key") || el.getAttribute("data-project") || "";
+    return String(key).trim();
+  };
   if (textOverlay && projectContainers.length) {
     const fetchJSON = (url) => fetch(url).then((r) => {
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -756,7 +761,8 @@ document.addEventListener("DOMContentLoaded", () => {
           });
 
           if (mostVisible && maxRatio > 0) {
-            setOverlayText(mostVisible.getAttribute("data-project"));
+            const key = getProjectKey(mostVisible) || mostVisible.getAttribute("data-project") || "";
+            setOverlayText(key);
           } else {
             setOverlayText("");
           }

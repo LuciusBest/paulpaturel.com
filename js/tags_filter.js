@@ -11,12 +11,18 @@
   window.__tagsFilterInitialized = true;
 
   const OVERLAY_SELECTOR = '#text_overlay_container';
-  const PROJECT_SELECTOR = '.project_container[data-project]';
+  const PROJECT_SELECTOR = '.project_container[data-project], .project_container[data-project-key]';
   const FILTERED_CLASS = 'is-filtered';
   const ACTIVE_CLASS = 'is-active';
 
   const overlay = document.querySelector(OVERLAY_SELECTOR);
   if (!overlay) return; // nothing to bind
+
+  const getProjectKey = (el) => {
+    if (!el) return '';
+    const key = el.getAttribute('data-project-key') || el.getAttribute('data-project') || '';
+    return String(key).trim();
+  };
 
   // Normalization: trim, collapse internal whitespace, lower-case; strip diacritics
   const normalizeTag = (s) => {
@@ -49,12 +55,23 @@
   let projectTags = new Map();
   let activeTag = null; // normalized or null
 
+  const emitFilterChange = () => {
+    try {
+      window.dispatchEvent(
+        new CustomEvent('projects:filter-change', {
+          detail: { activeTag },
+        })
+      );
+    } catch (_) {}
+  };
+
   const buildProjectTags = (texts) => {
     projectTags = new Map();
     // Collect all existing projects from DOM
     const projects = document.querySelectorAll(PROJECT_SELECTOR);
     projects.forEach((el) => {
-      const key = el.getAttribute('data-project');
+      const key = getProjectKey(el);
+      if (!key) return;
       const entry = texts && texts[key];
       let text = '';
       if (typeof entry === 'string') text = entry;
@@ -68,7 +85,8 @@
   const applyFilter = () => {
     const projects = document.querySelectorAll(PROJECT_SELECTOR);
     projects.forEach((el) => {
-      const key = el.getAttribute('data-project');
+      const key = getProjectKey(el);
+      if (!key) return;
       const tags = projectTags.get(key) || new Set();
       const shouldHide = activeTag ? !tags.has(activeTag) : false;
       if (shouldHide) el.classList.add(FILTERED_CLASS);
@@ -77,6 +95,7 @@
     // Nudge layout/observers after style changes
     Promise.resolve().then(() => {
       window.dispatchEvent(new Event('resize'));
+      emitFilterChange();
     });
   };
 
@@ -164,6 +183,7 @@
       .then((texts) => {
         buildProjectTags(texts);
         applyFilter(); // ensure initial state visible
+        emitFilterChange();
         // Observe overlay subtree
         mo.observe(overlay, { childList: true, subtree: true });
         // Enhance any existing chips
@@ -174,6 +194,7 @@
         // Even if JSON fails, enable chip semantics so user still gets hover/active feedback
         mo.observe(overlay, { childList: true, subtree: true });
         enhanceChips();
+        emitFilterChange();
       });
   };
 
