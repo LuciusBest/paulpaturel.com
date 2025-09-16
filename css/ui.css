@@ -168,7 +168,8 @@ body {
 #text_overlay_container_left .left-meta .char {
     background: transparent;
     color: inherit;
-    mix-blend-mode: inherit;
+    line-height: 0.9;
+    mix-blend-mode: difference;
 }
 
 #text_overlay_container_left .left-meta a {
