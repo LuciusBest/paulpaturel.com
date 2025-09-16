@@ -433,7 +433,7 @@
     { textHTML: 'LILAS <br> 75020', axes: { wght: 900, wdth: 150, opsz: 0 } },
     { textHTML: 'Playstation', axes: { wght: 500, wdth: 50, opsz: 100 } },
     { textHTML: 'HYPERDRIVE', axes: { wght: 500, wdth: 115, opsz: 50 } },
-    { textHTML: 'Not only he had a vynil collection...<br>But he paid the bills out of it.<br>Vince was the real deal.', axes: { wght: 600, wdth: 60, opsz: 40 } },
+    { textHTML: 'Not only he had a vynil collection...<br>But he paid the bills out of it.<br>Vince was the real deal.', axes: { wght: 601, wdth: 60, opsz: 40 } },
     { textHTML: 'Roland Jupiter-8<br>Sequential Six-Trak <br>Oberheim OB-XA<br>Ensoniq ESQ-1/SQ-80<br>Yamaha CS-70M', axes: { wght: 200, wdth: 50, opsz: 0 } },
     { textHTML: 'Edwin van der Sar – GK<br>Michael Reiziger – RB<br>Danny Blind – CB<br>Frank de Boer – DM<br>Frank Rijkaard – LB<br>Clarence Seedorf – CM<br>Edgar Davids – RW<br>Finidi George – CM<br>Jar Litmanen – CF<br>Marc Overmars – AM<br>Ronald de Boer – LW<br>', axes: { wght: 300, wdth: 110, opsz: 0 } },
     { textHTML: 'SUBOSCILLATOR', axes: { wght: 900, wdth: 50, opsz: 30 } },

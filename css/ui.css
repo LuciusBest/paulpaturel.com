@@ -29,9 +29,10 @@ body {
     width: 50%;
     z-index: 999;
     padding: 3px;
+    margin-top: 2px;
     /* Ensure legibility regardless of background */
     color: #ffffff;
-    mix-blend-mode: difference;
+    mix-blend-mode: normal;
     /* "negative fusion" style: invert vs background */
     -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.35);
     /* subtle fallback edge */
@@ -48,6 +49,24 @@ body {
     margin-left: 3px;
 }
 
+/* Make the name interactive (hover/click) without enabling the whole overlay */
+#left_name {
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+/* Enable interaction on the bio only when expanded */
+#text_overlay_container_left.bio-expanded #left_bio {
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+/* Avoid nested spans capturing hover/leave on the name wrapper */
+.char {
+    display: inline;
+    pointer-events: none;
+}
+
 /* Hover chip for email/instagram with white background and difference blend */
 #text_overlay_container_left .contact-chip {
     transition: background-color .2s ease, color .2s ease, opacity .2s ease;
@@ -61,9 +80,24 @@ body {
 #text_overlay_container_left .contact-chip:focus {
     background: #ffffff;
     color: #000000;
-    mix-blend-mode: difference;
+    mix-blend-mode: normal;
     /* ensure strong contrast via inversion over any backdrop */
     outline: none;
+}
+
+/* Left overlay: apply white background to name and bio tokens (match right overlay readability) */
+#text_overlay_container_left .word,
+#text_overlay_container_left .space {
+    background: #ffffff;
+    color: #000;
+    mix-blend-mode: normal;
+    border-radius: 0px;
+}
+
+#text_overlay_container_left .char {
+    background: #ffffff;
+    color: #000;
+    mix-blend-mode: normal;
 }
 
 /* Language toggle styles */
@@ -80,7 +114,7 @@ body {
 #text_overlay_container_left .lang-option:focus {
     background: #ffffff;
     color: #000000;
-    mix-blend-mode: difference;
+    mix-blend-mode: normal;
     outline: none;
 }
 
@@ -106,6 +140,7 @@ body {
     width: 50%;
     z-index: 999;
     padding: 3px;
+    margin-top: 2px;
     /* font-size: 18px; */
     /* Container no longer has a solid background; backgrounds applied per word/tag */
     color: black;
@@ -129,14 +164,9 @@ body {
     will-change: background-color, color, border-radius, opacity;
 }
 
-.char {
-    display: inline;
-}
+/* (char display kept above with pointer-events: none) */
 
-html,
-body {
-    cursor: pointer;
-}
+/* Use pointer cursor only on interactive elements, not globally */
 
 /* --- Phase de chargement (utilisant le nom de gauche) --- */
 /* Bloque le scroll et toute interaction */
@@ -159,9 +189,12 @@ body.is-loading *::after {
     background: #000;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 700ms ease, visibility 0s linear 700ms; /* fade-out in 0.7s */
-    pointer-events: none; /* don’t block clicks after loading */
+    transition: opacity 700ms ease, visibility 0s linear 700ms;
+    /* fade-out in 0.7s */
+    pointer-events: none;
+    /* don’t block clicks after loading */
 }
+
 /* Show quickly during loading */
 body.is-loading #loading-mask {
     opacity: 1;
@@ -170,10 +203,21 @@ body.is-loading #loading-mask {
 }
 
 /* Pendant le loading: cacher l’overlay droit et la bio */
-body.is-loading #text_overlay_container { display: none !important; }
-body.is-loading #left_bio { display: none !important; }
-body.is-loading .project-footer { display: none !important; }
-body.is-loading #cursor_arrow { display: none !important; }
+body.is-loading #text_overlay_container {
+    display: none !important;
+}
+
+body.is-loading #left_bio {
+    display: none !important;
+}
+
+body.is-loading .project-footer {
+    display: none !important;
+}
+
+body.is-loading #cursor_arrow {
+    display: none !important;
+}
 
 /* Space tokens: preserve width of spaces so they can receive background */
 .space {
@@ -197,6 +241,21 @@ body.is-loading #cursor_arrow { display: none !important; }
     margin-right: 3px;
     margin-bottom: 3px;
     pointer-events: auto;
+}
+
+/* Plus/Minus control chip — styled like a tag chip in both modes */
+#text_overlay_container .control-chip {
+    display: inline-block;
+    background: #ffffff;
+    color: #000;
+    border-radius: 0px;
+    padding: 0 6px;
+    margin-left: 0;
+    margin-right: 3px;
+    margin-bottom: 3px;
+    pointer-events: auto;
+    user-select: none;
+    cursor: pointer;
 }
 
 /* When using a tag wrapper, avoid double backgrounds on inner words in chips view */
@@ -223,6 +282,8 @@ body.is-loading #cursor_arrow { display: none !important; }
 #text_overlay_container.is-fulltext .space {
     background: #ffffff;
     color: #000;
+    pointer-events: auto;
+    cursor: pointer;
 }
 
 /* Active state (yellow) for chips in both modes */
@@ -236,6 +297,7 @@ body.is-loading #cursor_arrow { display: none !important; }
 #text_overlay_container .word.highlight,
 #text_overlay_container .tag.highlight {
     pointer-events: auto;
+    cursor: pointer;
 }
 
 /* Ensure active state overrides full-text white background */

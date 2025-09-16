@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let toggleWords = () => {};
   let toggleLetters = () => {};
+  let openLeftBio = () => {};
   // i18n state
   let currentLang = (localStorage.getItem('pp.lang') || 'en');
   let switchLanguage = () => {};
@@ -30,12 +31,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const BIO_DELAY = 450; // ms gap between name and bio animations
     let currentIndex = 0;
     let targetExpanded = false;
+    let isNameHovered = false;
     let letterTimeouts = [];
     let bioTimeouts = [];
 
     // Build structure: name container + bio container
     const nameEl = document.createElement("div");
     nameEl.id = "left_name";
+    // Make the name focusable/clickable for accessibility
+    try { nameEl.setAttribute('role', 'button'); nameEl.setAttribute('tabindex', '0'); } catch (_) {}
     const bioEl = document.createElement("div");
     bioEl.id = "left_bio";
     leftOverlay.innerHTML = "";
@@ -197,6 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initial rendering
     renderState(currentIndex);
     renderBio();
+    try { leftOverlay.classList.remove('bio-expanded'); } catch (_) {}
 
     // Language switching: update currentLang, persist, re-render bio and reveal if expanded
     switchLanguage = (lang) => {
@@ -256,6 +261,106 @@ document.addEventListener("DOMContentLoaded", () => {
 
       targetExpanded = goingToExpanded;
     };
+
+    // Open-only action: ensure PATUREL + reveal bio (idempotent)
+    openLeftBio = () => {
+      // If already expanded, ensure name is fully expanded and bail
+      if (targetExpanded) {
+        if (currentIndex !== states.length - 1) animateLettersTo(states.length - 1, 0);
+        return;
+      }
+      // Clear any pending animations
+      letterTimeouts.forEach(clearTimeout);
+      letterTimeouts = [];
+      clearBioTimeouts();
+
+      const targetIndex = states.length - 1;
+
+      // If the name is already visually PATUREL (hover path) or at final index,
+      // snap to final state and show bio instantly (no delay).
+      if (isNameHovered || currentIndex === targetIndex) {
+        // Snap render to final if needed
+        if (currentIndex !== targetIndex) {
+          renderState(targetIndex);
+          currentIndex = targetIndex;
+        }
+        animateBio(true); // instant reveal
+        try { leftOverlay.classList.add('bio-expanded'); } catch (_) {}
+        targetExpanded = true;
+        return;
+      }
+
+      // Otherwise, animate letters then reveal after the usual delay
+      const steps = Math.abs(targetIndex - currentIndex);
+      const totalLetterTime = steps * dt;
+      animateLettersTo(targetIndex, 0);
+      const start = setTimeout(() => { animateBio(true); }, totalLetterTime + BIO_DELAY);
+      bioTimeouts.push(start);
+      targetExpanded = true;
+      try { leftOverlay.classList.add('bio-expanded'); } catch (_) {}
+    };
+
+    // Collapse-only: hide bio, then collapse name back to PAUL if not hovered
+    const collapseLeftBio = () => {
+      if (!targetExpanded) return;
+      // Clear any pending animations
+      letterTimeouts.forEach(clearTimeout);
+      letterTimeouts = [];
+      clearBioTimeouts();
+      // Hide the bio first
+      const bioDuration = animateBio(false);
+      // After a gap, collapse the name only if not hovered
+      if (!isNameHovered) {
+        const start = setTimeout(() => { animateLettersTo(0, 0); }, bioDuration + BIO_DELAY);
+        letterTimeouts.push(start);
+      }
+      targetExpanded = false;
+      try { leftOverlay.classList.remove('bio-expanded'); } catch (_) {}
+    };
+
+    // Hover: only morph the name, do not touch the bio
+    const hoverIn = () => {
+      isNameHovered = true;
+      if (targetExpanded) return; // keep as PATUREL when expanded
+      letterTimeouts.forEach(clearTimeout);
+      letterTimeouts = [];
+      animateLettersTo(states.length - 1, 0);
+    };
+    const hoverOut = () => {
+      isNameHovered = false;
+      if (targetExpanded) return; // keep as PATUREL when expanded
+      letterTimeouts.forEach(clearTimeout);
+      letterTimeouts = [];
+      animateLettersTo(0, 0);
+    };
+    try {
+      nameEl.addEventListener('mouseenter', hoverIn);
+      nameEl.addEventListener('mouseleave', hoverOut);
+      nameEl.addEventListener('focus', hoverIn);
+      nameEl.addEventListener('blur', hoverOut);
+    } catch (_) {}
+
+    // Click/keyboard on the name opens the full bio
+    const activateOpen = (e) => {
+      try { if (e) { e.preventDefault(); e.stopPropagation(); } } catch (_) {}
+      if (targetExpanded) collapseLeftBio(); else openLeftBio();
+    };
+    try {
+      nameEl.addEventListener('click', activateOpen);
+      nameEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') activateOpen(e);
+      });
+    } catch (_) {}
+
+    // Click anywhere in the bio text to collapse it (chips/lang stopPropagation so they won't close)
+    try {
+      bioEl.addEventListener('click', (e) => {
+        if (!targetExpanded) return;
+        // Allow interactive chips to prevent this via stopPropagation
+        try { e.preventDefault(); e.stopPropagation(); } catch (_) {}
+        collapseLeftBio();
+      });
+    } catch (_) {}
   }
 
   const projectContainers = document.querySelectorAll(".project_container");
@@ -277,6 +382,30 @@ document.addEventListener("DOMContentLoaded", () => {
         let formatTimeouts = [];
         const HIGHLIGHT_DT = 100; // ms between each highlighted word transformation
         let lastProjectName = "";
+        let controlChipEl = null;
+
+        const ensureControlChip = () => {
+          if (controlChipEl) return controlChipEl;
+          controlChipEl = document.createElement('span');
+          controlChipEl.className = 'control-chip';
+          controlChipEl.setAttribute('role', 'button');
+          controlChipEl.setAttribute('tabindex', '0');
+          const activate = (e) => {
+            try { if (e) { e.preventDefault(); e.stopPropagation(); } } catch (_) {}
+            if (typeof toggleWords === 'function') toggleWords();
+          };
+          controlChipEl.addEventListener('click', activate);
+          controlChipEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') activate(e);
+          });
+          return controlChipEl;
+        };
+
+      const setControlSymbol = (isFull) => {
+          const el = ensureControlChip();
+          el.textContent = isFull ? '–' : '+';
+          el.setAttribute('aria-label', isFull ? 'Collapse description' : 'Expand description');
+        };
 
         // Format a tag token depending on the display mode (no '#')
         const capitalizeFirst = (s) =>
@@ -454,6 +583,13 @@ document.addEventListener("DOMContentLoaded", () => {
           clearFormatTimers();
           textOverlay.innerHTML = text ? renderWords(text, highlight) : "";
           currentText = text;
+          // Append the +/– control chip when there is content
+          if (currentText) {
+            const chip = ensureControlChip();
+            try { textOverlay.appendChild(chip); } catch (_) {}
+          } else if (controlChipEl && controlChipEl.parentNode) {
+            try { controlChipEl.parentNode.removeChild(controlChipEl); } catch (_) {}
+          }
           const nonHighlights = textOverlay.querySelectorAll("span.word:not(.highlight)");
           const spaces = textOverlay.querySelectorAll('span.space');
           if (wasFull) {
@@ -464,12 +600,15 @@ document.addEventListener("DOMContentLoaded", () => {
             textOverlay.classList.remove("tags-only");
             textOverlay.classList.add("is-fulltext");
             wordsVisible = true;
+            setControlSymbol(true);
+            // In full-text mode: clicking anywhere in the description collapses back to tags
           } else {
             nonHighlights.forEach((span) => (span.style.display = "none"));
             wordsVisible = false;
             updateHighlightText(false);
             textOverlay.classList.add("tags-only");
             textOverlay.classList.remove("is-fulltext");
+            setControlSymbol(false);
           }
         }
       };
@@ -563,6 +702,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }, totalDelay);
           timeouts.push(formatTimeout);
           wordsVisible = false;
+          setControlSymbol(false);
         } else {
           // Tags -> Full: enable per-word background first and keep spaces between visible words
           textOverlay.classList.remove("tags-only");
@@ -581,8 +721,20 @@ document.addEventListener("DOMContentLoaded", () => {
           }, endDelay + 10);
           timeouts.push(cleanup);
           wordsVisible = true;
+          setControlSymbol(true);
         }
       };
+
+      // When in full-text mode, allow clicking anywhere in the overlay to collapse back to tags
+      const onFullTextClick = (e) => {
+        if (!textOverlay.classList.contains('is-fulltext')) return;
+        // Prevent tag filter or other handlers from also acting
+        try { e.preventDefault(); e.stopPropagation(); } catch (_) {}
+        if (typeof toggleWords === 'function') toggleWords();
+      };
+      try {
+        textOverlay.addEventListener('click', onFullTextClick, true); // capture to intercept
+      } catch (_) {}
 
       const thresholds = Array.from({ length: 101 }, (_, i) => i / 100);
       const visibilityMap = new Map();
@@ -626,15 +778,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  // Global click routing: left half -> left overlay action, right half -> right overlay action
-  window.addEventListener("click", (e) => {
-    const mid = window.innerWidth / 2;
-    if (e.clientX < mid) {
-      // Left side: toggle the name morphing
-      if (typeof toggleLetters === "function") toggleLetters();
-    } else {
-      // Right side: toggle tags/fulltext
-      if (typeof toggleWords === "function") toggleWords();
-    }
-  });
+  // Global click routing disabled for right overlay toggling and left bio.
+  // Interactions now live on explicit controls: NAME on the left, +/– chip on the right.
+  // (Retain no-op listener only if future global behaviors are added.)
 });
