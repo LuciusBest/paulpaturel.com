@@ -52,13 +52,16 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // Simple word/space wrapper (no highlight), matching right overlay tokenization
-    const wrapWords = (text) => {
+    const wrapWords = (text, classes = {}) => {
+      const opts = typeof classes === 'object' && classes !== null ? classes : {};
+      const extraWordClass = opts.word ? ` ${opts.word}` : '';
+      const extraSpaceClass = opts.space ? ` ${opts.space}` : '';
       const parts = String(text).split(/(\s+)/);
       return parts
         .map((part, i) => {
-          if (i % 2 === 1) return `<span class="space">${part}</span>`;
+          if (i % 2 === 1) return `<span class="space${extraSpaceClass}">${part}</span>`;
           if (!part) return "";
-          return `<span class="word">${part}</span>`;
+          return `<span class="word${extraWordClass}">${part}</span>`;
         })
         .join("");
     };
@@ -98,6 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const emailHTML = `<span class="word contact-chip" role="link" tabindex="0" data-no-custom-cursor="true" data-url="mailto:paulpaturel75@gmail.com">paulpaturel75@gmail.com</span>`;
       const instaHTML = `<span class="word contact-chip" role="link" tabindex="0" data-no-custom-cursor="true" data-url="https://www.instagram.com/_paul_pat_/">@_paul_pat_</span>`;
       const copy = bioCopy[currentLang] || bioCopy.en;
+      const metaClasses = { word: 'left-meta-token', space: 'left-meta-gap' };
       const html = [
         // Next line after name
         "<br>",
@@ -125,15 +129,15 @@ document.addEventListener("DOMContentLoaded", () => {
         "<br>",
         '<span class="left-meta">',
           // Line 1: version
-          wrapWords('V0.0 released 16/09/2025.'),
+          wrapWords('V0.0 released 16/09/2025.', metaClasses),
           '<br>',
           // Line 2: font credit
-          wrapWords('Font → Arzier by '),
+          wrapWords('Font → Arzier by ', metaClasses),
           // Linked author token
-          '<span class="word contact-chip" role="link" tabindex="0" data-no-custom-cursor="true" data-url="https://hugoscholl.ch/">Hugo Scholl</span>',
-          '<span class="space"> </span>',
+          '<span class="word left-meta-token contact-chip" role="link" tabindex="0" data-no-custom-cursor="true" data-url="https://hugoscholl.ch/">Hugo Scholl</span>',
+          '<span class="space left-meta-gap"> </span>',
           // "- Interscript." as tokenized words
-          wrapWords('- Interscript.'),
+          wrapWords('- Interscript.', metaClasses),
         '</span>',
       ].join("");
       bioEl.innerHTML = html;
