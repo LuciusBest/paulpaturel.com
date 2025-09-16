@@ -15,6 +15,19 @@ body {
     line-height: 1.2;
 }
 
+:root {
+    --ui-space-unit: 4px;
+    --ui-space-half: calc(var(--ui-space-unit) / 2);
+    --ui-space-1_5: calc(var(--ui-space-unit) * 1.5);
+    --ui-space-double: calc(var(--ui-space-unit) * 2);
+    --ui-space-triple: calc(var(--ui-space-unit) * 3);
+    --ui-space-quad: calc(var(--ui-space-unit) * 4);
+    --ui-padding-block: var(--ui-space-unit);
+    --ui-padding-inline: var(--ui-space-1_5);
+    --ui-gap: var(--ui-space-double);
+    --ui-chip-gap: var(--ui-space-unit);
+}
+
 .ui_text {
     font-size: 16px;
     font-family: 'IS-ArzierVF', sans-serif;
@@ -28,8 +41,8 @@ body {
     height: auto;
     width: 50%;
     z-index: 999;
-    padding: 3px;
-    margin-top: 2px;
+    padding: var(--ui-padding-block);
+    margin-top: var(--ui-space-half);
     /* Ensure legibility regardless of background */
     color: #ffffff;
     mix-blend-mode: normal;
@@ -46,7 +59,7 @@ body {
 /* Slight left indent for left overlay text without shifting layout */
 #left_name,
 #left_bio {
-    margin-left: 3px;
+    margin-left: var(--ui-space-unit);
 }
 
 /* Make the name interactive (hover/click) without enabling the whole overlay */
@@ -139,8 +152,8 @@ body {
     height: auto;
     width: 50%;
     z-index: 999;
-    padding: 3px;
-    margin-top: 2px;
+    padding: var(--ui-padding-block);
+    margin-top: var(--ui-space-half);
     /* font-size: 18px; */
     /* Container no longer has a solid background; backgrounds applied per word/tag */
     color: black;
@@ -242,9 +255,9 @@ body.is-loading #cursor_arrow {
     background: #ffffff;
     color: #000;
     border-radius: 0px;
-    padding: 0 6px;
-    margin-right: 3px;
-    margin-bottom: 3px;
+    padding: 0 var(--ui-padding-inline);
+    margin-right: var(--ui-chip-gap);
+    margin-bottom: var(--ui-chip-gap);
     pointer-events: auto;
 }
 
@@ -254,10 +267,10 @@ body.is-loading #cursor_arrow {
     background: #ffffff;
     color: #000;
     border-radius: 0px;
-    padding: 0 6px;
+    padding: 0 var(--ui-padding-inline);
     margin-left: 0;
-    margin-right: 3px;
-    margin-bottom: 3px;
+    margin-right: var(--ui-chip-gap);
+    margin-bottom: var(--ui-chip-gap);
     pointer-events: auto;
     user-select: none;
     cursor: pointer;
@@ -323,7 +336,7 @@ body.is-loading #cursor_arrow {
 /* Preserve left padding for the first visible word in full text to match chip padding */
 #text_overlay_container.is-fulltext>.word:first-child,
 #text_overlay_container.is-fulltext>.tag:first-child .word:first-child {
-    padding-left: 6px;
+    padding-left: var(--ui-padding-inline);
 }
 
 /* --- Custom Arrow Cursor (IS-Arzier) --- */
