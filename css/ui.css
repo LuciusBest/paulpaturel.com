@@ -99,8 +99,8 @@ body {
 }
 
 /* Left overlay: apply white background to name and bio tokens (match right overlay readability) */
-#text_overlay_container_left .word,
-#text_overlay_container_left .space {
+#text_overlay_container_left .word:not(.left-meta-token),
+#text_overlay_container_left .space:not(.left-meta-gap) {
     background: #ffffff;
     color: #000;
     mix-blend-mode: normal;
@@ -155,6 +155,8 @@ body {
     pointer-events: auto;
     -webkit-text-stroke: 0;
     text-shadow: none;
+    display: inline-block;
+    isolation: isolate;
 }
 
 /* Ensure difference blending on the meta block and its descendants (no white background) */
@@ -163,12 +165,12 @@ body {
     mix-blend-mode: difference;
 }
 
-#text_overlay_container_left .left-meta .word,
-#text_overlay_container_left .left-meta .space,
-#text_overlay_container_left .left-meta .char {
+#text_overlay_container_left .left-meta .left-meta-token,
+#text_overlay_container_left .left-meta .left-meta-gap {
     background: transparent;
     color: inherit;
-    mix-blend-mode: inherit;
+    line-height: 0.9;
+    mix-blend-mode: difference;
 }
 
 #text_overlay_container_left .left-meta a {
