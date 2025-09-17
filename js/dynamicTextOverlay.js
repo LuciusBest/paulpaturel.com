@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
         s1:
           "Born in Paris, I moved to Lausanne to study at ECAL, <br>where I am now based as a graphic designer.",
         s2:
-          "I am available for commissions and collaborations, with a focus <br>on typography, web design, 3D, and print.",
+          "I am available for commissions and collaborations, with a focus on typography, web design, 3D, and print.",
         contact: "Contact",
       },
       fr: {
