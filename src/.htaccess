@@ -1,5 +1,16 @@
 RewriteEngine On
 
+# Ensure Apache serves critical assets with the right MIME types.
+# With X-Content-Type-Options:nosniff browsers block scripts if sent as text/plain.
+AddType application/javascript .js
+AddType application/json .json
+AddType text/css .css
+AddType font/woff2 .woff2
+AddType font/woff .woff
+AddType font/otf .otf
+AddType font/ttf .ttf
+AddType video/mp4 .mp4
+
 # 1) Redirect all traffic to canonical HTTPS hostname (non-www)
 #    This ensures one, consistent URL in Google: https://paulpaturel.com/
 RewriteCond %{HTTP_HOST} !^paulpaturel\.com$ [NC]

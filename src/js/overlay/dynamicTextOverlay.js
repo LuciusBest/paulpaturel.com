@@ -19,7 +19,13 @@ document.addEventListener("DOMContentLoaded", () => {
   let toggleLetters = () => {};
   let openLeftBio = () => {};
   // i18n state
-  let currentLang = (localStorage.getItem('pp.lang') || 'en');
+  let currentLang = 'en';
+  try {
+    const stored = localStorage.getItem('pp.lang');
+    if (stored) currentLang = stored;
+  } catch (error) {
+    console.warn('[dynamicTextOverlay] localStorage unavailable, defaulting to EN', error);
+  }
   let switchLanguage = () => {};
   let refreshRightOverlayForLang = () => {};
   try { document.documentElement.setAttribute('lang', currentLang); } catch (_) {}
