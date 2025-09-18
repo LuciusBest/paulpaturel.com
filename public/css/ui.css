@@ -2,7 +2,7 @@
 html,
 body {
     font-family: 'IS-ArzierVF', sans-serif;
-    font-weight: 400;
+    font-weight: 350;
     font-feature-settings: "ss03";
     line-height: 1.2;
 }
@@ -18,12 +18,17 @@ body {
     --ui-padding-inline: var(--ui-space-1_5);
     --ui-gap: var(--ui-space-double);
     --ui-chip-gap: var(--ui-space-unit);
+    --ui-font-size: 16px;
+    --ui-line-height: 1.25;
+    --ui-font-weight: 350;
+    --ui-margin: 5px;
 }
 
 .ui_text {
-    font-size: 16px;
+    font-size: var(--ui-font-size);
     font-family: 'IS-ArzierVF', sans-serif;
-    font-weight: 400;
+    font-weight: var(--ui-font-weight);
+    line-height: var(--ui-line-height);
 }
 
 #text_overlay_container_left {
@@ -34,7 +39,7 @@ body {
     width: 35%;
     z-index: 999;
     padding: var(--ui-padding-block);
-    margin-top: var(--ui-space-half);
+    margin: var(--ui-margin);
     /* Ensure legibility regardless of background */
     color: #ffffff;
     mix-blend-mode: difference;
@@ -46,11 +51,6 @@ body {
 }
 
 /* Slight left indent for left overlay text without shifting layout */
-#left_name,
-#left_bio {
-    margin-left: var(--ui-space-unit);
-}
-
 /* Make the name interactive (hover/click) without enabling the whole overlay */
 #left_name {
     pointer-events: auto;
@@ -141,8 +141,8 @@ body {
 
 /* Meta line under EN/FR: small, negative fusion, no white backgrounds */
 #text_overlay_container_left .left-meta {
-    font-size: 12px;
-    line-height: 0.9;
+    font-size: var(--ui-font-size);
+    line-height: var(--ui-line-height);
     mix-blend-mode: difference;
     color: #ffffff;
     pointer-events: auto;
@@ -190,7 +190,7 @@ body {
     width: 65%;
     z-index: 999;
     padding: var(--ui-padding-block);
-    margin-top: var(--ui-space-half);
+    margin: var(--ui-margin);
     /* font-size: 18px; */
     /* Container relies on negative blend for legibility */
     color: #ffffff;
@@ -207,7 +207,8 @@ body {
     width: 100%;
     height: 44px;
     display: none;
-    font-size: 12px;
+    font-size: var(--ui-font-size);
+    font-weight: var(--ui-font-weight);
     color: white;
     mix-blend-mode: difference;
     pointer-events: none;
@@ -227,8 +228,10 @@ body {
     will-change: left;
     background: transparent;
     color: #ffffff;
-    font-size: 15px;
-    line-height: 20px;
+    font-size: var(--ui-font-size);
+    font-weight: var(--ui-font-weight);
+    line-height: calc(var(--ui-font-size) * var(--ui-line-height));
+    margin: var(--ui-margin);
     border-radius: 0px;
     padding: 0 var(--ui-padding-inline);
     mix-blend-mode: difference;
@@ -269,8 +272,10 @@ body {
     white-space: nowrap;
     background: transparent;
     color: #ffffff;
-    font-size: 15px;
-    line-height: 20px;
+    font-size: var(--ui-font-size);
+    font-weight: var(--ui-font-weight);
+    line-height: calc(var(--ui-font-size) * var(--ui-line-height));
+    margin: var(--ui-margin);
     border-radius: 0px;
     padding: 0 var(--ui-padding-inline);
     mix-blend-mode: difference;
@@ -375,7 +380,7 @@ body.is-loading #cursor_arrow {
 
 /* Space tokens: preserve width of spaces so they can receive background */
 .space {
-    white-space: pre;
+    white-space: normal;
     transition: background-color .2s ease, color .2s ease, border-radius .2s ease, opacity .2s ease;
     will-change: background-color, color, border-radius, opacity;
     background: transparent;
@@ -455,11 +460,6 @@ body.is-loading #cursor_arrow {
 }
 
 /* Hover fade for chips in tags-only mode */
-#text_overlay_container.tags-only .word.highlight:hover,
-#text_overlay_container.tags-only .tag:hover {
-    opacity: 0.6;
-}
-
 /* Full-text mode: keep words legible via negative blend, allow pointer events */
 #text_overlay_container.is-fulltext .word,
 #text_overlay_container.is-fulltext .space {
