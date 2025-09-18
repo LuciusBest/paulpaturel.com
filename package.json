@@ -1,0 +1,16 @@
+{
+  "name": "paulpaturel-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "rm -rf public && mkdir -p public && (cd src && find . -mindepth 1 -maxdepth 1 -exec cp -R {} ../public/ \\;)",
+    "serve:src": "npx http-server src -p 3000 -c-1",
+    "serve:public": "npx http-server public -p 4000 -c-1",
+    "check:links:src": "npx linkinator http://localhost:3000 --silent --recurse",
+    "check:links:public": "npx linkinator http://localhost:4000 --silent --recurse"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "linkinator": "^4.0.0"
+  }
+}

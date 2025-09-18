@@ -1,0 +1,9 @@
+from,to
+/CosmaWebTypeTester/,/
+/CosmaWebTypeTester/index.html,/
+/CosmaWebTypeTester/css/style.css,/css/projectsLayout.css
+/CosmaWebTypeTester/js/script.js,/js/projects/cosma_tester_embed.js
+/CosmaWebTypeTester/fonts/Cosma-VF.woff2,/font/Cosma-VF.woff2
+/css/navigation.css,/css/ui.css
+/css/toper.css,/css/style.css
+/js/media/diaporama.js,/js/media/diaporama_mouse.js

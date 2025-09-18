@@ -1,0 +1,23 @@
+@font-face {
+    font-family: 'IS-ArzierVF';
+    src: url('../font/IS-ArzierVF.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'IS-Arzier';
+    src: url('../font/IS-Arzier-400.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Cosma';
+    src: url('../font/Cosma-VF.woff2') format('woff2-variations');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
