@@ -18,9 +18,9 @@ body {
     --ui-padding-inline: var(--ui-space-1_5);
     --ui-gap: var(--ui-space-double);
     --ui-chip-gap: var(--ui-space-unit);
-    --ui-font-size: 16px;
+    --ui-font-size: 15px;
     --ui-line-height: 1.25;
-    --ui-font-weight: 350;
+    --ui-font-weight: 300;
     --ui-margin: 5px;
 }
 
@@ -219,6 +219,8 @@ body {
     position: relative;
     width: 100%;
     height: 100%;
+    padding-right: var(--ui-margin);
+    box-sizing: border-box;
 }
 
 .project-footer .pagination {
@@ -231,7 +233,6 @@ body {
     font-size: var(--ui-font-size);
     font-weight: var(--ui-font-weight);
     line-height: calc(var(--ui-font-size) * var(--ui-line-height));
-    margin: var(--ui-margin);
     border-radius: 0px;
     padding: 0 var(--ui-padding-inline);
     mix-blend-mode: difference;

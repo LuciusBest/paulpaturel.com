@@ -18,6 +18,126 @@
   const overlay = document.querySelector(OVERLAY_SELECTOR);
   if (!overlay) return; // nothing to bind
 
+  const getScrollContext = () => {
+    const container = document.querySelector('.main_container');
+    if (container) {
+      return {
+        getViewportTop: () => container.getBoundingClientRect().top,
+        getViewportHeight: () => container.clientHeight || 0,
+        getScrollTop: () => container.scrollTop || 0,
+        setScrollTop: (value) => {
+          container.scrollTop = value;
+        },
+        dispatchScroll: () => {
+          try {
+            container.dispatchEvent(new Event('scroll'));
+          } catch (_) {}
+        },
+      };
+    }
+
+    const scrollElement =
+      document.scrollingElement || document.documentElement || document.body || null;
+
+    const getScrollTop = () => {
+      if (typeof window.pageYOffset === 'number') return window.pageYOffset;
+      if (scrollElement && typeof scrollElement.scrollTop === 'number') return scrollElement.scrollTop;
+      return 0;
+    };
+
+    const setScrollTop = (value) => {
+      if (scrollElement && typeof scrollElement.scrollTop === 'number') {
+        scrollElement.scrollTop = value;
+      }
+      if (typeof window.scrollTo === 'function') {
+        try {
+          window.scrollTo({ top: value, behavior: 'auto' });
+        } catch (_) {
+          try {
+            window.scrollTo(0, value);
+          } catch (_) {}
+        }
+      }
+    };
+
+    return {
+      getViewportTop: () => 0,
+      getViewportHeight: () => window.innerHeight || (scrollElement ? scrollElement.clientHeight : 0) || 0,
+      getScrollTop,
+      setScrollTop,
+      dispatchScroll: () => {
+        try {
+          window.dispatchEvent(new Event('scroll'));
+        } catch (_) {}
+      },
+    };
+  };
+
+  const captureScrollAnchor = () => {
+    const context = getScrollContext();
+    const viewportTop = context.getViewportTop();
+    const viewportHeight = context.getViewportHeight() || window.innerHeight || 0;
+    if (!viewportHeight) return null;
+    const viewportCenter = viewportTop + viewportHeight / 2;
+
+    let anchor = null;
+    let bestDistance = Infinity;
+
+    const projects = Array.from(document.querySelectorAll(PROJECT_SELECTOR));
+    projects.forEach((project) => {
+      if (!project || !project.isConnected) return;
+      if (project.classList.contains(FILTERED_CLASS)) return;
+      const rect = project.getBoundingClientRect();
+      if (!rect || rect.height <= 0) return;
+      const mid = rect.top + rect.height / 2;
+      const distance = Math.abs(mid - viewportCenter);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        anchor = {
+          el: project,
+          relativeTop: rect.top - viewportTop,
+          context,
+        };
+      }
+    });
+
+    return anchor;
+  };
+
+  const restoreScrollAnchor = (anchor) => {
+    if (!anchor || !anchor.el || !anchor.el.isConnected) return;
+    const ctx = anchor.context || getScrollContext();
+
+    const adjust = () => {
+      if (!anchor.el || !anchor.el.isConnected) return;
+      if (anchor.el.classList && anchor.el.classList.contains(FILTERED_CLASS)) {
+        ctx.dispatchScroll();
+        return;
+      }
+      const viewportTop = ctx.getViewportTop();
+      const rect = anchor.el.getBoundingClientRect();
+      if (!rect || rect.height <= 0) {
+        ctx.dispatchScroll();
+        return;
+      }
+      const newRelativeTop = rect.top - viewportTop;
+      const delta = newRelativeTop - anchor.relativeTop;
+      if (Number.isFinite(delta) && Math.abs(delta) > 0.5) {
+        const current = ctx.getScrollTop();
+        if (Number.isFinite(current)) {
+          ctx.setScrollTop(current + delta);
+        }
+      }
+      ctx.dispatchScroll();
+    };
+
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(adjust);
+    } else {
+      setTimeout(adjust, 0);
+    }
+  };
+
   const getProjectKey = (el) => {
     if (!el) return '';
     const key = el.getAttribute('data-project-key') || el.getAttribute('data-project') || '';
@@ -127,9 +247,11 @@
   };
 
   const toggleTag = (tagNorm) => {
+    const anchor = captureScrollAnchor();
     activeTag = activeTag === tagNorm ? null : tagNorm;
     syncActiveChips();
     applyFilter();
+    if (anchor) restoreScrollAnchor(anchor);
   };
 
   // Add semantics and interactions to chips in current overlay DOM
