@@ -213,14 +213,14 @@ body {
     mix-blend-mode: difference;
     pointer-events: none;
     z-index: 1000;
+    padding: 0 var(--ui-margin);
+    box-sizing: border-box;
 }
 
 .project-footer-track {
     position: relative;
     width: 100%;
     height: 100%;
-    padding-right: var(--ui-margin);
-    box-sizing: border-box;
 }
 
 .project-footer .pagination {
