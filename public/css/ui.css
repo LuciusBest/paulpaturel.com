@@ -37,12 +37,9 @@ body {
     margin-top: var(--ui-space-half);
     /* Ensure legibility regardless of background */
     color: #ffffff;
-    mix-blend-mode: normal;
-    /* "negative fusion" style: invert vs background */
-    -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.35);
-    /* subtle fallback edge */
-    text-shadow: 0 0 1px rgba(0, 0, 0, 0.25);
-    /* fallback halo on flat colors */
+    mix-blend-mode: difference;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
     user-select: none;
     pointer-events: none;
     /* don't block hovers/clicks beneath */
@@ -72,37 +69,40 @@ body {
     pointer-events: none;
 }
 
-/* Hover chip for email/instagram with white background and difference blend */
+/* Hover chip for email/instagram inherits the overlay blend */
 #text_overlay_container_left .contact-chip {
     transition: background-color .25s ease, color .25s ease, opacity .25s ease;
     border-radius: 0px;
     cursor: pointer;
     pointer-events: auto;
     /* re-enable interaction inside left overlay */
+    mix-blend-mode: inherit;
+    background: transparent;
+    color: inherit;
 }
 
 #text_overlay_container_left .contact-chip:hover,
 #text_overlay_container_left .contact-chip:focus {
-    background: #000000;
-    color: #ffffff;
+    background: #ffffff;
+    color: #000000;
     mix-blend-mode: normal;
-    /* ensure strong contrast via inversion over any backdrop */
+    text-decoration: none;
     outline: none;
 }
 
-/* Left overlay: apply white background to name and bio tokens (match right overlay readability) */
+/* Left overlay tokens inherit blend settings for name and bio */
 #text_overlay_container_left .word,
 #text_overlay_container_left .space {
-    background: #ffffff;
-    color: #000;
-    mix-blend-mode: normal;
+    background: transparent;
+    color: inherit;
+    mix-blend-mode: inherit;
     border-radius: 0px;
 }
 
 #text_overlay_container_left .char {
-    background: #ffffff;
-    color: #000;
-    mix-blend-mode: normal;
+    background: transparent;
+    color: inherit;
+    mix-blend-mode: inherit;
 }
 
 /* Language toggle styles */
@@ -118,9 +118,10 @@ body {
 
 #text_overlay_container_left .lang-option:hover,
 #text_overlay_container_left .lang-option:focus {
-    background: #000000;
-    color: #ffffff;
+    background: #ffffff;
+    color: #000000;
     mix-blend-mode: normal;
+    text-decoration: none;
     outline: none;
 }
 
@@ -175,8 +176,8 @@ body {
 #text_overlay_container_left .left-meta a:focus,
 #text_overlay_container_left .left-meta .contact-chip:hover,
 #text_overlay_container_left .left-meta .contact-chip:focus {
-    background: #000000;
-    color: #ffffff;
+    background: #ffffff;
+    color: #000000;
     mix-blend-mode: normal;
     outline: none;
 }
@@ -191,8 +192,9 @@ body {
     padding: var(--ui-padding-block);
     margin-top: var(--ui-space-half);
     /* font-size: 18px; */
-    /* Container no longer has a solid background; backgrounds applied per word/tag */
-    color: black;
+    /* Container relies on negative blend for legibility */
+    color: #ffffff;
+    mix-blend-mode: difference;
     pointer-events: none;
     /* don't block underlying content */
     transition: opacity 0.5s ease;
@@ -223,13 +225,13 @@ body {
     left: 0;
     white-space: nowrap;
     will-change: left;
-    background: #ffffff;
-    color: #000000;
+    background: transparent;
+    color: #ffffff;
     font-size: 15px;
     line-height: 20px;
     border-radius: 0px;
     padding: 0 var(--ui-padding-inline);
-    mix-blend-mode: normal;
+    mix-blend-mode: difference;
     display: inline-block;
     transition: left 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease;
 }
@@ -265,13 +267,13 @@ body {
 .project-vertical-rail .vertical-index,
 .project-vertical-rail .vertical-project-name {
     white-space: nowrap;
-    background: #ffffff;
-    color: #000000;
+    background: transparent;
+    color: #ffffff;
     font-size: 15px;
     line-height: 20px;
     border-radius: 0px;
     padding: 0 var(--ui-padding-inline);
-    mix-blend-mode: normal;
+    mix-blend-mode: difference;
     display: inline-block;
     transition: opacity 0.5s ease;
 }
@@ -294,16 +296,22 @@ body.ui-idle .project-vertical-rail .vertical-project-name {
     display: inline;
     transition: background-color .2s ease, color .2s ease, border-radius .2s ease, opacity .2s ease;
     will-change: background-color, color, border-radius, opacity;
+    background: transparent;
+    color: inherit;
+    mix-blend-mode: inherit;
 }
 
 body.ui-idle #text_overlay_container {
-    opacity: 0.15;
+    opacity: 1;
 }
 
 .word {
     display: inline;
     transition: background-color .2s ease, color .2s ease, border-radius .2s ease, opacity .2s ease;
     will-change: background-color, color, border-radius, opacity;
+    background: transparent;
+    color: inherit;
+    mix-blend-mode: inherit;
 }
 
 /* (char display kept above with pointer-events: none) */
@@ -357,6 +365,10 @@ body.is-loading .project-footer {
     display: none !important;
 }
 
+body.is-loading .project-vertical-rail {
+    display: none !important;
+}
+
 body.is-loading #cursor_arrow {
     display: none !important;
 }
@@ -366,9 +378,12 @@ body.is-loading #cursor_arrow {
     white-space: pre;
     transition: background-color .2s ease, color .2s ease, border-radius .2s ease, opacity .2s ease;
     will-change: background-color, color, border-radius, opacity;
+    background: transparent;
+    color: inherit;
+    mix-blend-mode: inherit;
 }
 
-/* Tags-only mode: show only highlighted words as white chips, hide spaces */
+/* Tags-only mode: show only highlighted words as blend-aware chips, hide spaces */
 #text_overlay_container.tags-only .space {
     display: none;
 }
@@ -376,8 +391,8 @@ body.is-loading #cursor_arrow {
 #text_overlay_container.tags-only .word.highlight,
 #text_overlay_container.tags-only .tag {
     display: inline-block;
-    background: #ffffff;
-    color: #000;
+    background: transparent;
+    color: inherit;
     border-radius: 0px;
     padding: 0 var(--ui-padding-inline);
     margin-right: var(--ui-chip-gap);
@@ -385,13 +400,36 @@ body.is-loading #cursor_arrow {
     pointer-events: auto;
     user-select: none;
     -webkit-user-select: none;
+    mix-blend-mode: inherit;
+}
+
+/* Hover/focus/active states: restore white chip background for interactions */
+#text_overlay_container .word.highlight:hover,
+#text_overlay_container .word.highlight:focus,
+#text_overlay_container .tag:hover,
+#text_overlay_container .tag:focus,
+#text_overlay_container .control-chip:hover,
+#text_overlay_container .control-chip:focus,
+#text_overlay_container .word.highlight.is-active,
+#text_overlay_container .tag.is-active,
+#text_overlay_container .control-chip.is-active {
+    background: #ffffff;
+    color: #000000;
+    mix-blend-mode: normal;
+    text-decoration: none;
+}
+
+#text_overlay_container .word.highlight.is-active,
+#text_overlay_container .tag.is-active,
+#text_overlay_container .control-chip.is-active {
+    opacity: 1;
 }
 
 /* Plus/Minus control chip — styled like a tag chip in both modes */
 #text_overlay_container .control-chip {
     display: inline-block;
-    background: #ffffff;
-    color: #000;
+    background: transparent;
+    color: inherit;
     border-radius: 0px;
     padding: 0 var(--ui-padding-inline);
     margin-left: 0;
@@ -400,6 +438,7 @@ body.is-loading #cursor_arrow {
     pointer-events: auto;
     user-select: none;
     cursor: pointer;
+    mix-blend-mode: inherit;
 }
 
 /* When using a tag wrapper, avoid double backgrounds on inner words in chips view */
@@ -421,20 +460,21 @@ body.is-loading #cursor_arrow {
     opacity: 0.6;
 }
 
-/* Full-text mode: give each word (and spaces) a white background for legibility */
+/* Full-text mode: keep words legible via negative blend, allow pointer events */
 #text_overlay_container.is-fulltext .word,
 #text_overlay_container.is-fulltext .space {
-    background: #ffffff;
-    color: #000;
+    background: transparent;
+    color: inherit;
     pointer-events: auto;
     cursor: pointer;
 }
 
-/* Active state (yellow) for chips in both modes */
+/* Active state for chips in both modes */
 #text_overlay_container .word.highlight.is-active,
 #text_overlay_container .tag.is-active {
-    background: #FFD400;
-    color: #000;
+    background: transparent;
+    color: inherit;
+    text-decoration: underline;
 }
 
 /* Ensure interactive tokens in right overlay can receive pointer events even if parent ignores them */
@@ -449,8 +489,8 @@ body.is-loading #cursor_arrow {
 /* Ensure active state overrides full-text white background */
 #text_overlay_container.is-fulltext .word.highlight.is-active,
 #text_overlay_container.is-fulltext .tag.is-active {
-    background: #FFD400;
-    color: #000;
+    background: transparent;
+    color: inherit;
 }
 
 /* (Removed spaces-hidden strategy: spacing now handled inline per span) */
@@ -489,9 +529,8 @@ body.is-loading #cursor_arrow {
     line-height: 1;
     color: #ffffff;
     mix-blend-mode: difference;
-    /* visible on any background */
-    -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.35);
-    text-shadow: 0 0 1px rgba(0, 0, 0, 0.25);
+    /* visible on any background without outlines */
+    text-shadow: none;
     user-select: none;
     will-change: transform, opacity;
 }
