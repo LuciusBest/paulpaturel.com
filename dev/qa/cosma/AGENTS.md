@@ -9,9 +9,10 @@ Guidelines for agents (and contributors) working in this repository. Keep change
 **Repo Map (common paths)**
 - `index.html` — main entry. Add more static pages alongside as needed.
 - `css/` — site styles: `ui.css`, `navigation.css`, `projectsLayout.css`, `security.css`.
-- `js/` — vanilla JS modules: `axis_lock_scroll.js`, `tags_filter.js`, `dynamicTextOverlay.js`, `cosma_tester_embed.js`.
+- `js/` — vanilla JS modules grouped by feature (`global/`, `media/`, `overlay/`, `projects/`, `ui/`).
 - `font/` — local fonts: `IS-Arzier-400.otf`, `IS-ArzierVF.ttf`.
-- `Typetester_Tests_Scripts/` — QA scripts and artifacts (do not ship to production unless asked).
+- `dev/qa/cosma/` — QA scripts and artifacts (do not ship to production unless asked).
+- `data/` — JSON content served to the frontend (`projectTexts.json`, `projectTexts.fr.json`).
 - `robots.txt`, `sitemap.xml` — SEO surface.
 - `.cpanel.yml` — hosting/deployment automation context (cPanel).
 
@@ -43,7 +44,7 @@ Guidelines for agents (and contributors) working in this repository. Keep change
 - Keep modules focused: one feature per file. Reuse utilities where possible.
 
 **Data and Content**
-- `js/projectTexts.json`: preserve schema and keys when updating. Validate JSON.
+- `data/projectTexts.json`: preserve schema and keys when updating. Validate JSON.
 - Images/assets: optimize (reasonable size), use descriptive filenames, include `alt` text in HTML.
 
 **Accessibility (a11y)**
@@ -91,7 +92,7 @@ Guidelines for agents (and contributors) working in this repository. Keep change
 - `axis_lock_scroll.js`: If modifying scroll locking, ensure it doesn’t trap focus and works with touch + wheel input.
 - `tags_filter.js`: Filtering should degrade gracefully; show all items if JS is unavailable or errors.
 - `dynamicTextOverlay.js`: Ensure text remains readable over backgrounds; consider contrast checks.
-- `Typetester_Tests_Scripts/`: Treat as dev/QA utilities; avoid including references from production pages unless requested.
+- `dev/qa/cosma/`: Treat as dev/QA utilities; avoid including references from production pages unless requested.
 
 **When in Doubt**
 - Ask before introducing dependencies, new patterns, or broad refactors.

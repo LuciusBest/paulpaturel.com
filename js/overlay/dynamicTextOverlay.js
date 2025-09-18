@@ -1,7 +1,7 @@
 /*
   dynamicTextOverlay.js
   - Affiche un texte contextuel superposé pour le .project_container le plus visible.
-    • Charge le texte et les mots à surligner depuis "js/projectTexts.json".
+    • Charge le texte et les mots à surligner depuis "data/projectTexts.json".
     • Utilise IntersectionObserver avec des seuils fins pour suivre le projet le plus visible
       et mettre à jour le texte en conséquence.
   - Animation d'apparition des mots : au clic, alterne l'affichage des mots non surlignés
@@ -400,8 +400,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return r.json();
     });
     Promise.all([
-      fetchJSON("js/projectTexts.json").catch(() => ({})),
-      fetchJSON("js/projectTexts.fr.json").catch(() => ({})),
+      fetchJSON("data/projectTexts.json").catch(() => ({})),
+      fetchJSON("data/projectTexts.fr.json").catch(() => ({})),
     ])
       .then(([projectTextsEN, projectTextsFR]) => {
         const byLang = { en: projectTextsEN || {}, fr: projectTextsFR || {} };

@@ -3,7 +3,7 @@
 Displays scroll-sensitive project descriptions that reveal or hide non-highlighted words on click and a secondary fixed name overlay that flips between “PAUL” and “PATUREL”.
 
 ## Overview
-The script observes `.project_container` elements and shows the paragraph for the most visible project in a fixed overlay. Each paragraph loads from `js/projectTexts.json`.
+The script observes `.project_container` elements and shows the paragraph for the most visible project in a fixed overlay. Each paragraph loads from `data/projectTexts.json`.
 
 Highlighting options:
 - Inline tags (recommended): wrap words with `<tag>...</tag>` to highlight specific words, e.g. `<tag>Website</tag> design … <tag>2023</tag>`.
@@ -18,9 +18,9 @@ Highlighting options:
 - the overlay resets to the collapsed (highlight-only) state whenever the visible project changes
 
 ## Usage & customization
-- edit `js/projectTexts.json` to change paragraph texts and `highlight` indices
+- edit `data/projectTexts.json` to change paragraph texts and `highlight` indices
 - adjust highlight styling in `css/ui.css`
-- include the script with `<script src="js/dynamicTextOverlay.js" defer></script>`
+- include the script with `<script src="js/overlay/dynamicTextOverlay.js" defer></script>`
 
 ## Tech constraints
 Vanilla JavaScript only; no external libraries or bundlers. Requires a browser environment supporting `IntersectionObserver` and `fetch`.

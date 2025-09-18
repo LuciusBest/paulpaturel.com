@@ -2,7 +2,7 @@
   tags_filter.js
   - Turns right-overlay tags into interactive, accessible chips.
   - Single-select filter: clicking a tag toggles it active and filters projects.
-  - Derives project tag sets from js/projectTexts.json (<tag> ... </tag> segments).
+  - Derives project tag sets from data/projectTexts.json (<tag> ... </tag> segments).
   - Resilient to overlay re-renders via MutationObserver.
 */
 
@@ -185,7 +185,7 @@
 
   const init = () => {
     // Build project tag map from JSON
-    fetch('js/projectTexts.json')
+    fetch('data/projectTexts.json')
       .then((r) => r.json())
       .then((texts) => {
         buildProjectTags(texts);
