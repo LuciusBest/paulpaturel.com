@@ -18,10 +18,11 @@ body {
     --ui-padding-inline: var(--ui-space-1_5);
     --ui-gap: var(--ui-space-double);
     --ui-chip-gap: var(--ui-space-unit);
+    --ui-font-size: 16px;
 }
 
 .ui_text {
-    font-size: 16px;
+    font-size: var(--ui-font-size);
     font-family: 'IS-ArzierVF', sans-serif;
     font-weight: 400;
 }
@@ -141,7 +142,7 @@ body {
 
 /* Meta line under EN/FR: small, negative fusion, no white backgrounds */
 #text_overlay_container_left .left-meta {
-    font-size: 12px;
+    font-size: var(--ui-font-size);
     line-height: 0.9;
     mix-blend-mode: difference;
     color: #ffffff;
@@ -207,7 +208,7 @@ body {
     width: 100%;
     height: 44px;
     display: none;
-    font-size: 12px;
+    font-size: var(--ui-font-size);
     color: white;
     mix-blend-mode: difference;
     pointer-events: none;
@@ -227,7 +228,7 @@ body {
     will-change: left;
     background: transparent;
     color: #ffffff;
-    font-size: 15px;
+    font-size: var(--ui-font-size);
     line-height: 20px;
     border-radius: 0px;
     padding: 0 var(--ui-padding-inline);
@@ -269,7 +270,7 @@ body {
     white-space: nowrap;
     background: transparent;
     color: #ffffff;
-    font-size: 15px;
+    font-size: var(--ui-font-size);
     line-height: 20px;
     border-radius: 0px;
     padding: 0 var(--ui-padding-inline);
