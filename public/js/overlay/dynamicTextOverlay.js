@@ -420,6 +420,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const HIGHLIGHT_DT = 100; // ms between each highlighted word transformation
         let lastProjectName = "";
         let controlChipEl = null;
+        const YEAR_TAG_PATTERN = /^(?:19|20)\d{2}$/;
 
         const ensureControlChip = () => {
           if (controlChipEl) return controlChipEl;
@@ -438,10 +439,59 @@ document.addEventListener("DOMContentLoaded", () => {
           return controlChipEl;
         };
 
-      const setControlSymbol = (isFull) => {
+        const setControlSymbol = (isFull) => {
           const el = ensureControlChip();
           el.textContent = isFull ? '–' : '+';
           el.setAttribute('aria-label', isFull ? 'Collapse description' : 'Expand description');
+          el.classList.toggle('is-active', !!isFull);
+        };
+
+        const isHighlightToken = (node) => {
+          if (!node || node.nodeType !== 1) return false;
+          if (node.parentElement !== textOverlay) return false;
+          const cls = node.classList;
+          if (!cls) return false;
+          if (cls.contains('tag') && cls.contains('highlight')) return true;
+          if (cls.contains('word') && cls.contains('highlight')) return true;
+          return false;
+        };
+
+        const isSpaceNode = (node) =>
+          !!node && node.nodeType === 1 && node.classList && node.classList.contains('space');
+
+        const getTokenText = (node) => ((node && node.textContent) || '').trim();
+
+        const reorderTagTokens = () => {
+          if (!textOverlay) return;
+          const groups = [];
+          let cursor = textOverlay.firstElementChild;
+          while (cursor) {
+            if (isHighlightToken(cursor)) {
+              const nodes = [cursor];
+              let walker = cursor.nextElementSibling;
+              while (walker && isSpaceNode(walker)) {
+                nodes.push(walker);
+                walker = walker.nextElementSibling;
+              }
+              groups.push({ token: cursor, nodes });
+              cursor = walker;
+            } else {
+              cursor = cursor.nextElementSibling;
+            }
+          }
+
+          if (!groups.length) return;
+
+          const dateGroups = groups.filter(({ token }) =>
+            YEAR_TAG_PATTERN.test(getTokenText(token))
+          );
+          if (!dateGroups.length) return;
+
+          dateGroups.forEach(({ nodes }) => {
+            const fragment = document.createDocumentFragment();
+            nodes.forEach((node) => fragment.appendChild(node));
+            textOverlay.appendChild(fragment);
+          });
         };
 
         // Format a tag token depending on the display mode (no '#')
@@ -619,14 +669,20 @@ document.addEventListener("DOMContentLoaded", () => {
           timeouts = [];
           clearFormatTimers();
           textOverlay.innerHTML = text ? renderWords(text, highlight) : "";
+          reorderTagTokens();
           currentText = text;
           // Append the +/– control chip when there is content
           if (currentText) {
             const chip = ensureControlChip();
-            try { textOverlay.appendChild(chip); } catch (_) {}
+            try {
+              const firstElement = textOverlay.firstElementChild;
+              if (firstElement) textOverlay.insertBefore(chip, firstElement);
+              else textOverlay.appendChild(chip);
+            } catch (_) {}
           } else if (controlChipEl && controlChipEl.parentNode) {
             try { controlChipEl.parentNode.removeChild(controlChipEl); } catch (_) {}
           }
+          if (!currentText && controlChipEl) controlChipEl.classList.remove('is-active');
           const nonHighlights = textOverlay.querySelectorAll("span.word:not(.highlight)");
           const spaces = textOverlay.querySelectorAll('span.space');
           if (wasFull) {
