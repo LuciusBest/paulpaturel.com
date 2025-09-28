@@ -473,9 +473,10 @@ body.is-loading #cursor_arrow {
 /* Active state for chips in both modes */
 #text_overlay_container .word.highlight.is-active,
 #text_overlay_container .tag.is-active {
-    background: transparent;
-    color: inherit;
-    text-decoration: underline;
+    background: #ffffff;
+    color: #000000;
+    mix-blend-mode: normal;
+    text-decoration: none;
 }
 
 /* Ensure interactive tokens in right overlay can receive pointer events even if parent ignores them */
@@ -487,11 +488,12 @@ body.is-loading #cursor_arrow {
     -webkit-user-select: none;
 }
 
-/* Ensure active state overrides full-text white background */
+/* Ensure active state matches hover styling in full text view */
 #text_overlay_container.is-fulltext .word.highlight.is-active,
 #text_overlay_container.is-fulltext .tag.is-active {
-    background: transparent;
-    color: inherit;
+    background: #ffffff;
+    color: #000000;
+    mix-blend-mode: normal;
 }
 
 /* (Removed spaces-hidden strategy: spacing now handled inline per span) */
