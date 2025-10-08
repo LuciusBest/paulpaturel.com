@@ -294,6 +294,13 @@
       };
       node.addEventListener('pointerover', wake);
       node.addEventListener('focus', wake);
+
+      // Prevent mouse clicks from leaving a focus highlight on deselected chips
+      node.addEventListener('mousedown', (ev) => {
+        if (ev.button === 0) {
+          ev.preventDefault();
+        }
+      });
     });
 
     // Reflect current activeTag
