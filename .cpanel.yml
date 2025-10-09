@@ -1,10 +1,11 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/fizo1332/public_html
+    - export DEPLOYPATH="$HOME/public_html"
     - /bin/mkdir -p "$DEPLOYPATH"
     - /bin/rsync -av --delete \
         --exclude='.git*' \
         --exclude='.cpanel*' \
-        --exclude='media/' \
-        ./ "$DEPLOYPATH"/
+        --exclude='.well-known/' \
+        --exclude='cgi-bin/' \
+        public/ "$DEPLOYPATH"/
