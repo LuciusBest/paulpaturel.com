@@ -409,17 +409,28 @@ body.is-loading #cursor_arrow {
     mix-blend-mode: inherit;
 }
 
-/* Hover/focus/active states: restore white chip background for interactions */
+/* Hover/focus states: soften chip backgrounds; active states stay solid white below */
 #text_overlay_container .word.highlight:hover,
 #text_overlay_container .word.highlight:focus,
-#text_overlay_container .tag:hover,
-#text_overlay_container .tag:focus,
-#text_overlay_container .control-chip:hover,
-#text_overlay_container .control-chip:focus,
 #text_overlay_container .word.highlight.is-active,
-#text_overlay_container .tag.is-active,
 #text_overlay_container .control-chip.is-active {
     background: #ffffff;
+    color: #000000;
+    mix-blend-mode: normal;
+    text-decoration: none;
+}
+
+#text_overlay_container .tag:hover,
+#text_overlay_container .tag:focus {
+    background: rgba(255, 255, 255, 0.8);
+    color: #000000;
+    mix-blend-mode: normal;
+    text-decoration: none;
+}
+
+#text_overlay_container .control-chip:not(.is-active):hover,
+#text_overlay_container .control-chip:not(.is-active):focus {
+    background: rgba(255, 255, 255, 0.8);
     color: #000000;
     mix-blend-mode: normal;
     text-decoration: none;
