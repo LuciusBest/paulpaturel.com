@@ -34,5 +34,5 @@ jobs:
           protocol: ftps
           port: ${{ secrets.FTP_PORT }}
           server-dir: ${{ secrets.FTP_REMOTE_DIR }}
-          local-dir: public/
+          local-dir: ./public/
           state-name: ftp-state.json
