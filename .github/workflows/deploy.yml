@@ -36,3 +36,4 @@ jobs:
           server-dir: ${{ secrets.FTP_REMOTE_DIR }}
           local-dir: ./public/
           state-name: ftp-state.json
+          dangerous-clean-slate: true
