@@ -30,21 +30,13 @@ Test harnesses and exploratory scripts live in `tests/`; they are excluded from 
 
 Changes are authored in `src/`. Run `npm run build` before deploying or validating to ensure `public/` stays in sync.
 
-## Deploy (GitHub Actions → o2switch)
+## Deploy (manual FTPS upload)
 
-Automated deployment runs through the workflow in `.github/workflows/deploy.yml`. Each push to `main` (or a manual trigger) builds the site and publishes `public/` via FTPS.
-
-1. Add the following repository secrets on GitHub (`Settings → Secrets and variables → Actions → New repository secret`):
-   - `FTP_HOST` — o2switch FTP hostname (ex: `ftp.paulpaturel.com` or server hostname).
-   - `FTP_USERNAME` — the FTP user with access to your hosting root.
-   - `FTP_PASSWORD` — password for that FTP user.
-   - `FTP_PORT` — usually `21` (or `990` for implicit FTPS).
-   - `FTP_REMOTE_DIR` — remote path to publish to (ex: `/public_html/`).
-2. Push to `main` or trigger the workflow manually (`Actions → Deploy site via FTP → Run workflow`).
-3. The workflow runs `npm run build`, then uploads only the contents of `public/`. Changes are incremental thanks to `SamKirkland/FTP-Deploy-Action`.
-4. Verify the run on the Actions tab, then spot-check [paulpaturel.com](https://paulpaturel.com). Purge CDN caches if necessary.
-
-Fallback manual deploy: run `npm run build`, then sync `public/` to the hosting root with your preferred FTP client.
+1. Run `npm run build` to refresh the contents of `public/`.
+2. Open Cyberduck (or any FTP/FTPS client) and connect to the hosting account.
+3. Navigate to the remote `public_html/` directory.
+4. Drag the *contents* of the local `public/` directory into `public_html/`, letting the client replace existing files.
+5. Once the transfer completes, hit [paulpaturel.com](https://paulpaturel.com) with a hard refresh and spot-check key pages.
 
 ## Performance checklist
 
