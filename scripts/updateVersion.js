@@ -13,6 +13,7 @@ const fs = require('fs');
 const path = require('path');
 
 const versionFile = path.join(__dirname, '..', 'src', 'data', 'siteVersion.json');
+const inlineVersionFile = path.join(__dirname, '..', 'src', 'js', 'data', 'siteVersionInline.js');
 
 function pad(value) {
   return String(value).padStart(2, '0');
@@ -79,6 +80,12 @@ function writeVersion(filePath, payload) {
   fs.writeFileSync(filePath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
 }
 
+function writeInlineVersion(filePath, payload) {
+  const content = `window.SiteVersion = ${JSON.stringify(payload)};\n`;
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, content, 'utf8');
+}
+
 function main() {
   const now = new Date();
   const current = readCurrentVersion(versionFile);
@@ -92,6 +99,7 @@ function main() {
   };
 
   writeVersion(versionFile, payload);
+  writeInlineVersion(inlineVersionFile, payload);
 
   console.log(`Updated site version → ${payload.semantic} (${payload.timestamp})`);
 }

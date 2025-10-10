@@ -271,7 +271,15 @@ document.addEventListener("DOMContentLoaded", () => {
         console.warn('[dynamicTextOverlay] site version fetch threw', error);
       }
     };
-    fetchSiteVersion();
+    const inlineVersion =
+      typeof window !== 'undefined' && window.SiteVersion && typeof window.SiteVersion === 'object'
+        ? window.SiteVersion
+        : null;
+    if (inlineVersion) {
+      applySiteVersion(inlineVersion);
+    } else {
+      fetchSiteVersion();
+    }
     try { leftOverlay.classList.remove('bio-expanded'); } catch (_) {}
 
     // Language switching: update currentLang, persist, re-render bio and reveal if expanded
