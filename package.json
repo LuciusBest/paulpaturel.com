@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "version:update": "node scripts/updateVersion.js",
     "build": "rm -rf public && mkdir -p public && (cd src && find . -mindepth 1 -maxdepth 1 -exec cp -R {} ../public/ \\;)",
     "serve:src": "npx http-server src -p 3000 -c-1",
     "serve:public": "npx http-server public -p 4000 -c-1",

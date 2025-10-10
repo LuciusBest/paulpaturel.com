@@ -25,6 +25,7 @@ Test harnesses and exploratory scripts live in `tests/`; they are excluded from 
 | Install tools | `npm install` (installs `http-server` + `linkinator` for local workflows) |
 | Start dev server from source | `npm run serve:src` (http://localhost:3000) |
 | Build + serve production snapshot | `npm run build` then `npm run serve:public` (http://localhost:4000) |
+| Bump site version before release | `npm run version:update` |
 | Check links (source / public) | `npm run check:links:src` / `npm run check:links:public` |
 
 Changes are authored in `src/`. Run `npm run build` before deploying or validating to ensure `public/` stays in sync.
