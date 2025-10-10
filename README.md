@@ -29,12 +29,21 @@ Test harnesses and exploratory scripts live in `tests/`; they are excluded from 
 
 Changes are authored in `src/`. Run `npm run build` before deploying or validating to ensure `public/` stays in sync.
 
-## Deploy (o2switch)
+## Deploy (GitHub Actions → o2switch)
 
-1. Run `npm run build`.
-2. Upload the contents of `public/` (including `.htaccess`) to the hosting root.
-3. Upload `redirects.csv` if your tooling expects the manifest; otherwise ensure `.htaccess` ships with the 301 rules.
-4. Purge CDN caches if fronted by Cloudflare/other.
+Automated deployment runs through the workflow in `.github/workflows/deploy.yml`. Each push to `main` (or a manual trigger) builds the site and publishes `public/` via FTPS.
+
+1. Add the following repository secrets on GitHub (`Settings → Secrets and variables → Actions → New repository secret`):
+   - `FTP_HOST` — o2switch FTP hostname (ex: `ftp.paulpaturel.com` or server hostname).
+   - `FTP_USERNAME` — the FTP user with access to your hosting root.
+   - `FTP_PASSWORD` — password for that FTP user.
+   - `FTP_PORT` — usually `21` (or `990` for implicit FTPS).
+   - `FTP_REMOTE_DIR` — remote path to publish to (ex: `/public_html/`).
+2. Push to `main` or trigger the workflow manually (`Actions → Deploy site via FTP → Run workflow`).
+3. The workflow runs `npm run build`, then uploads only the contents of `public/`. Changes are incremental thanks to `SamKirkland/FTP-Deploy-Action`.
+4. Verify the run on the Actions tab, then spot-check [paulpaturel.com](https://paulpaturel.com). Purge CDN caches if necessary.
+
+Fallback manual deploy: run `npm run build`, then sync `public/` to the hosting root with your preferred FTP client.
 
 ## Performance checklist
 
