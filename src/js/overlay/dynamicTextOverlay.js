@@ -31,6 +31,10 @@ document.addEventListener("DOMContentLoaded", () => {
   try { document.documentElement.setAttribute('lang', currentLang); } catch (_) {}
 
   if (leftOverlay) {
+    let siteVersion = {
+      semantic: 'V00.00.00',
+      timestamp: '1970/01/01/00/00'
+    };
     const states = ["PAUL", "PATUL", "PATURL", "PATUREL"];
     const highlightSet = new Set(["P", "A", "U", "L"]);
     const dt = 80;
@@ -130,8 +134,17 @@ document.addEventListener("DOMContentLoaded", () => {
         "<br>",
         "<br>",
         '<span class="left-meta">',
-          // Line 1: version
-          wrapWords('V0.0 released 16/09/2025.'),
+          // Line 1: dynamic version + timestamp
+          (() => {
+            const semantic = siteVersion && typeof siteVersion.semantic === 'string' && siteVersion.semantic.trim()
+              ? siteVersion.semantic.trim()
+              : 'V00.00.00';
+            const timestamp = siteVersion && typeof siteVersion.timestamp === 'string' && siteVersion.timestamp.trim()
+              ? siteVersion.timestamp.trim()
+              : '1970/01/01/00/00';
+            const verb = currentLang === 'fr' ? 'publié le' : 'released';
+            return wrapWords(`${semantic} ${verb} ${timestamp}.`);
+          })(),
           '<br>',
           // Line 2: font credit
           wrapWords('Font → Arzier by '),
@@ -222,6 +235,43 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initial rendering
     renderState(currentIndex);
     renderBio();
+    const refreshBioWithVersion = () => {
+      clearBioTimeouts();
+      const wasExpanded = targetExpanded;
+      renderBio();
+      if (wasExpanded) setTimeout(() => animateBio(true), 10);
+    };
+    const applySiteVersion = (payload) => {
+      if (!payload || typeof payload !== 'object') return;
+      let changed = false;
+      const semantic = typeof payload.semantic === 'string' ? payload.semantic.trim() : '';
+      const timestamp = typeof payload.timestamp === 'string' ? payload.timestamp.trim() : '';
+      if (semantic) {
+        siteVersion.semantic = semantic;
+        changed = true;
+      }
+      if (timestamp) {
+        siteVersion.timestamp = timestamp;
+        changed = true;
+      }
+      if (changed) refreshBioWithVersion();
+    };
+    const fetchSiteVersion = () => {
+      try {
+        fetch('data/siteVersion.json', { cache: 'no-store' })
+          .then((res) => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.json();
+          })
+          .then(applySiteVersion)
+          .catch((error) => {
+            console.warn('[dynamicTextOverlay] site version fetch failed', error);
+          });
+      } catch (error) {
+        console.warn('[dynamicTextOverlay] site version fetch threw', error);
+      }
+    };
+    fetchSiteVersion();
     try { leftOverlay.classList.remove('bio-expanded'); } catch (_) {}
 
     // Language switching: update currentLang, persist, re-render bio and reveal if expanded
