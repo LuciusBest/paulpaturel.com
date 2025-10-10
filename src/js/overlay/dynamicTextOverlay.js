@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (leftOverlay) {
     let siteVersion = {
-      semantic: 'V00.00.00',
+      semantic: 'V1.00.00',
       timestamp: '1970/01/01/00/00'
     };
     const states = ["PAUL", "PATUL", "PATURL", "PATUREL"];
@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
           (() => {
             const semantic = siteVersion && typeof siteVersion.semantic === 'string' && siteVersion.semantic.trim()
               ? siteVersion.semantic.trim()
-              : 'V00.00.00';
+              : 'V1.00.00';
             const timestamp = siteVersion && typeof siteVersion.timestamp === 'string' && siteVersion.timestamp.trim()
               ? siteVersion.timestamp.trim()
               : '1970/01/01/00/00';

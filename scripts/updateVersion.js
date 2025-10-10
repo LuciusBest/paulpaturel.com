@@ -2,7 +2,7 @@
 /**
  * Increment the site version and write both semantic and timestamp formats.
  *
- * - semantic: V00.00.00 (two-digit major/minor/patch, zero-padded)
+ * - semantic: V1.00.00 (major without leading zero once >= 1, minor/patch remain zero-padded)
  * - timestamp: YYYY/MM/DD/MinMin/SS (minutes labelled "Min" to avoid confusion with month)
  *
  * The script is idempotent per run and will carry values across executions via
@@ -20,7 +20,7 @@ function pad(value) {
 }
 
 function parseSemantic(value) {
-  const match = /^V(\d{2})\.(\d{2})\.(\d{2})$/.exec(value || '');
+  const match = /^V(\d{1,2})\.(\d{2})\.(\d{2})$/.exec(value || '');
   if (!match) {
     return { major: 0, minor: 0, patch: 0 };
   }
@@ -49,7 +49,8 @@ function incrementSemantic(current) {
     nextMajor = 0;
   }
 
-  return `V${pad(nextMajor)}.${pad(nextMinor)}.${pad(nextPatch)}`;
+  const majorStr = nextMajor >= 10 ? String(nextMajor) : String(nextMajor);
+  return `V${majorStr}.${pad(nextMinor)}.${pad(nextPatch)}`;
 }
 
 function formatTimestamp(date) {
