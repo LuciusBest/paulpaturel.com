@@ -249,7 +249,7 @@ body {
     top: 0;
     right: 0;
     width: 64px;
-    height: 100dvh;
+    height: var(--viewport-block);
     display: none;
     padding: var(--ui-rail-padding-block) var(--ui-rail-padding-inline);
     box-sizing: border-box;

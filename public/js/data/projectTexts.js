@@ -1,17 +1,9 @@
 // Centralized loader for project text overlays with shared caching.
 (function (global) {
-  const LANG_FALLBACK = 'en';
-  const ENDPOINTS = {
-    en: 'data/projectTexts.json',
-    fr: 'data/projectTexts.fr.json'
-  };
+  const CACHE_KEY = 'en';
+  const ENDPOINT = 'data/projectTexts.json';
 
-  const cache = new Map(); // lang -> Promise<Record<string, any>>
-
-  const normalizeLang = (value) => {
-    const normalized = String(value || '').toLowerCase();
-    return normalized === 'fr' ? 'fr' : 'en';
-  };
+  const cache = new Map(); // cache key -> Promise<Record<string, any>>
 
   const fetchJSON = (url) => {
     return fetch(url, { credentials: 'same-origin' })
@@ -23,32 +15,30 @@
       });
   };
 
-  const loadLang = (lang) => {
-    const key = normalizeLang(lang);
-    if (!cache.has(key)) {
-      const url = ENDPOINTS[key] || ENDPOINTS[LANG_FALLBACK];
-      const promise = fetchJSON(url)
+  const loadLang = () => {
+    if (!cache.has(CACHE_KEY)) {
+      const promise = fetchJSON(ENDPOINT)
         .catch((error) => {
-          console.error('[projectTexts] failed to load', url, error);
+          console.error('[projectTexts] failed to load', ENDPOINT, error);
           return {};
         })
         .then((data) => (data && typeof data === 'object' ? data : {}));
-      cache.set(key, promise);
+      cache.set(CACHE_KEY, promise);
     }
-    return cache.get(key);
+    return cache.get(CACHE_KEY);
   };
 
   const loadAll = () => {
-    return Promise.all([loadLang('en'), loadLang('fr')]).then(([en, fr]) => ({ en, fr }));
+    return loadLang().then((en) => ({ en }));
   };
 
   const api = {
-    load(lang) {
-      return loadLang(lang);
+    load() {
+      return loadLang();
     },
     loadAll,
-    preload(lang) {
-      loadLang(lang);
+    preload() {
+      loadLang();
     },
     reset() {
       cache.clear();

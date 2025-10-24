@@ -18,17 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let toggleWords = () => {};
   let toggleLetters = () => {};
   let openLeftBio = () => {};
-  // i18n state
-  let currentLang = 'en';
-  try {
-    const stored = localStorage.getItem('pp.lang');
-    if (stored) currentLang = stored;
-  } catch (error) {
-    console.warn('[dynamicTextOverlay] localStorage unavailable, defaulting to EN', error);
-  }
-  let switchLanguage = () => {};
-  let refreshRightOverlayForLang = () => {};
-  try { document.documentElement.setAttribute('lang', currentLang); } catch (_) {}
+  try { document.documentElement.setAttribute('lang', 'en'); } catch (_) {}
 
   if (leftOverlay) {
     let siteVersion = {
@@ -73,64 +63,41 @@ document.addEventListener("DOMContentLoaded", () => {
         .join("");
     };
 
-    // Bio content in both languages
+    // Bio content (English only)
     const bioCopy = {
-      en: {
-        s1:
-          "Born in Paris, I moved to Lausanne to study at ECAL, <br>where I am now based as a graphic designer.",
-        s2:
-          "I am available for commissions and collaborations, with a focus on typography, web design, 3D, and print.",
-        contact: "Contact",
-      },
-      fr: {
-        s1:
-          "Né à Paris, j’ai déménagé à Lausanne pour étudier à l’ECAL, <br>où je suis désormais basé en tant que designer graphique.",
-        s2:
-          "Je suis disponible pour des commandes et des collaborations, avec un intérêt <br>pour la typographie, le web, la 3D et l’impression.",
-        contact: "Contact",
-      },
-    };
-
-    const langToggleHTML = () => {
-      const enActive = currentLang === 'en';
-      const frActive = currentLang === 'fr';
-      return [
-        '<span class="lang-toggle" role="group" aria-label="Language">',
-        `<span class="word lang-option ${enActive ? 'active' : 'inactive'}" data-lang="en" role="button" tabindex="0" data-no-custom-cursor="true">EN</span>`,
-        '<span class="space">  </span>',
-        `<span class="word lang-option ${frActive ? 'active' : 'inactive'}" data-lang="fr" role="button" tabindex="0" data-no-custom-cursor="true">FR</span>`,
-        '</span>'
-      ].join("");
+      s1:
+        "Born in Paris, I moved to Lausanne to study at ECAL, <br>where I am now based as a graphic designer.",
+      s2:
+        "I am available for commissions and collaborations, with a focus on typography, web design, 3D, and print.",
+      contact: "Contact",
     };
 
     const renderBio = () => {
       // Respect line skips exactly
       const emailHTML = `<span class="word contact-chip" role="link" tabindex="0" data-no-custom-cursor="true" data-url="mailto:paulpaturel75@gmail.com">paulpaturel75@gmail.com</span>`;
       const instaHTML = `<span class="word contact-chip" role="link" tabindex="0" data-no-custom-cursor="true" data-url="https://www.instagram.com/_paul_pat_/">@_paul_pat_</span>`;
-      const copy = bioCopy[currentLang] || bioCopy.en;
       const html = [
         // Next line after name
         "<br>",
         // First sentence
-        wrapWords(copy.s1),
+        wrapWords(bioCopy.s1),
         // Next line
         "<br>",
         // Second sentence
-        wrapWords(copy.s2),
-        // Blank line after BIO (no top toggle)
+        wrapWords(bioCopy.s2),
+        // Blank line after BIO
         "<br>",
         "<br>",
         // Contact block
-        wrapWords(copy.contact),
+        wrapWords(bioCopy.contact),
         "<br>",
         emailHTML,
         "<br>",
         instaHTML,
-        // Blank line after Contact, then EN FR again
+        // Blank line after Contact
         "<br>",
         "<br>",
-        langToggleHTML(),
-        // Meta paragraph under EN/FR with extra spacing
+        // Meta paragraph with version + font credits
         "<br>",
         "<br>",
         '<span class="left-meta">',
@@ -142,8 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const timestamp = siteVersion && typeof siteVersion.timestamp === 'string' && siteVersion.timestamp.trim()
               ? siteVersion.timestamp.trim()
               : '1970/01/01/00/00';
-            const verb = currentLang === 'fr' ? 'publié le' : 'released';
-            return wrapWords(`${semantic} ${verb} ${timestamp}.`);
+            return wrapWords(`${semantic} released ${timestamp}.`);
           })(),
           '<br>',
           // Line 2: font credit
@@ -176,20 +142,6 @@ document.addEventListener("DOMContentLoaded", () => {
           if (e.key === 'Enter' || e.key === ' ') {
             open(e);
           }
-        });
-      });
-      // Language toggle: click/keyboard handlers
-      const langOpts = bioEl.querySelectorAll('.lang-option[data-lang]');
-      langOpts.forEach((el) => {
-        const lang = el.getAttribute('data-lang');
-        const activate = (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (typeof switchLanguage === 'function') switchLanguage(lang);
-        };
-        el.addEventListener('click', activate);
-        el.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') activate(e);
         });
       });
       // Hide all words/spaces initially; they will reveal with animation
@@ -281,19 +233,6 @@ document.addEventListener("DOMContentLoaded", () => {
       fetchSiteVersion();
     }
     try { leftOverlay.classList.remove('bio-expanded'); } catch (_) {}
-
-    // Language switching: update currentLang, persist, re-render bio and reveal if expanded
-    switchLanguage = (lang) => {
-      if (!lang || lang === currentLang) return;
-      currentLang = (lang === 'fr' ? 'fr' : 'en');
-      try { localStorage.setItem('pp.lang', currentLang); } catch (_) {}
-      try { document.documentElement.setAttribute('lang', currentLang); } catch (_) {}
-      const wasExpanded = targetExpanded;
-      renderBio();
-      if (wasExpanded) setTimeout(() => animateBio(true), 10);
-      // Ask right overlay to refresh its text for the new language
-      try { refreshRightOverlayForLang(); } catch (_) {}
-    };
 
     const animateLettersTo = (targetIndex, startDelay = 0) => {
       letterTimeouts.forEach(clearTimeout);
@@ -441,7 +380,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (document.activeElement === nameEl) nameEl.blur();
     } catch (_) {}
 
-    // Click anywhere in the bio text to collapse it (chips/lang stopPropagation so they won't close)
+    // Click anywhere in the bio text to collapse it (chips stopPropagation so they won't close)
     try {
       bioEl.addEventListener('click', (e) => {
         if (!targetExpanded) return;
@@ -459,17 +398,17 @@ document.addEventListener("DOMContentLoaded", () => {
     return String(key).trim();
   };
   if (textOverlay && projectContainers.length) {
-    const loader = (window.ProjectTexts && typeof window.ProjectTexts.loadAll === 'function')
-      ? window.ProjectTexts.loadAll()
-      : Promise.resolve({ en: {}, fr: {} });
+    const loader = (window.ProjectTexts && typeof window.ProjectTexts.load === 'function')
+      ? window.ProjectTexts.load('en')
+      : Promise.resolve({});
 
     loader
       .catch((error) => {
         console.error('[dynamicTextOverlay] project texts failed to load', error);
-        return { en: {}, fr: {} };
+        return {};
       })
-      .then(({ en, fr }) => {
-        const byLang = { en: en || {}, fr: fr || {} };
+      .then((loadedTexts) => {
+        const projectTexts = loadedTexts && typeof loadedTexts === 'object' ? loadedTexts : {};
         let currentText = "";
         let wordsVisible = false;
         let timeouts = [];
@@ -707,13 +646,10 @@ document.addEventListener("DOMContentLoaded", () => {
         return highlightWords(text, highlight);
       };
 
-      const setOverlayText = (projectName) => {
-        lastProjectName = projectName;
-        const dict = byLang[currentLang] && Object.keys(byLang[currentLang]).length
-          ? byLang[currentLang]
-          : byLang.en;
-        const wasFull = textOverlay.classList.contains('is-fulltext');
-        const entry = dict[projectName];
+        const setOverlayText = (projectName) => {
+          lastProjectName = projectName;
+          const wasFull = textOverlay.classList.contains('is-fulltext');
+          const entry = projectTexts[projectName];
         let text = "";
         let highlight = [];
         if (typeof entry === "string") {
@@ -744,7 +680,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const nonHighlights = textOverlay.querySelectorAll("span.word:not(.highlight)");
           const spaces = textOverlay.querySelectorAll('span.space');
           if (wasFull) {
-            // Preserve full-text mode across language switches
+            // Preserve full-text mode when refreshing the overlay
             nonHighlights.forEach((span) => (span.style.display = "inline"));
             spaces.forEach((sp) => (sp.style.display = 'inline'));
             updateHighlightText(true);
@@ -920,10 +856,6 @@ document.addEventListener("DOMContentLoaded", () => {
         visibilityMap.set(container, 0);
         observer.observe(container);
       });
-      // Provide a hook for the left overlay language switcher to refresh the right overlay
-      refreshRightOverlayForLang = () => {
-        setOverlayText(lastProjectName || "");
-      };
     })
       .catch((err) => {
         console.error("Failed to load project texts", err);
