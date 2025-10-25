@@ -73,6 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let isNameHovered = false;
     let letterTimeouts = [];
     let bioTimeouts = [];
+    let bioWordTimeouts = [];
 
     // Build structure: name container + bio container
     const nameEl = document.createElement("div");
@@ -86,6 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (toperBioSlot) {
       toperBioSlot.innerHTML = "";
       toperBioSlot.appendChild(nameEl);
+      toperBioSlot.appendChild(leftOverlay);
     } else {
       leftOverlay.appendChild(nameEl);
     }
@@ -93,6 +95,28 @@ document.addEventListener("DOMContentLoaded", () => {
     const clearBioTimeouts = () => {
       bioTimeouts.forEach(clearTimeout);
       bioTimeouts = [];
+      bioWordTimeouts.forEach(clearTimeout);
+      bioWordTimeouts = [];
+    };
+
+    const hideAllBioTokens = () => {
+      const tokens = bioEl.querySelectorAll('.word, .space');
+      tokens.forEach((span) => {
+        span.style.display = 'none';
+      });
+    };
+
+    const flagBioVisibility = (expanded) => {
+      try { leftOverlay.setAttribute('aria-hidden', expanded ? 'false' : 'true'); } catch (_) {}
+      try { bioEl.style.pointerEvents = expanded ? 'auto' : 'none'; } catch (_) {}
+    };
+
+    const applyBioLayoutState = (expanded) => {
+      const method = expanded ? 'add' : 'remove';
+      try { leftOverlay.classList[method]('bio-expanded'); } catch (_) {}
+      if (toperBioSlot) {
+        try { toperBioSlot.classList[method]('bio-expanded'); } catch (_) {}
+      }
     };
 
     // Simple word/space wrapper (no highlight), matching right overlay tokenization
@@ -219,21 +243,64 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       });
       // Hide all words/spaces initially; they will reveal with animation
+      hideAllBioTokens();
+      if (!targetExpanded) {
+        bioEl.style.display = 'none';
+        bioEl.style.opacity = '0';
+      }
     };
 
     const animateBio = (show) => {
       clearBioTimeouts();
+      const words = Array.from(bioEl.querySelectorAll('span.word'));
+      const dt = 40;
       if (show) {
         bioEl.style.display = 'block';
         bioEl.style.opacity = '1';
-      } else {
+        scheduleToperHeightRefresh();
+        hideAllBioTokens();
+        words.forEach((span, index) => {
+          const id = setTimeout(() => {
+            span.style.display = 'inline';
+            const prev = span.previousElementSibling;
+            if (prev && prev.classList && prev.classList.contains('space')) {
+              prev.style.display = 'inline';
+            }
+          }, index * dt);
+          bioWordTimeouts.push(id);
+        });
+        const finalize = setTimeout(() => {
+          scheduleToperHeightRefresh();
+        }, words.length * dt + 20);
+        bioWordTimeouts.push(finalize);
+        return Math.max(words.length * dt, 250);
+      }
+
+      const ordered = words.slice().reverse();
+      scheduleToperHeightRefresh();
+      ordered.forEach((span, index) => {
+        const id = setTimeout(() => {
+          span.style.display = 'none';
+          const prev = span.previousElementSibling;
+          if (prev && prev.classList && prev.classList.contains('space')) {
+            prev.style.display = 'none';
+          }
+        }, index * dt);
+        bioWordTimeouts.push(id);
+      });
+
+      const total = Math.max(ordered.length * dt, 250);
+      const fadeId = setTimeout(() => {
         bioEl.style.opacity = '0';
         const hide = setTimeout(() => {
           bioEl.style.display = 'none';
+          hideAllBioTokens();
+          scheduleToperHeightRefresh();
         }, 250);
         bioTimeouts.push(hide);
-      }
-      return 250;
+      }, total);
+      bioWordTimeouts.push(fadeId);
+      return total + 250;
     };
 
     const renderState = (index) => {
@@ -254,7 +321,14 @@ document.addEventListener("DOMContentLoaded", () => {
       clearBioTimeouts();
       const wasExpanded = targetExpanded;
       renderBio();
-      if (wasExpanded) setTimeout(() => animateBio(true), 10);
+      if (wasExpanded) {
+        flagBioVisibility(true);
+        applyBioLayoutState(true);
+        setTimeout(() => animateBio(true), 10);
+      } else {
+        flagBioVisibility(false);
+        applyBioLayoutState(false);
+      }
     };
     const applySiteVersion = (payload) => {
       if (!payload || typeof payload !== 'object') return;
@@ -300,7 +374,8 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       fetchSiteVersion();
     }
-    try { leftOverlay.classList.remove('bio-expanded'); } catch (_) {}
+    flagBioVisibility(false);
+    applyBioLayoutState(false);
 
     const animateLettersTo = (targetIndex, startDelay = 0) => {
       letterTimeouts.forEach(clearTimeout);
@@ -319,37 +394,17 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     toggleLetters = () => {
-      // Clear any pending animations
-      letterTimeouts.forEach(clearTimeout);
-      letterTimeouts = [];
-      clearBioTimeouts();
-
-      // Toggle target state
-      const goingToExpanded = !targetExpanded;
-      const targetIndex = goingToExpanded ? states.length - 1 : 0;
-      const steps = Math.abs(targetIndex - currentIndex);
-      const totalLetterTime = steps * dt;
-
-      if (goingToExpanded) {
-        // 1) Morph name immediately to PATUREL
-        animateLettersTo(targetIndex, 0);
-        // 2) After a 0.7s gap from name completion, reveal the bio
-        const start = setTimeout(() => {
-          animateBio(true);
-        }, totalLetterTime + BIO_DELAY);
-        bioTimeouts.push(start);
+      if (targetExpanded) {
+        collapseLeftBio();
       } else {
-        // 1) Hide the bio first
-        const bioDuration = animateBio(false);
-        // 2) After a 0.7s gap from bio completion, morph the name back to PAUL
-        animateLettersTo(targetIndex, bioDuration + BIO_DELAY);
+        openLeftBio();
       }
-
-      targetExpanded = goingToExpanded;
     };
 
     // Open-only action: ensure PATUREL + reveal bio (idempotent)
     openLeftBio = () => {
+      flagBioVisibility(true);
+      applyBioLayoutState(true);
       // If already expanded, ensure name is fully expanded and bail
       if (targetExpanded) {
         if (currentIndex !== states.length - 1) animateLettersTo(states.length - 1, 0);
@@ -371,10 +426,6 @@ document.addEventListener("DOMContentLoaded", () => {
           currentIndex = targetIndex;
         }
         const bioDuration = animateBio(true); // instant reveal
-        try {
-          leftOverlay.classList.add('bio-expanded');
-          leftOverlay.setAttribute('aria-hidden', 'false');
-        } catch (_) {}
         targetExpanded = true;
         scheduleToperHeightRefresh();
         if (bioDuration > 0) {
@@ -399,10 +450,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }, totalLetterTime + BIO_DELAY);
       bioTimeouts.push(start);
       targetExpanded = true;
-      try {
-        leftOverlay.classList.add('bio-expanded');
-        leftOverlay.setAttribute('aria-hidden', 'false');
-      } catch (_) {}
       scheduleToperHeightRefresh();
     };
 
@@ -413,6 +460,7 @@ document.addEventListener("DOMContentLoaded", () => {
       letterTimeouts.forEach(clearTimeout);
       letterTimeouts = [];
       clearBioTimeouts();
+      flagBioVisibility(false);
       // Hide the bio first
       const bioDuration = animateBio(false);
       // After a gap, collapse the name only if not hovered
@@ -421,10 +469,11 @@ document.addEventListener("DOMContentLoaded", () => {
         letterTimeouts.push(start);
       }
       targetExpanded = false;
-      try {
-        leftOverlay.classList.remove('bio-expanded');
-        leftOverlay.setAttribute('aria-hidden', 'true');
-      } catch (_) {}
+      const layoutReset = setTimeout(() => {
+        applyBioLayoutState(false);
+        scheduleToperHeightRefresh();
+      }, Math.max(bioDuration, 0) + 10);
+      bioTimeouts.push(layoutReset);
       scheduleToperHeightRefresh();
       if (bioDuration > 0) {
         const finalize = setTimeout(() => scheduleToperHeightRefresh(), bioDuration + BIO_DELAY + 10);
