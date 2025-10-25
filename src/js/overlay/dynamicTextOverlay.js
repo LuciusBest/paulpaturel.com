@@ -23,7 +23,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (leftOverlay) {
     let siteVersion = {
       semantic: 'V1.00.00',
-      timestamp: '1970/01/01/00/00'
+      timestamp: '1970/01/01/00/00',
+      updatedAt: ''
     };
     const states = ["PAUL", "PATUL", "PATURL", "PATUREL"];
     const highlightSet = new Set(["P", "A", "U", "L"]);
@@ -63,6 +64,40 @@ document.addEventListener("DOMContentLoaded", () => {
         .join("");
     };
 
+    // --- Version formatting helpers (English) ---
+    const fmt = {
+      monthShort: [
+        'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'
+      ]
+    };
+    const tidy = (s) => String(s || '').trim();
+    const parseLooseTimestamp = (rawTs, isoFallback) => {
+      const iso = tidy(isoFallback);
+      if (iso && !Number.isNaN(Date.parse(iso))) return new Date(iso);
+      const s = tidy(rawTs);
+      // Expect something like YYYY/MM/DD/HH/MM or YYYY/MM/DD/mm/ss (script inconsistency safe-guard)
+      const bits = s.split('/')
+        .map((x) => x.trim())
+        .filter(Boolean);
+      if (bits.length >= 3) {
+        const Y = parseInt(bits[0], 10) || 1970;
+        const M = Math.max(1, Math.min(12, parseInt(bits[1], 10) || 1));
+        const D = Math.max(1, Math.min(31, parseInt(bits[2], 10) || 1));
+        // Try to guess hour/min from remaining parts; tolerate missing hour
+        const HH = bits.length >= 4 ? Math.max(0, Math.min(23, parseInt(bits[3], 10) || 0)) : 0;
+        const mm = bits.length >= 5 ? Math.max(0, Math.min(59, parseInt(bits[4], 10) || 0)) : 0;
+        try { return new Date(Y, M - 1, D, HH, mm); } catch (_) { /* noop */ }
+      }
+      const d = new Date(s);
+      return Number.isNaN(d.getTime()) ? new Date(0) : d;
+    };
+    const formatDateShort = (date) => {
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = fmt.monthShort[date.getMonth()] || '';
+      const year = date.getFullYear();
+      return `${day} ${month} ${year}`;
+    };
+
     // Bio content (English only)
     const bioCopy = {
       s1:
@@ -94,31 +129,27 @@ document.addEventListener("DOMContentLoaded", () => {
         emailHTML,
         "<br>",
         instaHTML,
-        // Blank line after Contact
+        // Blank separation before meta paragraph
         "<br>",
         "<br>",
-        // Meta paragraph with version + font credits
-        "<br>",
-        "<br>",
+        // Meta paragraph with font credits + last updated date
         '<span class="left-meta">',
-          // Line 1: dynamic version + timestamp
-          (() => {
-            const semantic = siteVersion && typeof siteVersion.semantic === 'string' && siteVersion.semantic.trim()
-              ? siteVersion.semantic.trim()
-              : 'V1.00.00';
-            const timestamp = siteVersion && typeof siteVersion.timestamp === 'string' && siteVersion.timestamp.trim()
-              ? siteVersion.timestamp.trim()
-              : '1970/01/01/00/00';
-            return wrapWords(`${semantic} released ${timestamp}.`);
-          })(),
-          '<br>',
-          // Line 2: font credit
+          // Line 1: font credit
           wrapWords('Font → Arzier by '),
           // Linked author token
           '<span class="word contact-chip" role="link" tabindex="0" data-no-custom-cursor="true" data-url="https://hugoscholl.ch/">Hugo Scholl</span>',
           '<span class="space"> </span>',
           // "- Interscript." as tokenized words
           wrapWords('- Interscript.'),
+          '<br>',
+          // Line 2 (last line): last updated with abbreviated month name
+          (() => {
+            const tsRaw = siteVersion && typeof siteVersion.timestamp === 'string' ? siteVersion.timestamp : '';
+            const updatedAtRaw = siteVersion && typeof siteVersion.updatedAt === 'string' ? siteVersion.updatedAt : '';
+            const date = parseLooseTimestamp(tsRaw, updatedAtRaw);
+            const dateStr = formatDateShort(date);
+            return wrapWords(`Last updated – ${dateStr}`);
+          })(),
         '</span>',
       ].join("");
       bioEl.innerHTML = html;
@@ -198,12 +229,17 @@ document.addEventListener("DOMContentLoaded", () => {
       let changed = false;
       const semantic = typeof payload.semantic === 'string' ? payload.semantic.trim() : '';
       const timestamp = typeof payload.timestamp === 'string' ? payload.timestamp.trim() : '';
+      const updatedAt = typeof payload.updatedAt === 'string' ? payload.updatedAt.trim() : '';
       if (semantic) {
         siteVersion.semantic = semantic;
         changed = true;
       }
       if (timestamp) {
         siteVersion.timestamp = timestamp;
+        changed = true;
+      }
+      if (updatedAt) {
+        siteVersion.updatedAt = updatedAt;
         changed = true;
       }
       if (changed) refreshBioWithVersion();

@@ -1,12 +1,16 @@
 #!/usr/bin/env node
 /**
- * Increment the site version and write both semantic and timestamp formats.
+ * Update the site metadata (semantic version + timestamps).
  *
- * - semantic: V1.00.00 (major without leading zero once >= 1, minor/patch remain zero-padded)
- * - timestamp: YYYY/MM/DD/MinMin/SS (minutes labelled "Min" to avoid confusion with month)
+ * CLI usage:
+ *   node scripts/updateVersion.js [major|minor|patch|none]
  *
- * The script is idempotent per run and will carry values across executions via
- * src/data/siteVersion.json. Run it before committing/pushing a production update.
+ * - default bump: patch
+ * - "none": keep existing semantic version, only refresh timestamps
+ *
+ * The script persists payload to:
+ *   • src/data/siteVersion.json (for fetch at runtime)
+ *   • src/js/data/siteVersionInline.js (for inline boot)
  */
 
 const fs = require('fs');
@@ -20,37 +24,61 @@ function pad(value) {
 }
 
 function parseSemantic(value) {
-  const match = /^V(\d{1,2})\.(\d{2})\.(\d{2})$/.exec(value || '');
+  const match = /^V?(\d{1,3})\.(\d{2})\.(\d{2})$/.exec(value || '');
   if (!match) {
     return { major: 0, minor: 0, patch: 0 };
   }
-
-  const [major, minor, patch] = match.slice(1).map(Number);
-  return { major, minor, patch };
+  const [major, minor, patch] = match.slice(1).map((part) => Number(part) || 0);
+  return {
+    major: clamp(major, 0, 999),
+    minor: clamp(minor, 0, 99),
+    patch: clamp(patch, 0, 99)
+  };
 }
 
-function incrementSemantic(current) {
-  const { major, minor, patch } = parseSemantic(current);
-  let nextMajor = major;
-  let nextMinor = minor;
-  let nextPatch = patch + 1;
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
 
-  if (nextPatch > 99) {
-    nextPatch = 0;
-    nextMinor += 1;
+function formatSemantic(parts) {
+  const major = clamp(parts.major ?? 0, 0, 999);
+  const minor = clamp(parts.minor ?? 0, 0, 99);
+  const patch = clamp(parts.patch ?? 0, 0, 99);
+  return `V${String(major)}.${pad(minor)}.${pad(patch)}`;
+}
+
+function bumpSemantic(current, bumpType) {
+  const base = parseSemantic(current);
+  let { major, minor, patch } = base;
+  switch (bumpType) {
+    case 'major':
+      major = (major + 1) % 1000;
+      minor = 0;
+      patch = 0;
+      break;
+    case 'minor':
+      minor = (minor + 1) % 100;
+      patch = 0;
+      if (minor === 0) {
+        major = (major + 1) % 1000;
+      }
+      break;
+    case 'patch':
+      patch += 1;
+      if (patch > 99) {
+        patch = 0;
+        minor += 1;
+        if (minor > 99) {
+          minor = 0;
+          major = (major + 1) % 1000;
+        }
+      }
+      break;
+    case 'none':
+    default:
+      break;
   }
-
-  if (nextMinor > 99) {
-    nextMinor = 0;
-    nextMajor += 1;
-  }
-
-  if (nextMajor > 99) {
-    nextMajor = 0;
-  }
-
-  const majorStr = nextMajor >= 10 ? String(nextMajor) : String(nextMajor);
-  return `V${majorStr}.${pad(nextMinor)}.${pad(nextPatch)}`;
+  return formatSemantic({ major, minor, patch });
 }
 
 function formatTimestamp(date) {
@@ -60,6 +88,14 @@ function formatTimestamp(date) {
   const minutes = pad(date.getMinutes());
   const seconds = pad(date.getSeconds());
   return `${year}/${month}/${day}/${minutes}/${seconds}`;
+}
+
+function resolveBumpType(argv) {
+  const alt = String(argv[2] || '').trim().toLowerCase();
+  if (alt === 'major' || alt === 'minor' || alt === 'patch' || alt === 'none') {
+    return alt;
+  }
+  return 'patch';
 }
 
 function readCurrentVersion(filePath) {
@@ -90,7 +126,9 @@ function writeInlineVersion(filePath, payload) {
 function main() {
   const now = new Date();
   const current = readCurrentVersion(versionFile);
-  const nextSemantic = incrementSemantic(current?.semantic);
+  const bumpType = resolveBumpType(process.argv);
+  const baseSemantic = current?.semantic || 'V0.00.00';
+  const nextSemantic = bumpSemantic(baseSemantic, bumpType);
   const timestamp = formatTimestamp(now);
 
   const payload = {
@@ -102,7 +140,8 @@ function main() {
   writeVersion(versionFile, payload);
   writeInlineVersion(inlineVersionFile, payload);
 
-  console.log(`Updated site version → ${payload.semantic} (${payload.timestamp})`);
+  const note = bumpType === 'none' ? 'timestamp refreshed' : `${bumpType} bump`;
+  console.log(`Updated site metadata → ${payload.timestamp} (${note})`);
 }
 
 main();
