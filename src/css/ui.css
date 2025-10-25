@@ -31,15 +31,171 @@ body {
     line-height: var(--ui-line-height);
 }
 
-#text_overlay_container_left {
+:root {
+    --toper-height: calc(var(--ui-font-size) * var(--ui-line-height) + 2 * var(--ui-padding-block));
+}
+
+.toper {
     position: fixed;
     top: 0;
     left: 0;
-    height: auto;
-    width: 35%;
+    width: 100%;
     z-index: 999;
-    padding: var(--ui-padding-block);
+    padding: var(--ui-padding-block) var(--ui-padding-inline);
     margin: var(--ui-margin);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--ui-space-unit);
+    color: #ffffff;
+    mix-blend-mode: difference;
+    pointer-events: none;
+    box-sizing: border-box;
+}
+
+.toper__bio,
+.toper__title,
+.toper__tags,
+.toper__title-group {
+    pointer-events: auto;
+}
+
+.toper__bio {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--ui-space-unit);
+    mix-blend-mode: inherit;
+    font: inherit;
+    line-height: inherit;
+}
+
+.toper__title-group {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: var(--ui-space-unit);
+    flex: 0 0 auto;
+    max-width: 30vw;
+    width: auto;
+    min-width: 0;
+    mix-blend-mode: inherit;
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+}
+
+.toper__title {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    width: auto;
+    background: transparent;
+    border: 0;
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    text-align: left;
+    mix-blend-mode: inherit;
+}
+
+.toper__title:focus,
+.toper__title:hover,
+.toper__title:active {
+    background: transparent;
+    color: inherit;
+    mix-blend-mode: inherit;
+    outline: none;
+}
+
+.toper__title-text {
+    display: inline-block;
+    pointer-events: none;
+    white-space: nowrap;
+    vertical-align: baseline;
+    background: transparent;
+    color: inherit;
+    transition: background-color .25s ease, color .25s ease;
+    flex: 0 0 auto;
+}
+
+.toper__title:not(.is-description-open):hover .toper__title-text,
+.toper__title:not(.is-description-open):focus-visible .toper__title-text {
+    background: rgba(255, 255, 255, 0.8);
+    color: #000000;
+    mix-blend-mode: normal;
+}
+
+.toper__title:not(.is-description-open):active .toper__title-text {
+    background: #ffffff;
+    color: #000000;
+    mix-blend-mode: normal;
+}
+
+.toper__splitter {
+    width: 2px;
+    height: 1em;
+    background: currentColor;
+    mix-blend-mode: difference;
+    align-self: baseline;
+    margin: 0 5px;
+    display: inline-block;
+    pointer-events: none;
+    flex: 0 0 2px;
+}
+
+.toper__tags {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--ui-space-unit);
+    mix-blend-mode: inherit;
+    font: inherit;
+    line-height: inherit;
+}
+
+.toper__tag {
+    display: inline-flex;
+    align-items: baseline;
+    background: transparent;
+    border: 0;
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+    padding: 0 var(--ui-padding-inline);
+    margin: 0;
+    cursor: pointer;
+    mix-blend-mode: inherit;
+    transition: background-color .2s ease, color .2s ease, opacity .2s ease;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.toper__tag:hover,
+.toper__tag:focus {
+    background: rgba(255, 255, 255, 0.8);
+    color: #000000;
+    mix-blend-mode: normal;
+    outline: none;
+}
+
+.toper__tag.is-active {
+    background: #ffffff;
+    color: #000000;
+    mix-blend-mode: normal;
+}
+
+#text_overlay_container_left {
+    position: fixed;
+    top: calc(2 * var(--ui-margin) + var(--toper-height));
+    left: var(--ui-margin);
+    height: auto;
+    width: min(35vw, 28rem);
+    z-index: 998;
+    padding: var(--ui-padding-block);
+    margin: 0;
     /* Ensure legibility regardless of background */
     color: #ffffff;
     mix-blend-mode: difference;
@@ -183,21 +339,31 @@ body {
 }
 
 #text_overlay_container {
-    position: fixed;
-    top: 0;
-    left: 35%;
-    height: auto;
-    width: 65%;
-    z-index: 999;
-    padding: var(--ui-padding-block);
-    margin: var(--ui-margin);
-    /* font-size: 18px; */
-    /* Container relies on negative blend for legibility */
-    color: #ffffff;
-    mix-blend-mode: difference;
+    position: static;
+    display: inline-block;
+    width: auto;
+    max-width: 30vw;
+    padding: 0;
+    margin: 0;
+    color: inherit;
+    mix-blend-mode: inherit;
     pointer-events: none;
-    /* don't block underlying content */
-    transition: opacity 0.5s ease;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    white-space: normal;
+    line-height: inherit;
+    vertical-align: baseline;
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+#text_overlay_container.is-open {
+    pointer-events: auto;
+    opacity: 1;
+    margin-left: 20px;
+}
+
+    opacity: 1;
 }
 
 .project-footer {
@@ -263,7 +429,7 @@ body {
     right: 0;
     display: flex;
     align-items: center;
-    gap: var(--ui-chip-gap);
+    gap: var(--ui-space-unit);
     transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
     will-change: transform;
 }
@@ -389,137 +555,6 @@ body.is-loading #cursor_arrow {
     mix-blend-mode: inherit;
 }
 
-/* Tags-only mode: show only highlighted words as blend-aware chips, hide spaces */
-#text_overlay_container.tags-only .space {
-    display: none;
-}
-
-#text_overlay_container.tags-only .word.highlight,
-#text_overlay_container.tags-only .tag {
-    display: inline-block;
-    background: transparent;
-    color: inherit;
-    border-radius: 0px;
-    padding: 0 var(--ui-padding-inline);
-    margin-right: var(--ui-chip-gap);
-    margin-bottom: var(--ui-chip-gap);
-    pointer-events: auto;
-    user-select: none;
-    -webkit-user-select: none;
-    mix-blend-mode: inherit;
-}
-
-/* Hover/focus states: soften chip backgrounds; active states stay solid white below */
-#text_overlay_container .word.highlight:hover,
-#text_overlay_container .word.highlight:focus,
-#text_overlay_container .word.highlight.is-active,
-#text_overlay_container .control-chip.is-active {
-    background: #ffffff;
-    color: #000000;
-    mix-blend-mode: normal;
-    text-decoration: none;
-}
-
-#text_overlay_container .tag:hover,
-#text_overlay_container .tag:focus {
-    background: rgba(255, 255, 255, 0.8);
-    color: #000000;
-    mix-blend-mode: normal;
-    text-decoration: none;
-}
-
-#text_overlay_container .control-chip:not(.is-active):hover,
-#text_overlay_container .control-chip:not(.is-active):focus {
-    background: rgba(255, 255, 255, 0.8);
-    color: #000000;
-    mix-blend-mode: normal;
-    text-decoration: none;
-}
-
-#text_overlay_container .word.highlight.is-active,
-#text_overlay_container .tag.is-active,
-#text_overlay_container .control-chip.is-active {
-    opacity: 1;
-}
-
-/* Plus/Minus control chip — styled like a tag chip in both modes */
-#text_overlay_container .control-chip {
-    display: inline-block;
-    background: transparent;
-    color: inherit;
-    border-radius: 0px;
-    padding: 0 var(--ui-padding-inline);
-    margin-left: 0;
-    margin-right: var(--ui-chip-gap);
-    margin-bottom: var(--ui-chip-gap);
-    pointer-events: auto;
-    user-select: none;
-    cursor: pointer;
-    mix-blend-mode: inherit;
-}
-
-/* When using a tag wrapper, avoid double backgrounds on inner words in chips view */
-#text_overlay_container.tags-only .tag .word.highlight {
-    background: transparent;
-    padding: 0;
-    margin: 0;
-    display: inline;
-}
-
-/* Keep spaces visible inside tag wrapper in chips view */
-#text_overlay_container.tags-only .tag .space {
-    display: inline;
-}
-
-/* Hover fade for chips in tags-only mode */
-/* Full-text mode: keep words legible via negative blend, allow pointer events */
-#text_overlay_container.is-fulltext .word,
-#text_overlay_container.is-fulltext .space {
-    background: transparent;
-    color: inherit;
-    pointer-events: auto;
-    cursor: pointer;
-}
-
-/* Active state for chips in both modes */
-#text_overlay_container .word.highlight.is-active,
-#text_overlay_container .tag.is-active {
-    background: #ffffff;
-    color: #000000;
-    mix-blend-mode: normal;
-    text-decoration: none;
-}
-
-/* Ensure interactive tokens in right overlay can receive pointer events even if parent ignores them */
-#text_overlay_container .word.highlight,
-#text_overlay_container .tag.highlight {
-    pointer-events: auto;
-    cursor: pointer;
-    user-select: none;
-    -webkit-user-select: none;
-}
-
-/* Ensure active state matches hover styling in full text view */
-#text_overlay_container.is-fulltext .word.highlight.is-active,
-#text_overlay_container.is-fulltext .tag.is-active {
-    background: #ffffff;
-    color: #000000;
-    mix-blend-mode: normal;
-}
-
-/* (Removed spaces-hidden strategy: spacing now handled inline per span) */
-
-/* Square edges in full text for smoother radius transition from chips */
-#text_overlay_container.is-fulltext .word,
-#text_overlay_container.is-fulltext .space {
-    border-radius: 0px;
-}
-
-/* Preserve left padding for the first visible word in full text to match chip padding */
-#text_overlay_container.is-fulltext>.word:first-child,
-#text_overlay_container.is-fulltext>.tag:first-child .word:first-child {
-    padding-left: var(--ui-padding-inline);
-}
 
 /* --- Custom Arrow Cursor (IS-Arzier) --- */
 .use-arrow-cursor {
