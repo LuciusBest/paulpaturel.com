@@ -1,22 +1,21 @@
 /*
   tags_filter.js
-  - Turns right-overlay tags into interactive, accessible chips.
+  - Handles project filtering via the topper tag chips.
   - Single-select filter: clicking a tag toggles it active and filters projects.
-  - Derives project tag sets from data/projectTexts.json (<tag> ... </tag> segments).
-  - Resilient to overlay re-renders via MutationObserver.
+  - Preserves scroll position when filters change and emits a change event.
 */
 
 (function () {
   if (window.__tagsFilterInitialized) return;
   window.__tagsFilterInitialized = true;
 
-  const OVERLAY_SELECTOR = '#text_overlay_container';
+  const TAGS_CONTAINER_SELECTOR = '#toperTags';
   const PROJECT_SELECTOR = '.project_container[data-project], .project_container[data-project-key]';
   const FILTERED_CLASS = 'is-filtered';
   const ACTIVE_CLASS = 'is-active';
 
-  const overlay = document.querySelector(OVERLAY_SELECTOR);
-  if (!overlay) return; // nothing to bind
+  const tagsHost = document.querySelector(TAGS_CONTAINER_SELECTOR);
+  if (!tagsHost) return;
 
   const getScrollContext = () => {
     const container = document.querySelector('.main_container');
@@ -62,7 +61,8 @@
 
     return {
       getViewportTop: () => 0,
-      getViewportHeight: () => window.innerHeight || (scrollElement ? scrollElement.clientHeight : 0) || 0,
+      getViewportHeight: () =>
+        window.innerHeight || (scrollElement ? scrollElement.clientHeight : 0) || 0,
       getScrollTop,
       setScrollTop,
       dispatchScroll: () => {
@@ -144,36 +144,41 @@
     return String(key).trim();
   };
 
-  // Normalization: trim, collapse internal whitespace, lower-case; strip diacritics
   const normalizeTag = (s) => {
     if (!s) return '';
     const collapsed = String(s).trim().replace(/\s+/g, ' ');
-    // Remove diacritics for robust matching
-    // Strip combining marks after NFD to drop accents (broad browser support)
     const stripped = collapsed
       .normalize('NFD')
       .replace(/[\u0300-\u036f]+/g, '');
     return stripped.toLowerCase();
   };
 
-  // Extract <tag>...</tag> tokens from a text blob, return Set of normalized labels
-  const extractTags = (text) => {
+  const collectTagSet = (entry) => {
     const tags = new Set();
-    if (!text) return tags;
-    // Simple non-greedy matching is sufficient for our JSON content
-    const re = /<tag>([\s\S]*?)<\/tag>/gi;
-    let m;
-    while ((m = re.exec(text))) {
-      const labelRaw = m[1] || '';
-      const label = normalizeTag(labelRaw.replace(/\s+/g, ' '));
-      if (label) tags.add(label);
+    const add = (label) => {
+      const norm = normalizeTag(label);
+      if (norm) tags.add(norm);
+    };
+
+    if (entry && typeof entry === 'object' && Array.isArray(entry.tags)) {
+      entry.tags.forEach(add);
+    } else if (typeof entry === 'string') {
+      // legacy fallback: parse inline <tag>...</tag>
+      const re = /<tag>([\s\S]*?)<\/tag>/gi;
+      let m;
+      while ((m = re.exec(entry))) add(m[1] || '');
+    } else if (entry && typeof entry === 'object' && entry.text) {
+      const re = /<tag>([\s\S]*?)<\/tag>/gi;
+      let m;
+      while ((m = re.exec(entry.text))) add(m[1] || '');
     }
+
     return tags;
   };
 
-  // Build project -> Set(tags)
   let projectTags = new Map();
-  let activeTag = null; // normalized or null
+  let activeTag = null;
+  let currentRenderedTags = [];
 
   const emitFilterChange = () => {
     try {
@@ -187,21 +192,16 @@
 
   const buildProjectTags = (texts) => {
     projectTags = new Map();
-    // Collect all existing projects from DOM
     const projects = document.querySelectorAll(PROJECT_SELECTOR);
     projects.forEach((el) => {
       const key = getProjectKey(el);
       if (!key) return;
       const entry = texts && texts[key];
-      let text = '';
-      if (typeof entry === 'string') text = entry;
-      else if (entry && typeof entry === 'object') text = entry.text || '';
-      const set = extractTags(text);
+      const set = collectTagSet(entry);
       projectTags.set(key, set);
     });
   };
 
-  // Apply filtering to projects based on activeTag
   const applyFilter = () => {
     const projects = document.querySelectorAll(PROJECT_SELECTOR);
     projects.forEach((el) => {
@@ -212,136 +212,101 @@
       if (shouldHide) el.classList.add(FILTERED_CLASS);
       else el.classList.remove(FILTERED_CLASS);
     });
-    // Nudge layout/observers after style changes
     Promise.resolve().then(() => {
       window.dispatchEvent(new Event('resize'));
       emitFilterChange();
     });
   };
 
-  // For a chip element, derive its label (visible token text)
-  const deriveChipLabel = (el) => {
-    // If it's a wrapper .tag.highlight, use its full text (includes spaces)
-    if (el.classList.contains('tag')) {
-      // Normalize spaces within
-      const raw = (el.textContent || '').replace(/\s+/g, ' ').trim();
-      return normalizeTag(raw);
-    }
-    // Else assume single word highlight
-    const raw = (el.textContent || '').trim();
-    return normalizeTag(raw);
+  const wake = () => {
+    try { window.dispatchEvent(new Event('ui:activity')); } catch (_) {}
   };
 
-  // Update all current chips to reflect activeTag
-  const syncActiveChips = () => {
-    const chips = overlay.querySelectorAll('.tag.highlight, .word.highlight');
-    chips.forEach((chip) => {
-      // Skip inner .word inside a .tag wrapper; the wrapper is the interactive node
-      if (chip.classList.contains('word') && chip.closest('.tag.highlight')) return;
-      const tagNorm = chip.getAttribute('data-tag') || deriveChipLabel(chip);
-      chip.setAttribute('data-tag', tagNorm);
-      const isOn = activeTag && tagNorm === activeTag;
-      chip.setAttribute('aria-pressed', isOn ? 'true' : 'false');
-      chip.classList.toggle(ACTIVE_CLASS, !!isOn);
+  const renderTags = (labels) => {
+    currentRenderedTags = Array.isArray(labels) ? labels.slice() : [];
+    tagsHost.innerHTML = '';
+    if (!currentRenderedTags.length) {
+      tagsHost.setAttribute('aria-hidden', 'true');
+      return;
+    }
+    tagsHost.removeAttribute('aria-hidden');
+    currentRenderedTags.forEach((label) => {
+      const norm = normalizeTag(label);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'toper__tag tag';
+      btn.textContent = label;
+      btn.setAttribute('data-tag', norm);
+      const isOn = activeTag && activeTag === norm;
+      btn.classList.toggle(ACTIVE_CLASS, !!isOn);
+      btn.setAttribute('aria-pressed', isOn ? 'true' : 'false');
+
+      const activate = (ev) => {
+        if (ev.type === 'keydown') {
+          const key = ev.key;
+          if (key !== 'Enter' && key !== ' ') return;
+          ev.preventDefault();
+        } else {
+          ev.preventDefault();
+        }
+        toggleTag(norm);
+      };
+
+      btn.addEventListener('click', activate);
+      btn.addEventListener('keydown', activate);
+      btn.addEventListener('pointerover', wake);
+      btn.addEventListener('focus', wake);
+      btn.addEventListener('mousedown', (ev) => {
+        if (ev.button === 0) ev.preventDefault();
+      });
+
+      tagsHost.appendChild(btn);
+    });
+  };
+
+  const syncRenderedState = () => {
+    const buttons = tagsHost.querySelectorAll('.toper__tag');
+    buttons.forEach((btn) => {
+      const norm = btn.getAttribute('data-tag') || '';
+      const isOn = activeTag && activeTag === norm;
+      btn.classList.toggle(ACTIVE_CLASS, !!isOn);
+      btn.setAttribute('aria-pressed', isOn ? 'true' : 'false');
     });
   };
 
   const toggleTag = (tagNorm) => {
     const anchor = captureScrollAnchor();
     activeTag = activeTag === tagNorm ? null : tagNorm;
-    syncActiveChips();
+    syncRenderedState();
     applyFilter();
     if (anchor) restoreScrollAnchor(anchor);
   };
 
-  // Add semantics and interactions to chips in current overlay DOM
-  const enhanceChips = () => {
-    const nodes = overlay.querySelectorAll('.tag.highlight, .word.highlight');
-    nodes.forEach((node) => {
-      // Interact only on wrapper if present
-      if (node.classList.contains('word') && node.closest('.tag.highlight')) return;
+  const onToperUpdate = (event) => {
+    const detail = event && event.detail ? event.detail : {};
+    const labels = Array.isArray(detail.tags) ? detail.tags : [];
+    renderTags(labels);
+    syncRenderedState();
+  };
 
-      // Semantics
-      if (!node.hasAttribute('role')) node.setAttribute('role', 'button');
-      if (!node.hasAttribute('tabindex')) node.setAttribute('tabindex', '0');
-      const tagNorm = deriveChipLabel(node);
-      node.setAttribute('data-tag', tagNorm);
-      node.setAttribute('aria-pressed', activeTag && activeTag === tagNorm ? 'true' : 'false');
-
-      // Avoid double-binding
-      if (node.__chipBound) return;
-      node.__chipBound = true;
-
-      const onActivate = (ev) => {
-        // Prevent the global right-side click toggle in dynamicTextOverlay
-        ev.stopPropagation();
-        if (ev.type === 'keydown') {
-          const e = ev;
-          const key = e.key;
-          if (key !== 'Enter' && key !== ' ') return;
-          e.preventDefault();
-        }
-        const label = node.getAttribute('data-tag') || deriveChipLabel(node);
-        toggleTag(label);
-      };
-
-      node.addEventListener('click', onActivate);
-      node.addEventListener('keydown', onActivate);
-
-      // Wake idle UI on hover/focus over interactive chips
-      const wake = () => {
-        try { window.dispatchEvent(new Event('ui:activity')); } catch (_) {}
-      };
-      node.addEventListener('pointerover', wake);
-      node.addEventListener('focus', wake);
-
-      // Prevent mouse clicks from leaving a focus highlight on deselected chips
-      node.addEventListener('mousedown', (ev) => {
-        if (ev.button === 0) {
-          ev.preventDefault();
-        }
+  const loader = (window.ProjectTexts && typeof window.ProjectTexts.load === 'function')
+    ? window.ProjectTexts.load('en')
+    : fetch('data/projectTexts.json').then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
       });
+
+  loader
+    .then((texts) => {
+      buildProjectTags(texts);
+      applyFilter();
+      emitFilterChange();
+    })
+    .catch((err) => {
+      console.error('tags_filter: failed to load projectTexts.json', err);
+      emitFilterChange();
     });
 
-    // Reflect current activeTag
-    syncActiveChips();
-  };
-
-  // Observe overlay for content changes and enhance chips accordingly
-  const mo = new MutationObserver(() => {
-    enhanceChips();
-  });
-
-  const init = () => {
-    const loader = (window.ProjectTexts && typeof window.ProjectTexts.load === 'function')
-      ? window.ProjectTexts.load('en')
-      : fetch('data/projectTexts.json').then((r) => {
-          if (!r.ok) throw new Error(`HTTP ${r.status}`);
-          return r.json();
-        });
-
-    loader
-      .then((texts) => {
-        buildProjectTags(texts);
-        applyFilter(); // ensure initial state visible
-        emitFilterChange();
-        // Observe overlay subtree
-        mo.observe(overlay, { childList: true, subtree: true });
-        // Enhance any existing chips
-        enhanceChips();
-      })
-      .catch((err) => {
-        console.error('tags_filter: failed to load projectTexts.json', err);
-        // Even if JSON fails, enable chip semantics so user still gets hover/active feedback
-        mo.observe(overlay, { childList: true, subtree: true });
-        enhanceChips();
-        emitFilterChange();
-      });
-  };
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, { once: true });
-  } else {
-    init();
-  }
+  window.addEventListener('toper:update', onToperUpdate);
+  renderTags([]);
 })();

@@ -1,26 +1,66 @@
 {
   "LOTTOFPRINTS": {
-    "text": "<tag>Visual identity</tag> (<tag>print</tag> and <tag>motion</tag>) for ECAL’s lottery game. <tag>2022</tag>"
+    "text": "Visual identity (print and motion) for ECAL’s lottery game. 2022.",
+    "tags": [
+      "Visual Identity",
+      "Print",
+      "Motion",
+      "2022"
+    ]
   },
   "SYNTHETIC_ORGANIC": {
-    "text": "Synthetic Organic is a series of eight <tag>3D</tag> sculptures, presented in a 20-page A3 booklet <tag>print</tag>ed by inkjet. <tag>2023</tag>"
+    "text": "Synthetic Organic is a series of eight 3D sculptures, presented in a 20-page A3 booklet printed by inkjet. 2023.",
+    "tags": [
+      "3D",
+      "Print",
+      "2023"
+    ]
   },
   "SENS_UNIK": {
-    "text": "<tag>Unselected</tag> project. Proposal for a static and motion <tag>visual identity</tag> for the <tag>music</tag> group Sens Unik. The <tag>3D</tag> imagery depicts the group’s hometown of Renens (1020 CH) through a dystopian lens inspired by comic book aesthetics. The project also includes the development of multiple <tag>logo</tag> variations. <tag>2025</tag>"
+    "text": "Unselected project. Proposal for a static and motion visual identity for the music group Sens Unik. The 3D imagery depicts the group’s hometown of Renens (1020 CH) through a dystopian lens inspired by comic book aesthetics, including the development of multiple logo variations. 2025.",
+    "tags": [
+      "Unselected",
+      "Visual Identity",
+      "Music",
+      "3D",
+      "Type Design",
+      "2025"
+    ]
   },
   "CamilleLeprinceWEB": {
-    "text": "<tag>Website</tag> designed and developped for photographer Camille Leprince. <tag>2023</tag>"
+    "text": "Website designed and developed for photographer Camille Leprince. 2023.",
+    "tags": [
+      "Web design",
+      "2023"
+    ]
   },
   "StencilPoster": {
-    "text": "<tag>Stencil</tag> poster cut into wood. <tag>Typographic</tag> design in collaboration with Hugo Scholl and Brian Roettinger. <tag>2022</tag>"
+    "text": "Stencil poster cut into wood. Typographic design in collaboration with Hugo Scholl and Brian Roettinger. 2022.",
+    "tags": [
+      "Type Design",
+      "2022"
+    ]
   },
   "RLSH": {
-    "text": "<tag>Editorial</tag> work based on Vladislav Iouchkov’s 2017 thesis: “The Hero with a Thousand Graces”: A Socio-Criminological Examination of the Real Life Super Hero Phenomenon. <tag>2022</tag>"
+    "text": "Editorial work based on Vladislav Iouchkov’s 2017 thesis, “The Hero with a Thousand Graces”: A Socio-Criminological Examination of the Real Life Super Hero Phenomenon. 2022.",
+    "tags": [
+      "Editorial",
+      "2022"
+    ]
   },
   "Relay": {
-    "text": "<tag>Typeface</tag> and <tag>type specimen</tag> developed under the supervision of Aurèle Sack. <tag>2024</tag>"
+    "text": "Typeface and type specimen developed under the supervision of Aurèle Sack. 2024.",
+    "tags": [
+      "Type Design",
+      "2024"
+    ]
   },
   "COSMA": {
-    "text": "Cosma is a display <tag>typeface</tag> in development since <tag>2024</tag>. It builds on the techno-futurist idiom of late-70s/early-80s electronics and computing—panel labels, interface lettering, early corporate wordmarks—shaped into a flexible, modular system.\nCosma extends these models through three variable axes—Weight, Width, and Contrast. It reaches from Light to Extra Bold, compact to wide, and low to high contrast, holding the construction steady while staying expressive. <tag>Work in progress</tag>."
+    "text": "Cosma is a display typeface in development since 2024. It builds on the techno-futurist idiom of late-70s and early-80s electronics and computing—panel labels, interface lettering, early corporate wordmarks—shaped into a flexible, modular system.\nCosma extends these models through three variable axes—Weight, Width, and Contrast. It reaches from Light to Extra Bold, compact to wide, and low to high contrast, holding the construction steady while staying expressive. Work in progress.",
+    "tags": [
+      "Type Design",
+      "2024",
+      "Work In Progress"
+    ]
   }
 }

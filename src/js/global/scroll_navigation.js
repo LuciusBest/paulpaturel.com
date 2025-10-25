@@ -72,13 +72,10 @@ document.addEventListener("DOMContentLoaded", () => {
   verticalRail.className = "project-vertical-rail";
   const verticalIndicatorGroup = document.createElement("div");
   verticalIndicatorGroup.className = "vertical-indicator-group";
-  const verticalProjectName = document.createElement("span");
-  verticalProjectName.className = "vertical-project-name";
-  verticalProjectName.textContent = "";
+  const verticalProjectName = null;
   const verticalIndex = document.createElement("span");
   verticalIndex.className = "vertical-index";
   verticalIndex.textContent = `1/${projects.length}`;
-  verticalIndicatorGroup.appendChild(verticalProjectName);
   verticalIndicatorGroup.appendChild(verticalIndex);
   verticalRail.appendChild(verticalIndicatorGroup);
   document.body.appendChild(verticalRail);
@@ -155,14 +152,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const setProjectName = (label) => {
     const text = tidy(label);
-    if (!text) {
-      verticalProjectName.textContent = "";
-      verticalProjectName.style.display = "none";
-      verticalProjectName.setAttribute("aria-hidden", "true");
+    if (!verticalIndex) return;
+    if (text) {
+      verticalIndex.setAttribute("aria-label", text);
+      verticalIndex.setAttribute("title", text);
     } else {
-      verticalProjectName.textContent = text;
-      verticalProjectName.style.display = "inline-block";
-      verticalProjectName.removeAttribute("aria-hidden");
+      verticalIndex.removeAttribute("aria-label");
+      verticalIndex.removeAttribute("title");
     }
   };
 
