@@ -170,6 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let cachedContentWidth = 0;
   let cachedRailHeight = 0;
   let cachedRailPaddingTop = 0;
+  let cachedRailPaddingBottom = 0;
 
   const recomputeFooterMetrics = () => {
     const styles = getComputedStyle(track);
@@ -183,8 +184,10 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const styles = getComputedStyle(verticalRail);
       cachedRailPaddingTop = parseFloat(styles.paddingTop) || 0;
+      cachedRailPaddingBottom = parseFloat(styles.paddingBottom) || 0;
     } catch (_) {
       cachedRailPaddingTop = 0;
+      cachedRailPaddingBottom = 0;
     }
   };
 
@@ -209,10 +212,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const railHeight = cachedRailHeight || verticalRail.clientHeight;
     const padTop = cachedRailPaddingTop;
+    const padBottom = cachedRailPaddingBottom;
     const indicatorHeight =
       verticalIndicatorGroup.offsetHeight || verticalIndex.offsetHeight;
     // Allow the indicator to travel so its bottom lines up with the rail's bottom edge.
-    const usableHeight = Math.max(railHeight - padTop - indicatorHeight, 0);
+    const usableHeight = Math.max(railHeight - padTop - padBottom - indicatorHeight, 0);
     const progress = isFinite(verticalState.progress) ? verticalState.progress : 0;
     const top = progress * usableHeight;
     verticalIndicatorGroup.style.transform = `translateY(${top}px)`;
