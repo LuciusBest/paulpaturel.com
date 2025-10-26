@@ -42,7 +42,7 @@ body {
     left: 0;
     width: 100%;
     z-index: 999;
-    padding: var(--ui-padding-block) var(--ui-padding-inline);
+    padding: var(--ui-padding-inline);
     margin: 0;
     display: flex;
     align-items: flex-start;
