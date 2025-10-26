@@ -613,6 +613,12 @@ body.is-loading #left_bio {
     display: none !important;
 }
 
+body.is-loading .toper__title-group,
+body.is-loading .toper__tags,
+body.is-loading .toper__splitter {
+    display: none !important;
+}
+
 body.is-loading .project-footer {
     display: none !important;
 }
