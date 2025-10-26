@@ -72,13 +72,10 @@ document.addEventListener("DOMContentLoaded", () => {
   verticalRail.className = "project-vertical-rail";
   const verticalIndicatorGroup = document.createElement("div");
   verticalIndicatorGroup.className = "vertical-indicator-group";
-  const verticalProjectName = document.createElement("span");
-  verticalProjectName.className = "vertical-project-name";
-  verticalProjectName.textContent = "";
+  const verticalProjectName = null;
   const verticalIndex = document.createElement("span");
   verticalIndex.className = "vertical-index";
   verticalIndex.textContent = `1/${projects.length}`;
-  verticalIndicatorGroup.appendChild(verticalProjectName);
   verticalIndicatorGroup.appendChild(verticalIndex);
   verticalRail.appendChild(verticalIndicatorGroup);
   document.body.appendChild(verticalRail);
@@ -155,14 +152,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const setProjectName = (label) => {
     const text = tidy(label);
-    if (!text) {
-      verticalProjectName.textContent = "";
-      verticalProjectName.style.display = "none";
-      verticalProjectName.setAttribute("aria-hidden", "true");
+    if (!verticalIndex) return;
+    if (text) {
+      verticalIndex.setAttribute("aria-label", text);
+      verticalIndex.setAttribute("title", text);
     } else {
-      verticalProjectName.textContent = text;
-      verticalProjectName.style.display = "inline-block";
-      verticalProjectName.removeAttribute("aria-hidden");
+      verticalIndex.removeAttribute("aria-label");
+      verticalIndex.removeAttribute("title");
     }
   };
 
@@ -174,6 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let cachedContentWidth = 0;
   let cachedRailHeight = 0;
   let cachedRailPaddingTop = 0;
+  let cachedRailPaddingBottom = 0;
 
   const recomputeFooterMetrics = () => {
     const styles = getComputedStyle(track);
@@ -187,8 +184,10 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const styles = getComputedStyle(verticalRail);
       cachedRailPaddingTop = parseFloat(styles.paddingTop) || 0;
+      cachedRailPaddingBottom = parseFloat(styles.paddingBottom) || 0;
     } catch (_) {
       cachedRailPaddingTop = 0;
+      cachedRailPaddingBottom = 0;
     }
   };
 
@@ -213,10 +212,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const railHeight = cachedRailHeight || verticalRail.clientHeight;
     const padTop = cachedRailPaddingTop;
+    const padBottom = cachedRailPaddingBottom;
     const indicatorHeight =
       verticalIndicatorGroup.offsetHeight || verticalIndex.offsetHeight;
     // Allow the indicator to travel so its bottom lines up with the rail's bottom edge.
-    const usableHeight = Math.max(railHeight - padTop - indicatorHeight, 0);
+    const usableHeight = Math.max(railHeight - padTop - padBottom - indicatorHeight, 0);
     const progress = isFinite(verticalState.progress) ? verticalState.progress : 0;
     const top = progress * usableHeight;
     verticalIndicatorGroup.style.transform = `translateY(${top}px)`;
@@ -389,8 +389,8 @@ document.addEventListener("DOMContentLoaded", () => {
     state.total = Math.max(1, activeSlides.length);
     state.progress = computeProjectProgress();
     recomputeFooterMetrics();
-    if (verticalRail.style.display !== "block") {
-      verticalRail.style.display = "block";
+    if (verticalRail.style.display !== "flex") {
+      verticalRail.style.display = "flex";
       recomputeVerticalMetrics();
     } else {
       recomputeVerticalMetrics();

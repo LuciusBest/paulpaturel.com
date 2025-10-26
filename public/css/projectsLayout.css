@@ -190,6 +190,14 @@ video.media-contain,
     transform: translate(-50%, -50%);
 }
 
+.project_container[data-project-key="RLSH"] .diapo-frame img {
+    width: 95%;
+    height: 95%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
 /* Hidden by tag filter */
 .project_container.is-filtered {
     display: none;
@@ -232,10 +240,11 @@ video.media-contain,
 
 .project_container[data-project-key="COSMA"] .cosma-tester {
     position: relative;
-    width: 80%;
-    /* leave 10% margin on each side */
-    margin: 0 10%;
-    height: 100%;
+    width: 90%;
+    /* leave 5% margin on each side */
+    margin: 0 5%;
+    height: 93%;
+    /* trim 7% of the wrapper height for breathing room */
     display: grid;
     /* center content above controls */
     grid-template-rows: 1fr auto;

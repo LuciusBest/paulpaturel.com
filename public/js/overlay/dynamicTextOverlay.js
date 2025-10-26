@@ -14,13 +14,51 @@
 document.addEventListener("DOMContentLoaded", () => {
   const textOverlay = document.getElementById("text_overlay_container");
   const leftOverlay = document.getElementById("text_overlay_container_left");
+  const toperBioSlot = document.getElementById("toperBio");
+  const toperTitle = document.getElementById("toperTitle");
+  const toperTitleText = document.getElementById("toperTitleText");
+  const toperHeader = document.getElementById("toper");
 
   let toggleWords = () => {};
   let toggleLetters = () => {};
   let openLeftBio = () => {};
   try { document.documentElement.setAttribute('lang', 'en'); } catch (_) {}
+  if (toperTitle) {
+    try { toperTitle.setAttribute('aria-controls', 'text_overlay_container'); } catch (_) {}
+    try { toperTitle.setAttribute('aria-expanded', 'false'); } catch (_) {}
+    try { toperTitle.setAttribute('type', 'button'); } catch (_) {}
+    toperTitle.disabled = true;
+  }
+
+  let toperHeightRaf = null;
+  const refreshToperHeight = () => {
+    toperHeightRaf = null;
+    if (!toperHeader) return;
+    const height = toperHeader.offsetHeight;
+    if (!Number.isFinite(height) || height <= 0) return;
+    try {
+      document.documentElement.style.setProperty('--toper-height', `${Math.round(height)}px`);
+    } catch (_) {}
+  };
+  const scheduleToperHeightRefresh = () => {
+    if (typeof requestAnimationFrame !== 'function') {
+      refreshToperHeight();
+      return;
+    }
+    if (toperHeightRaf !== null) return;
+    toperHeightRaf = requestAnimationFrame(refreshToperHeight);
+  };
+
+  scheduleToperHeightRefresh();
+  try { window.addEventListener('resize', scheduleToperHeightRefresh, { passive: true }); } catch (_) {}
 
   if (leftOverlay) {
+    try { leftOverlay.style.position = 'static'; } catch (_) {}
+    try { leftOverlay.style.width = 'auto'; } catch (_) {}
+    try { leftOverlay.style.maxWidth = '30vw'; } catch (_) {}
+    try { leftOverlay.style.pointerEvents = 'auto'; } catch (_) {}
+    try { leftOverlay.style.margin = '0'; } catch (_) {}
+    try { leftOverlay.style.padding = '0'; } catch (_) {}
     let siteVersion = {
       semantic: 'V1.00.00',
       timestamp: '1970/01/01/00/00',
@@ -35,6 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let isNameHovered = false;
     let letterTimeouts = [];
     let bioTimeouts = [];
+    let bioWordTimeouts = [];
 
     // Build structure: name container + bio container
     const nameEl = document.createElement("div");
@@ -44,12 +83,40 @@ document.addEventListener("DOMContentLoaded", () => {
     const bioEl = document.createElement("div");
     bioEl.id = "left_bio";
     leftOverlay.innerHTML = "";
-    leftOverlay.appendChild(nameEl);
     leftOverlay.appendChild(bioEl);
+    if (toperBioSlot) {
+      toperBioSlot.innerHTML = "";
+      toperBioSlot.appendChild(nameEl);
+      toperBioSlot.appendChild(leftOverlay);
+    } else {
+      leftOverlay.appendChild(nameEl);
+    }
 
     const clearBioTimeouts = () => {
       bioTimeouts.forEach(clearTimeout);
       bioTimeouts = [];
+      bioWordTimeouts.forEach(clearTimeout);
+      bioWordTimeouts = [];
+    };
+
+    const hideAllBioTokens = () => {
+      const tokens = bioEl.querySelectorAll('.word, .space');
+      tokens.forEach((span) => {
+        span.style.display = 'none';
+      });
+    };
+
+    const flagBioVisibility = (expanded) => {
+      try { leftOverlay.setAttribute('aria-hidden', expanded ? 'false' : 'true'); } catch (_) {}
+      try { bioEl.style.pointerEvents = expanded ? 'auto' : 'none'; } catch (_) {}
+    };
+
+    const applyBioLayoutState = (expanded) => {
+      const method = expanded ? 'add' : 'remove';
+      try { leftOverlay.classList[method]('bio-expanded'); } catch (_) {}
+      if (toperBioSlot) {
+        try { toperBioSlot.classList[method]('bio-expanded'); } catch (_) {}
+      }
     };
 
     // Simple word/space wrapper (no highlight), matching right overlay tokenization
@@ -176,32 +243,64 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       });
       // Hide all words/spaces initially; they will reveal with animation
-      bioEl.querySelectorAll("span.word").forEach((s) => (s.style.display = "none"));
-      bioEl.querySelectorAll("span.space").forEach((s) => (s.style.display = "none"));
+      hideAllBioTokens();
+      if (!targetExpanded) {
+        bioEl.style.display = 'none';
+        bioEl.style.opacity = '0';
+      }
     };
 
     const animateBio = (show) => {
       clearBioTimeouts();
-      const words = Array.from(bioEl.querySelectorAll("span.word"));
-      if (!words.length) return 0;
-      const dtBio = 40;
-      const targets = words.filter((w) =>
-        show ? w.style.display === "none" : w.style.display !== "none"
-      );
-      const ordered = show ? targets : targets.slice().reverse();
-      const duration = ordered.length * dtBio;
+      const words = Array.from(bioEl.querySelectorAll('span.word'));
+      const dt = 40;
+      if (show) {
+        bioEl.style.display = 'block';
+        bioEl.style.opacity = '1';
+        scheduleToperHeightRefresh();
+        hideAllBioTokens();
+        words.forEach((span, index) => {
+          const id = setTimeout(() => {
+            span.style.display = 'inline';
+            const prev = span.previousElementSibling;
+            if (prev && prev.classList && prev.classList.contains('space')) {
+              prev.style.display = 'inline';
+            }
+          }, index * dt);
+          bioWordTimeouts.push(id);
+        });
+        const finalize = setTimeout(() => {
+          scheduleToperHeightRefresh();
+        }, words.length * dt + 20);
+        bioWordTimeouts.push(finalize);
+        return Math.max(words.length * dt, 250);
+      }
+
+      const ordered = words.slice().reverse();
+      scheduleToperHeightRefresh();
       ordered.forEach((span, index) => {
         const id = setTimeout(() => {
-          const reveal = show;
-          span.style.display = reveal ? "inline" : "none";
+          span.style.display = 'none';
           const prev = span.previousElementSibling;
-          if (prev && prev.classList && prev.classList.contains("space")) {
-            prev.style.display = reveal ? "inline" : "none";
+          if (prev && prev.classList && prev.classList.contains('space')) {
+            prev.style.display = 'none';
           }
-        }, (index + 1) * dtBio);
-        bioTimeouts.push(id);
+        }, index * dt);
+        bioWordTimeouts.push(id);
       });
-      return duration;
+
+      const total = Math.max(ordered.length * dt, 250);
+      const fadeId = setTimeout(() => {
+        bioEl.style.opacity = '0';
+        const hide = setTimeout(() => {
+          bioEl.style.display = 'none';
+          hideAllBioTokens();
+          scheduleToperHeightRefresh();
+        }, 250);
+        bioTimeouts.push(hide);
+      }, total);
+      bioWordTimeouts.push(fadeId);
+      return total + 250;
     };
 
     const renderState = (index) => {
@@ -222,7 +321,14 @@ document.addEventListener("DOMContentLoaded", () => {
       clearBioTimeouts();
       const wasExpanded = targetExpanded;
       renderBio();
-      if (wasExpanded) setTimeout(() => animateBio(true), 10);
+      if (wasExpanded) {
+        flagBioVisibility(true);
+        applyBioLayoutState(true);
+        setTimeout(() => animateBio(true), 10);
+      } else {
+        flagBioVisibility(false);
+        applyBioLayoutState(false);
+      }
     };
     const applySiteVersion = (payload) => {
       if (!payload || typeof payload !== 'object') return;
@@ -268,7 +374,8 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       fetchSiteVersion();
     }
-    try { leftOverlay.classList.remove('bio-expanded'); } catch (_) {}
+    flagBioVisibility(false);
+    applyBioLayoutState(false);
 
     const animateLettersTo = (targetIndex, startDelay = 0) => {
       letterTimeouts.forEach(clearTimeout);
@@ -287,37 +394,17 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     toggleLetters = () => {
-      // Clear any pending animations
-      letterTimeouts.forEach(clearTimeout);
-      letterTimeouts = [];
-      clearBioTimeouts();
-
-      // Toggle target state
-      const goingToExpanded = !targetExpanded;
-      const targetIndex = goingToExpanded ? states.length - 1 : 0;
-      const steps = Math.abs(targetIndex - currentIndex);
-      const totalLetterTime = steps * dt;
-
-      if (goingToExpanded) {
-        // 1) Morph name immediately to PATUREL
-        animateLettersTo(targetIndex, 0);
-        // 2) After a 0.7s gap from name completion, reveal the bio
-        const start = setTimeout(() => {
-          animateBio(true);
-        }, totalLetterTime + BIO_DELAY);
-        bioTimeouts.push(start);
+      if (targetExpanded) {
+        collapseLeftBio();
       } else {
-        // 1) Hide the bio first
-        const bioDuration = animateBio(false);
-        // 2) After a 0.7s gap from bio completion, morph the name back to PAUL
-        animateLettersTo(targetIndex, bioDuration + BIO_DELAY);
+        openLeftBio();
       }
-
-      targetExpanded = goingToExpanded;
     };
 
     // Open-only action: ensure PATUREL + reveal bio (idempotent)
     openLeftBio = () => {
+      flagBioVisibility(true);
+      applyBioLayoutState(true);
       // If already expanded, ensure name is fully expanded and bail
       if (targetExpanded) {
         if (currentIndex !== states.length - 1) animateLettersTo(states.length - 1, 0);
@@ -338,9 +425,13 @@ document.addEventListener("DOMContentLoaded", () => {
           renderState(targetIndex);
           currentIndex = targetIndex;
         }
-        animateBio(true); // instant reveal
-        try { leftOverlay.classList.add('bio-expanded'); } catch (_) {}
+        const bioDuration = animateBio(true); // instant reveal
         targetExpanded = true;
+        scheduleToperHeightRefresh();
+        if (bioDuration > 0) {
+          const finalize = setTimeout(() => scheduleToperHeightRefresh(), bioDuration + 10);
+          bioTimeouts.push(finalize);
+        }
         return;
       }
 
@@ -348,10 +439,18 @@ document.addEventListener("DOMContentLoaded", () => {
       const steps = Math.abs(targetIndex - currentIndex);
       const totalLetterTime = steps * dt;
       animateLettersTo(targetIndex, 0);
-      const start = setTimeout(() => { animateBio(true); }, totalLetterTime + BIO_DELAY);
+      const start = setTimeout(() => {
+        const duration = animateBio(true);
+        if (duration > 0) {
+          const finalize = setTimeout(() => scheduleToperHeightRefresh(), duration + 10);
+          bioTimeouts.push(finalize);
+        } else {
+          scheduleToperHeightRefresh();
+        }
+      }, totalLetterTime + BIO_DELAY);
       bioTimeouts.push(start);
       targetExpanded = true;
-      try { leftOverlay.classList.add('bio-expanded'); } catch (_) {}
+      scheduleToperHeightRefresh();
     };
 
     // Collapse-only: hide bio, then collapse name back to PAUL if not hovered
@@ -361,6 +460,7 @@ document.addEventListener("DOMContentLoaded", () => {
       letterTimeouts.forEach(clearTimeout);
       letterTimeouts = [];
       clearBioTimeouts();
+      flagBioVisibility(false);
       // Hide the bio first
       const bioDuration = animateBio(false);
       // After a gap, collapse the name only if not hovered
@@ -369,7 +469,16 @@ document.addEventListener("DOMContentLoaded", () => {
         letterTimeouts.push(start);
       }
       targetExpanded = false;
-      try { leftOverlay.classList.remove('bio-expanded'); } catch (_) {}
+      const layoutReset = setTimeout(() => {
+        applyBioLayoutState(false);
+        scheduleToperHeightRefresh();
+      }, Math.max(bioDuration, 0) + 10);
+      bioTimeouts.push(layoutReset);
+      scheduleToperHeightRefresh();
+      if (bioDuration > 0) {
+        const finalize = setTimeout(() => scheduleToperHeightRefresh(), bioDuration + BIO_DELAY + 10);
+        bioTimeouts.push(finalize);
+      }
     };
 
     // Hover: only morph the name, do not touch the bio
@@ -445,460 +554,354 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .then((loadedTexts) => {
         const projectTexts = loadedTexts && typeof loadedTexts === 'object' ? loadedTexts : {};
-        let currentText = "";
-        let wordsVisible = false;
-        let timeouts = [];
-        let formatTimeout = null;
-        let formatTimeouts = [];
-        const HIGHLIGHT_DT = 100; // ms between each highlighted word transformation
-        let lastProjectName = "";
-        let controlChipEl = null;
-        const YEAR_TAG_PATTERN = /^(?:19|20)\d{2}$/;
+        const projectList = Array.from(projectContainers);
+        const projectByKey = new Map();
+        projectList.forEach((container) => {
+          const key = getProjectKey(container);
+          if (key) projectByKey.set(key, container);
+        });
 
-        const ensureControlChip = () => {
-          if (controlChipEl) return controlChipEl;
-          controlChipEl = document.createElement('span');
-          controlChipEl.className = 'control-chip';
-          controlChipEl.setAttribute('role', 'button');
-          controlChipEl.setAttribute('tabindex', '0');
-          const activate = (e) => {
-            try { if (e) { e.preventDefault(); e.stopPropagation(); } } catch (_) {}
-            if (typeof toggleWords === 'function') toggleWords();
+        const tidyLabel = (str) => String(str || '').replace(/\s+/g, ' ').trim();
+
+        const deriveProjectLabel = (key) => {
+          const el = projectByKey.get(key);
+          if (!el) return tidyLabel(key);
+          const explicit =
+            el.getAttribute('data-project-label') ||
+            el.getAttribute('data-project-name');
+          if (explicit) return tidyLabel(explicit);
+          const fallback = tidyLabel(el.getAttribute('data-project') || key);
+          if (!fallback) return '';
+          const hasSpace = /\s/.test(fallback);
+          const hasSeparator = /[-_]/.test(fallback);
+          let label = fallback;
+          if (!hasSpace || hasSeparator) {
+            label = fallback
+              .replace(/[_-]+/g, ' ')
+              .replace(/([a-z])([A-Z])/g, '$1 $2')
+              .replace(/([A-Z])([A-Z][a-z])/g, '$1 $2');
+            label = tidyLabel(label);
+            label = label
+              .split(' ')
+              .map((word) =>
+                /^[A-Z0-9]+$/.test(word)
+                  ? word
+                  : word.charAt(0).toUpperCase() + word.slice(1)
+              )
+              .join(' ');
+          }
+          return tidyLabel(label);
+        };
+
+        const LEGACY_TAG_REGEX = /<tag>([\s\S]*?)<\/tag>/gi;
+
+        const sanitizeLegacyMarkup = (raw) =>
+          String(raw || '').replace(LEGACY_TAG_REGEX, (_, inner) => inner || '');
+
+        const normalizeDisplayTag = (label) => {
+          const tidy = tidyLabel(label);
+          if (!tidy) return '';
+          const first = tidy.charAt(0);
+          if (!first) return '';
+          return first.toUpperCase() + tidy.slice(1);
+        };
+
+        const collectEntryTags = (entry, fallbackRaw) => {
+          const tags = [];
+          const seen = new Set();
+          const push = (label) => {
+            const display = normalizeDisplayTag(label);
+            if (!display) return;
+            const normalized = display
+              .normalize('NFD')
+              .replace(/[\u0300-\u036f]+/g, '')
+              .toLowerCase();
+            if (seen.has(normalized)) return;
+            seen.add(normalized);
+            tags.push(display);
           };
-          controlChipEl.addEventListener('click', activate);
-          controlChipEl.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') activate(e);
-          });
-          return controlChipEl;
+
+          if (entry && typeof entry === 'object' && Array.isArray(entry.tags)) {
+            entry.tags.forEach(push);
+          }
+
+          if (!tags.length && fallbackRaw) {
+            let match;
+            while ((match = LEGACY_TAG_REGEX.exec(String(fallbackRaw || '')))) {
+              push(match[1] || '');
+            }
+          }
+
+          return tags;
         };
 
-        const setControlSymbol = (isFull) => {
-          const el = ensureControlChip();
-          el.textContent = isFull ? '–' : '+';
-          el.setAttribute('aria-label', isFull ? 'Collapse description' : 'Expand description');
-          el.classList.toggle('is-active', !!isFull);
+        const resolveEntryPayload = (entry) => {
+          const rawText =
+            typeof entry === 'string'
+              ? entry
+              : entry && typeof entry === 'object'
+              ? entry.text || ''
+              : '';
+          const sanitized = sanitizeLegacyMarkup(rawText);
+          const tags = collectEntryTags(entry, rawText);
+          return { text: sanitized, tags };
         };
 
-        const isHighlightToken = (node) => {
-          if (!node || node.nodeType !== 1) return false;
-          if (node.parentElement !== textOverlay) return false;
-          const cls = node.classList;
-          if (!cls) return false;
-          if (cls.contains('tag') && cls.contains('highlight')) return true;
-          if (cls.contains('word') && cls.contains('highlight')) return true;
-          return false;
+        const tokenize = (textValue) => {
+          const parts = String(textValue || '').split(/(\s+)/);
+          return parts
+            .map((part, index) => {
+              if (index % 2 === 1) return `<span class="space">${part}</span>`;
+              if (!part) return '';
+              return `<span class="word">${part}</span>`;
+            })
+            .join('');
         };
 
-        const isSpaceNode = (node) =>
-          !!node && node.nodeType === 1 && node.classList && node.classList.contains('space');
+        const emitToperUpdate = (detail) => {
+          try {
+            window.dispatchEvent(new CustomEvent('toper:update', { detail }));
+          } catch (_) {}
+        };
 
-        const getTokenText = (node) => ((node && node.textContent) || '').trim();
+        let activeProjectKey = '';
+        let currentDescription = '';
+        let descriptionVisible = false;
+        let wordTimeouts = [];
 
-        const reorderTagTokens = () => {
+        const clearWordTimeouts = () => {
+          wordTimeouts.forEach((id) => clearTimeout(id));
+          wordTimeouts = [];
+        };
+
+        const syncTitle = (projectKey) => {
+          if (!toperTitleText) return '';
+          const label = tidyLabel(deriveProjectLabel(projectKey));
+          toperTitleText.textContent = label;
+          if (toperTitle) {
+            const hasContent = currentDescription.trim().length > 0;
+            toperTitle.disabled = !hasContent;
+            toperTitle.setAttribute('aria-controls', 'text_overlay_container');
+            toperTitle.setAttribute(
+              'aria-expanded',
+              hasContent && descriptionVisible ? 'true' : 'false'
+            );
+          }
+          return label;
+        };
+
+        const setDescriptionContent = (textValue, keepVisible) => {
           if (!textOverlay) return;
-          const groups = [];
-          let cursor = textOverlay.firstElementChild;
-          while (cursor) {
-            if (isHighlightToken(cursor)) {
-              const nodes = [cursor];
-              let walker = cursor.nextElementSibling;
-              while (walker && isSpaceNode(walker)) {
-                nodes.push(walker);
-                walker = walker.nextElementSibling;
-              }
-              groups.push({ token: cursor, nodes });
-              cursor = walker;
-            } else {
-              cursor = cursor.nextElementSibling;
+          clearWordTimeouts();
+          currentDescription = String(textValue || '');
+          const hasText = currentDescription.trim().length > 0;
+
+          if (!hasText) {
+            textOverlay.innerHTML = "";
+            descriptionVisible = false;
+            textOverlay.classList.remove('is-open');
+            textOverlay.setAttribute('aria-hidden', 'true');
+            if (toperTitle) {
+              toperTitle.disabled = true;
+              toperTitle.setAttribute('aria-expanded', 'false');
+              toperTitle.classList.remove('is-description-open');
             }
+            scheduleToperHeightRefresh();
+            return;
           }
 
-          if (!groups.length) return;
-
-          const dateGroups = groups.filter(({ token }) =>
-            YEAR_TAG_PATTERN.test(getTokenText(token))
-          );
-          if (!dateGroups.length) return;
-
-          dateGroups.forEach(({ nodes }) => {
-            const fragment = document.createDocumentFragment();
-            nodes.forEach((node) => fragment.appendChild(node));
-            textOverlay.appendChild(fragment);
-          });
-        };
-
-        // Format a tag token depending on the display mode (no '#')
-        const capitalizeFirst = (s) =>
-          s && s.length ? s.charAt(0).toUpperCase() + s.slice(1) : s;
-
-        const clearFormatTimers = () => {
-          if (formatTimeout) {
-            clearTimeout(formatTimeout);
-            formatTimeout = null;
-          }
-          formatTimeouts.forEach(clearTimeout);
-          formatTimeouts = [];
-        };
-
-        const updateHighlightText = (isFullText) => {
-          const spans = textOverlay.querySelectorAll("span.word.highlight");
-          spans.forEach((span) => {
-            if (!span.dataset.original) {
-              span.dataset.original = span.textContent;
-            }
-            if (isFullText) {
-              // Restore original wording in full text mode
-              span.textContent = span.dataset.original;
-            } else {
-              // Show as Tag (capitalize first letter) in tags-only mode
-              const token = span.dataset.original || "";
-              span.textContent = capitalizeFirst(token);
-            }
-          });
-        };
-
-        const animateHighlightText = (isFullText) => {
-          clearFormatTimers();
-          const spans = Array.from(
-            textOverlay.querySelectorAll("span.word.highlight")
-          );
-          const dtAnim = HIGHLIGHT_DT;
-          spans.forEach((span, index) => {
-            if (!span.dataset.original) {
-              span.dataset.original = span.textContent;
-            }
-            const id = setTimeout(() => {
-              const token = span.dataset.original || "";
-              span.textContent = isFullText ? token : capitalizeFirst(token);
-            }, index * dtAnim);
-            formatTimeouts.push(id);
-          });
-        };
-
-      const highlightWords = (text, highlight = []) => {
-        const parts = text.split(/(\s+)/);
-        const highlightSet = new Set(highlight);
-        let wordIndex = 0;
-
-        return parts
-          .map((part, i) => {
-            if (i % 2 === 1) {
-              // Wrap whitespace so it can be styled/hidden per mode
-              return `<span class="space">${part}</span>`;
-            }
-            if (!part) return part;
-            const cls = highlightSet.has(wordIndex)
-              ? "word highlight"
-              : "word";
-            const wrapped = `<span class="${cls}">${part}</span>`;
-            wordIndex++;
-            return wrapped;
-          })
-          .join("");
-      };
-
-      // Support inline <tag> ... </tag> to mark highlighted words
-      // Multi-word tags are wrapped as a single chip wrapper containing inner word/spaces
-      const renderFromTagged = (text) => {
-        let out = [];
-        let i = 0;
-        let depth = 0;
-        const len = text.length;
-
-        let groupParts = null; // holds inner spans while inside a top-level <tag>
-
-        const emit = (html) => out.push(html);
-
-        const pushWord = (word, highlighted) => {
-          if (!word) return;
-          const cls = highlighted ? "word highlight" : "word";
-          const node = `<span class="${cls}">${word}</span>`;
-          if (highlighted && groupParts) groupParts.push(node);
-          else emit(node);
-        };
-
-        const pushSpace = (spaceStr) => {
-          const inTag = depth > 0 ? ' in-tag' : '';
-          const node = `<span class="space${inTag}">${spaceStr}</span>`;
-          if (depth > 0 && groupParts) groupParts.push(node);
-          else emit(node);
-        };
-
-        const flushGroup = () => {
-          if (groupParts) {
-            emit(`<span class="tag highlight">${groupParts.join("")}</span>`);
-            groupParts = null;
-          }
-        };
-
-        while (i < len) {
-          if (text.startsWith("<tag>", i)) {
-            if (depth === 0) groupParts = [];
-            depth++;
-            i += 5;
-            continue;
-          }
-          if (text.startsWith("</tag>", i)) {
-            depth = Math.max(0, depth - 1);
-            i += 6;
-            if (depth === 0) flushGroup();
-            continue;
-          }
-
-          const ch = text[i];
-          if (/\s/.test(ch)) {
-            let j = i + 1;
-            while (j < len && /\s/.test(text[j])) j++;
-            pushSpace(text.slice(i, j));
-            i = j;
-            continue;
-          }
-
-          let j = i + 1;
-          while (
-            j < len &&
-            !/\s/.test(text[j]) &&
-            !text.startsWith("<tag>", j) &&
-            !text.startsWith("</tag>", j)
-          ) {
-            j++;
-          }
-          const token = text.slice(i, j);
-          pushWord(token, depth > 0);
-          i = j;
-        }
-
-        // flush if an opening tag was not closed
-        flushGroup();
-
-        return out.join("");
-      };
-
-      const renderWords = (text, highlight = []) => {
-        if (text && (text.includes("<tag>") || text.includes("</tag>"))) {
-          return renderFromTagged(text);
-        }
-        // fallback to legacy index-based highlighting
-        return highlightWords(text, highlight);
-      };
-
-        const setOverlayText = (projectName) => {
-          lastProjectName = projectName;
-          const wasFull = textOverlay.classList.contains('is-fulltext');
-          const entry = projectTexts[projectName];
-        let text = "";
-        let highlight = [];
-        if (typeof entry === "string") {
-          text = entry;
-        } else if (entry && typeof entry === "object") {
-          text = entry.text || "";
-          highlight = Array.isArray(entry.highlight) ? entry.highlight : [];
-        }
-        if (text !== currentText) {
-          timeouts.forEach(clearTimeout);
-          timeouts = [];
-          clearFormatTimers();
-          textOverlay.innerHTML = text ? renderWords(text, highlight) : "";
-          reorderTagTokens();
-          currentText = text;
-          // Append the +/– control chip when there is content
-          if (currentText) {
-            const chip = ensureControlChip();
-            try {
-              const firstElement = textOverlay.firstElementChild;
-              if (firstElement) textOverlay.insertBefore(chip, firstElement);
-              else textOverlay.appendChild(chip);
-            } catch (_) {}
-          } else if (controlChipEl && controlChipEl.parentNode) {
-            try { controlChipEl.parentNode.removeChild(controlChipEl); } catch (_) {}
-          }
-          if (!currentText && controlChipEl) controlChipEl.classList.remove('is-active');
-          const nonHighlights = textOverlay.querySelectorAll("span.word:not(.highlight)");
+          textOverlay.innerHTML = tokenize(currentDescription);
+          const words = textOverlay.querySelectorAll('span.word');
           const spaces = textOverlay.querySelectorAll('span.space');
-          if (wasFull) {
-            // Preserve full-text mode when refreshing the overlay
-            nonHighlights.forEach((span) => (span.style.display = "inline"));
-            spaces.forEach((sp) => (sp.style.display = 'inline'));
-            updateHighlightText(true);
-            textOverlay.classList.remove("tags-only");
-            textOverlay.classList.add("is-fulltext");
-            wordsVisible = true;
-            setControlSymbol(true);
-            // In full-text mode: clicking anywhere in the description collapses back to tags
+
+          if (keepVisible) {
+            words.forEach((span) => (span.style.display = 'inline'));
+            spaces.forEach((space) => (space.style.display = 'inline'));
+            descriptionVisible = true;
+            textOverlay.classList.add('is-open');
+            textOverlay.setAttribute('aria-hidden', 'false');
+            if (toperTitle) {
+              toperTitle.disabled = false;
+              toperTitle.setAttribute('aria-expanded', 'true');
+              toperTitle.classList.add('is-description-open');
+            }
           } else {
-            nonHighlights.forEach((span) => (span.style.display = "none"));
-            wordsVisible = false;
-            updateHighlightText(false);
-            textOverlay.classList.add("tags-only");
-            textOverlay.classList.remove("is-fulltext");
-            setControlSymbol(false);
+            words.forEach((span) => (span.style.display = 'none'));
+            spaces.forEach((space) => (space.style.display = 'none'));
+            descriptionVisible = false;
+            textOverlay.classList.remove('is-open');
+            textOverlay.setAttribute('aria-hidden', 'true');
+            if (toperTitle) {
+              toperTitle.disabled = false;
+              toperTitle.setAttribute('aria-expanded', 'false');
+              toperTitle.classList.remove('is-description-open');
+            }
           }
-        }
-      };
-
-        // Utility: clear inline display on all spaces so CSS can control visibility
-        const normalizeSpaces = () => {
-          const spaces = textOverlay.querySelectorAll('span.space');
-          spaces.forEach((sp) => (sp.style.display = ''));
+          scheduleToperHeightRefresh();
         };
 
-        // Utility: when expanding from tags, keep spaces between already-visible words
-        // (e.g., between highlighted tokens) but hide spaces that precede hidden words
-        const prepareSpacesForExpand = () => {
-          const spaces = textOverlay.querySelectorAll('span.space:not(.in-tag)');
-          spaces.forEach((sp) => {
-            const next = sp.nextElementSibling;
-            if (
-              next &&
-              next.matches('span.word:not(.highlight)') &&
-              next.style.display === 'none'
-            ) {
-              sp.style.display = 'none';
-            } else {
-              sp.style.display = 'inline';
-            }
+        const showDescription = () => {
+          if (!textOverlay) return;
+          if (descriptionVisible) return;
+          if (!currentDescription || !currentDescription.trim()) return;
+          clearWordTimeouts();
+          descriptionVisible = true;
+          textOverlay.classList.add('is-open');
+          textOverlay.setAttribute('aria-hidden', 'false');
+          if (toperTitle) {
+            toperTitle.setAttribute('aria-expanded', 'true');
+            toperTitle.classList.add('is-description-open');
+          }
+          scheduleToperHeightRefresh();
+          const words = Array.from(textOverlay.querySelectorAll('span.word'));
+          const dt = 40;
+          words.forEach((span, index) => {
+            const id = window.setTimeout(() => {
+              span.style.display = 'inline';
+              const prev = span.previousElementSibling;
+              if (prev && prev.classList && prev.classList.contains('space')) {
+                prev.style.display = 'inline';
+              }
+            }, index * dt);
+            wordTimeouts.push(id);
           });
+          const finalId = window.setTimeout(() => {
+            scheduleToperHeightRefresh();
+          }, words.length * dt + 20);
+          wordTimeouts.push(finalId);
+        };
+
+        const hideDescription = () => {
+          if (!textOverlay) return;
+          if (!descriptionVisible) return;
+          clearWordTimeouts();
+          descriptionVisible = false;
+          const words = Array.from(textOverlay.querySelectorAll('span.word'));
+          const dt = 40;
+          const ordered = words.slice().reverse();
+          ordered.forEach((span, index) => {
+            const id = window.setTimeout(() => {
+              span.style.display = 'none';
+              const prev = span.previousElementSibling;
+              if (prev && prev.classList && prev.classList.contains('space')) {
+                prev.style.display = 'none';
+              }
+            }, index * dt);
+            wordTimeouts.push(id);
+          });
+          const finalId = window.setTimeout(() => {
+            textOverlay.classList.remove('is-open');
+            textOverlay.setAttribute('aria-hidden', 'true');
+            if (toperTitle) {
+              toperTitle.setAttribute('aria-expanded', 'false');
+              toperTitle.classList.remove('is-description-open');
+            }
+            scheduleToperHeightRefresh();
+          }, ordered.length * dt + 20);
+          wordTimeouts.push(finalId);
         };
 
         toggleWords = () => {
-        timeouts.forEach(clearTimeout);
-        timeouts = [];
-        clearFormatTimers();
-
-        const spans = Array.from(
-          textOverlay.querySelectorAll("span.word:not(.highlight)")
-        );
-        if (!spans.length) return;
-
-        const hiddenCount = spans.filter(
-          (s) => s.style.display === "none"
-        ).length;
-        const currentlyFullText = hiddenCount === 0;
-        const targetWordsVisible = !currentlyFullText; // after toggle
-
-        const hide = currentlyFullText; // hide when leaving full text
-        const targets = spans.filter((span) =>
-          hide ? span.style.display !== "none" : span.style.display === "none"
-        );
-
-        const dt = 40;
-
-        const scheduleNonHighlightToggle = (startDelay) => {
-          // When collapsing (hiding), remove from the end first to keep the prefix longest
-          const ordered = hide ? targets.slice().reverse() : targets;
-          ordered.forEach((span, index) => {
-            const id = setTimeout(() => {
-              const show = !hide;
-              span.style.display = show ? "inline" : "none";
-              const prev = span.previousElementSibling;
-              if (
-                prev &&
-                prev.classList &&
-                prev.classList.contains("space") &&
-                !prev.classList.contains("in-tag")
-              ) {
-                // When showing, reveal its preceding space; when hiding, hide it too
-                prev.style.display = show ? "inline" : "none";
-              }
-            }, startDelay + (index + 1) * dt);
-            timeouts.push(id);
-          });
-          return startDelay + (ordered.length ? ordered.length : 0) * dt;
+          if (!currentDescription || !currentDescription.trim()) return;
+          if (descriptionVisible) hideDescription();
+          else showDescription();
         };
 
-        if (currentlyFullText) {
-          // Full -> Tags
-          // 1) Immediately morph highlighted tokens to majuscule format
-          // 2) Hide non-highlighted words (staggered)
-          // 3) After both are done, switch to chip backgrounds (tags-only)
-          animateHighlightText(false);
-          const endDelay = scheduleNonHighlightToggle(0);
-          const highlightTotal =
-            textOverlay.querySelectorAll("span.word.highlight").length *
-            HIGHLIGHT_DT;
-          const totalDelay = Math.max(endDelay, highlightTotal) + 10;
-          formatTimeout = setTimeout(() => {
-            textOverlay.classList.add("tags-only");
-            textOverlay.classList.remove("is-fulltext");
-            // Cleanup any inline space display so CSS fully controls in chips view
-            normalizeSpaces();
-          }, totalDelay);
-          timeouts.push(formatTimeout);
-          wordsVisible = false;
-          setControlSymbol(false);
-        } else {
-          // Tags -> Full: enable per-word background first and keep spaces between visible words
-          textOverlay.classList.remove("tags-only");
-          textOverlay.classList.add("is-fulltext");
-          // Prepare space visibility before revealing hidden words
-          prepareSpacesForExpand();
-          // Normalize highlighted tags, then reveal hidden words after the text morph
-          animateHighlightText(true);
-          const highlightTotal =
-            textOverlay.querySelectorAll("span.word.highlight").length *
-            HIGHLIGHT_DT;
-          const endDelay = scheduleNonHighlightToggle(highlightTotal + 10);
-          // After words are revealed, allow CSS to control spaces again
-          const cleanup = setTimeout(() => {
-            normalizeSpaces();
-          }, endDelay + 10);
-          timeouts.push(cleanup);
-          wordsVisible = true;
-          setControlSymbol(true);
-        }
-      };
-
-      // When in full-text mode, allow clicking anywhere in the overlay to collapse back to tags
-      const onFullTextClick = (e) => {
-        if (!textOverlay.classList.contains('is-fulltext')) return;
-        // Prevent tag filter or other handlers from also acting
-        try { e.preventDefault(); e.stopPropagation(); } catch (_) {}
-        if (typeof toggleWords === 'function') toggleWords();
-      };
-      try {
-        textOverlay.addEventListener('click', onFullTextClick, true); // capture to intercept
-      } catch (_) {}
-
-      const thresholds = Array.from({ length: 101 }, (_, i) => i / 100);
-      const visibilityMap = new Map();
-
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            visibilityMap.set(entry.target, entry.intersectionRatio);
-          });
-
-          let mostVisible = null;
-          let maxRatio = 0;
-
-          visibilityMap.forEach((ratio, element) => {
-            if (ratio > maxRatio) {
-              maxRatio = ratio;
-              mostVisible = element;
-            }
-          });
-
-          if (mostVisible && maxRatio > 0) {
-            const key = getProjectKey(mostVisible) || mostVisible.getAttribute("data-project") || "";
-            setOverlayText(key);
-          } else {
-            setOverlayText("");
+        const applyProject = (projectKey) => {
+          if (!projectKey || !projectTexts[projectKey]) {
+            activeProjectKey = '';
+            currentDescription = '';
+            setDescriptionContent('', false);
+            if (toperTitleText) toperTitleText.textContent = '';
+            emitToperUpdate({ key: '', title: '', tags: [] });
+            return;
           }
-        },
-        { threshold: thresholds }
-      );
+          if (projectKey === activeProjectKey) return;
+          const entry = projectTexts[projectKey];
+          const { text: entryText, tags: entryTags } = resolveEntryPayload(entry);
+          const wasVisible = descriptionVisible;
+          activeProjectKey = projectKey;
+          setDescriptionContent(entryText, wasVisible);
+          const title = syncTitle(projectKey);
+          emitToperUpdate({ key: projectKey, title, tags: entryTags });
+        };
 
-      projectContainers.forEach((container) => {
-        visibilityMap.set(container, 0);
-        observer.observe(container);
-      });
-    })
+        if (projectList[0]) {
+          const firstKey = getProjectKey(projectList[0]);
+          if (firstKey) applyProject(firstKey);
+        } else {
+          emitToperUpdate({ key: '', title: '', tags: [] });
+        }
+
+        if (toperTitle) {
+          toperTitle.addEventListener('click', (ev) => {
+            try { ev.preventDefault(); } catch (_) {}
+            toggleWords();
+          });
+        }
+
+        if (textOverlay) {
+          textOverlay.addEventListener(
+            'click',
+            (ev) => {
+              if (!descriptionVisible) return;
+              try {
+                ev.preventDefault();
+                ev.stopPropagation();
+              } catch (_) {}
+              hideDescription();
+            },
+            true
+          );
+        }
+
+        const setOverlayText = (projectName) => {
+          if (!projectName) {
+            applyProject('');
+            return;
+          }
+          applyProject(projectName);
+        };
+
+        const thresholds = Array.from({ length: 101 }, (_, i) => i / 100);
+        const visibilityMap = new Map();
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              visibilityMap.set(entry.target, entry.intersectionRatio);
+            });
+
+            let mostVisible = null;
+            let maxRatio = 0;
+
+            visibilityMap.forEach((ratio, element) => {
+              if (ratio > maxRatio) {
+                maxRatio = ratio;
+                mostVisible = element;
+              }
+            });
+
+            if (mostVisible && maxRatio > 0) {
+              const key = getProjectKey(mostVisible) || mostVisible.getAttribute('data-project') || '';
+              setOverlayText(key);
+            } else {
+              setOverlayText('');
+            }
+          },
+          { threshold: thresholds }
+        );
+
+        projectContainers.forEach((container) => {
+          visibilityMap.set(container, 0);
+          observer.observe(container);
+        });
+      })
       .catch((err) => {
         console.error("Failed to load project texts", err);
       });
   }
 
-  // Global click routing disabled for right overlay toggling and left bio.
-  // Interactions now live on explicit controls: NAME on the left, +/– chip on the right.
+  // Interactions now live on explicit controls: PAUL in the topper and the project title button.
   // (Retain no-op listener only if future global behaviors are added.)
 });

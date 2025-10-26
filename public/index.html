@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Paul Paturel — Portfolio</title>
+  <title>Paul Paturel</title>
   <meta name="description" content="An independent graphic design practice led by Paul Paturel. Editorial design, type design, web design, 3D, and more, for cultural and commercial clients." />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://paulpaturel.com/" />
@@ -23,7 +23,7 @@
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Paul Paturel — Portfolio" />
+  <meta name="twitter:title" content="Paul Paturel — Graphic Designer" />
   <meta name="twitter:description" content="Independent practice by Paul Paturel: editorial design, type design, web design, 3D, and more." />
   <meta name="twitter:image" content="https://paulpaturel.com/images/SYNTHETIC_ORGANIC/KushletMains_01.webp" />
 
@@ -77,9 +77,20 @@
   <!-- Masque noir pendant le chargement (placé sous le nom de gauche) -->
   <div id="loading-mask" aria-hidden="true"></div>
   <h1 class="visually-hidden">Paul Paturel — Graphic Designer Portfolio (Lausanne)</h1>
-  <!-- <div id="toper"></div> -->
-  <div class="ui_text" id="text_overlay_container_left"></div>
-  <div class="ui_text" id="text_overlay_container" aria-hidden="true"></div>
+  <header class="toper" id="toper">
+    <div class="toper__bio" id="toperBio">
+      <div class="ui_text" id="text_overlay_container_left" aria-hidden="true"></div>
+    </div>
+    <span class="toper__splitter" aria-hidden="true"></span>
+    <div class="toper__title-group">
+      <button class="toper__title" id="toperTitle" type="button" aria-expanded="false">
+        <span class="toper__title-text" id="toperTitleText"></span>
+        <span class="ui_text toper__description" id="text_overlay_container" aria-hidden="true"></span>
+      </button>
+    </div>
+    <span class="toper__splitter" aria-hidden="true"></span>
+    <div class="toper__tags" id="toperTags" role="group" aria-label="Project tags"></div>
+  </header>
   <div class="main_container" id="mainContainer">
     <!-- --- -->  
     <!-- <div class="project_container" data-project="LOTTOFPRINTS">
