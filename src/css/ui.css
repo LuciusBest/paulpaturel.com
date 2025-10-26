@@ -147,19 +147,41 @@ body {
     color: inherit;
     transition: background-color .25s ease, color .25s ease;
     flex: 0 0 auto;
+    position: relative;
+    z-index: 0;
+    overflow: visible;
+    padding: 0 var(--ui-padding-inline);
+}
+
+.toper__title-text::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: transparent;
+    transition: background-color .25s ease, top .25s ease;
+    z-index: -1;
 }
 
 .toper__title:not(.is-description-open):hover .toper__title-text,
 .toper__title:not(.is-description-open):focus-visible .toper__title-text {
-    background: rgba(255, 255, 255, 0.8);
     color: #000000;
     mix-blend-mode: normal;
 }
 
 .toper__title:not(.is-description-open):active .toper__title-text {
-    background: #ffffff;
     color: #000000;
     mix-blend-mode: normal;
+}
+
+.toper__title:not(.is-description-open):hover .toper__title-text::after,
+.toper__title:not(.is-description-open):focus-visible .toper__title-text::after {
+    background: rgba(255, 255, 255, 0.8);
+    top: -4px;
+}
+
+.toper__title:not(.is-description-open):active .toper__title-text::after {
+    background: #ffffff;
+    top: -4px;
 }
 
 .toper__splitter {
