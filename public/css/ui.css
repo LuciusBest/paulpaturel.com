@@ -213,7 +213,8 @@ body {
     mix-blend-mode: difference;
     pointer-events: none;
     z-index: 1000;
-    padding: 0 var(--ui-margin);
+    padding: 0 var(--ui-padding-inline);
+    margin: 0 var(--ui-margin);
     box-sizing: border-box;
 }
 
