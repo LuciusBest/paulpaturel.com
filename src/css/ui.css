@@ -13,7 +13,7 @@ body {
     --ui-space-1_5: calc(var(--ui-space-unit) * 1.5);
     --ui-space-double: calc(var(--ui-space-unit) * 2);
     --ui-space-triple: calc(var(--ui-space-unit) * 3);
-    --ui-space-quad: calc(var(--ui-space-unit) *);
+    --ui-space-quad: calc(var(--ui-space-unit) * 4);
     --ui-shell-edge: var(--ui-space-1_5);
     --ui-shell-edge-inline: var(--ui-shell-edge);
     --ui-shell-edge-block: var(--ui-shell-edge);
@@ -458,16 +458,19 @@ body {
     right: 0;
     height: var(--viewport-block);
     display: none;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-end;
     box-sizing: border-box;
     pointer-events: none;
     mix-blend-mode: difference;
     z-index: 1000;
+    overflow: hidden;
 }
 
 .project-vertical-rail .vertical-indicator-group {
-    position: absolute;
-    right: 0;
-    display: flex;
+    position: relative;
+    display: inline-flex;
     align-items: center;
     gap: var(--ui-space-unit);
     transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);

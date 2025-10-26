@@ -389,8 +389,8 @@ document.addEventListener("DOMContentLoaded", () => {
     state.total = Math.max(1, activeSlides.length);
     state.progress = computeProjectProgress();
     recomputeFooterMetrics();
-    if (verticalRail.style.display !== "block") {
-      verticalRail.style.display = "block";
+    if (verticalRail.style.display !== "flex") {
+      verticalRail.style.display = "flex";
       recomputeVerticalMetrics();
     } else {
       recomputeVerticalMetrics();
