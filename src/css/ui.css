@@ -9,20 +9,35 @@ body {
 
 :root {
     --ui-space-unit: 4px;
+    /* unité de base pour tous les espacements (tags, rails, footer) */
     --ui-space-half: calc(var(--ui-space-unit) / 2);
+    /* demi-unité pour micro-ajustements (chips, animations) */
     --ui-space-1_5: calc(var(--ui-space-unit) * 1.5);
+    /* espacement intermédiaire légèrement supérieur (toper__tag) */
     --ui-space-double: calc(var(--ui-space-unit) * 2);
+    /* double unité pour grands gaps horizontaux/verticaux (groupes topper) */
     --ui-space-triple: calc(var(--ui-space-unit) * 3);
+    /* triple unité pour espacements généreux (layouts ponctuels) */
     --ui-space-quad: calc(var(--ui-space-unit) * 4);
-    --ui-shell-edge: var(--ui-space-1_5);
+    /* quadruple unité pour marges très larges (utilitaires futurs) */
+    --ui-shell-edge: 10px;
+    /* marge commune entre toper, footer, vertical rail et la fenêtre */
     --ui-shell-edge-inline: var(--ui-shell-edge);
+    /* équivalent horizontal de la marge commune (padding-inline UI) */
     --ui-shell-edge-block: var(--ui-shell-edge);
+    /* équivalent vertical de la marge commune (padding-block UI) */
     --ui-gap: var(--ui-space-double);
+    /* espacement standard entre éléments frères du topper (.toper__*) */
     --ui-chip-gap: var(--ui-space-unit);
+    /* espacement entre les tags / chips interactifs (.toper__tags) */
     --ui-font-size: 15px;
+    /* corps de texte par défaut des éléments UI (.ui_text, rail, footer) */
     --ui-line-height: 1.25;
+    /* interlignage pour lisibilité du texte (toper, footer, rail) */
     --ui-font-weight: 300;
+    /* graisse par défaut des textes UI (.ui_text et descendants) */
     --ui-bio-desc-line-height: 1.18;
+    /* interlignage spécifique pour bio/description (#text_overlay_container_*) */
 }
 
 /* Shared edge padding keeps UI text evenly inset from the viewport */
