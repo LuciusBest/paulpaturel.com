@@ -68,8 +68,17 @@
   <!-- Hide loading mask if JS is disabled -->
   <noscript><style>body.is-loading #loading-mask{display:none!important}</style></noscript>
 
-  <!-- Privacy-friendly analytics by Umami -->
-  <script defer src="https://cloud.umami.is/script.js" data-website-id="5741dadb-8971-4521-b1e2-e0965c6f7fdd"></script>
+  <!-- Privacy-friendly analytics by Plausible -->
+  <script async src="https://plausible.io/js/pa-2Mi0vKMdvgS5Er2LKNsHX.js"></script>
+  <script>
+    window.plausible = window.plausible || function () {
+      (plausible.q = plausible.q || []).push(arguments);
+    };
+    plausible.init = plausible.init || function (i) {
+      plausible.o = i || {};
+    };
+    plausible.init();
+  </script>
 
 </head>
 
