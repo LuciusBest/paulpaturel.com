@@ -168,7 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Bio content (English only)
     const bioCopy = {
       s1:
-        "Born in Paris, I moved to Lausanne to study at ECAL, <br>where I am now based as a graphic designer.",
+        "Born in Paris, I moved to Lausanne to study at ECAL, where I am now based as a graphic designer.",
       s2:
         "I am available for commissions and collaborations, with a focus on typography, web design, 3D, and print.",
       contact: "Contact",
