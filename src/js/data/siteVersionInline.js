@@ -1,1 +1,1 @@
-window.SiteVersion = {"semantic":"V1.00.00","timestamp":"2025/10/27/59/44","updatedAt":"2025-10-26T23:59:44.122Z"};
+window.SiteVersion = {"semantic":"V1.00.00","timestamp":"2025/10/27/20/20","updatedAt":"2025-10-27T00:20:20.858Z"};
