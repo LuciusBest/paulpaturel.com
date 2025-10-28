@@ -101,9 +101,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const hideAllBioTokens = () => {
       const tokens = bioEl.querySelectorAll('.word, .space');
-      tokens.forEach((span) => {
-        span.style.display = 'none';
-      });
+      tokens.forEach((span) => { span.style.display = 'none'; });
+      const breaks = bioEl.querySelectorAll('br');
+      breaks.forEach((br) => { br.style.display = 'none'; });
     };
 
     const flagBioVisibility = (expanded) => {
@@ -262,10 +262,20 @@ document.addEventListener("DOMContentLoaded", () => {
         words.forEach((span, index) => {
           const id = setTimeout(() => {
             span.style.display = 'inline';
-            const prev = span.previousElementSibling;
-            if (prev && prev.classList && prev.classList.contains('space')) {
-              prev.style.display = 'inline';
+            // Reveal adjacent spaces and any preceding line breaks
+            let prev = span.previousElementSibling;
+            while (prev) {
+              if (prev.classList && prev.classList.contains('space')) {
+                prev.style.display = 'inline';
+              } else if (prev.tagName === 'BR') {
+                prev.style.display = 'inline';
+              } else {
+                break;
+              }
+              prev = prev.previousElementSibling;
             }
+            // Recompute topper height in sync with reveal
+            scheduleToperHeightRefresh();
           }, index * dt);
           bioWordTimeouts.push(id);
         });
