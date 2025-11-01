@@ -76,30 +76,6 @@ body {
     box-sizing: border-box;
 }
 
-/* Black backdrop behind topper text, above media */
-.toper::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    height: 100%;
-    /* Visible black (no blend) to ensure readability */
-    mix-blend-mode: normal;
-    pointer-events: none;
-    z-index: 0;
-    /* Semi-transparent black with 3px bottom fade */
-    background: linear-gradient(
-        to bottom,
-        rgba(0, 0, 0, 0.7) 0%,
-        rgba(0, 0, 0, 0.7) calc(100% - 3px),
-        rgba(0, 0, 0, 0) 100%
-    );
-    /* Follow topper height exactly, no lag */
-    transition: none;
-}
-
-/* Ensure topper content renders above the backdrop */
 .toper__bio,
 .toper__title-group,
 .toper__tags,
