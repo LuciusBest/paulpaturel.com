@@ -118,9 +118,27 @@ function writeVersion(filePath, payload) {
 }
 
 function writeInlineVersion(filePath, payload) {
-  const content = `window.SiteVersion = ${JSON.stringify(payload)};\n`;
+  const content = [
+    `window.SiteVersion = ${JSON.stringify(payload)};`,
+    typeof payload.cacheToken === 'string' && payload.cacheToken.length > 0
+      ? `window.__assetVersion = '${payload.cacheToken}';`
+      : ''
+  ]
+    .filter(Boolean)
+    .join('\n')
+    .concat('\n');
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, content, 'utf8');
+}
+
+function makeCacheToken({ semantic, timestamp, updatedAt }) {
+  const pieces = [semantic, timestamp, updatedAt]
+    .map((part) => (typeof part === 'string' ? part.trim() : ''))
+    .filter(Boolean);
+  const raw = pieces.length > 0 ? pieces.join('-') : new Date().toISOString();
+  const cleaned = raw.replace(/[^0-9A-Za-z]+/g, '');
+  const sliced = cleaned.slice(-64);
+  return sliced || `${Date.now()}`;
 }
 
 function main() {
@@ -136,6 +154,7 @@ function main() {
     timestamp,
     updatedAt: now.toISOString()
   };
+  payload.cacheToken = makeCacheToken(payload);
 
   writeVersion(versionFile, payload);
   writeInlineVersion(inlineVersionFile, payload);

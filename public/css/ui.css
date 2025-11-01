@@ -70,9 +70,42 @@ body {
     align-items: flex-start;
     gap: var(--ui-space-unit);
     color: #ffffff;
-    mix-blend-mode: difference;
+    mix-blend-mode: normal;
+    isolation: isolate;
     pointer-events: none;
     box-sizing: border-box;
+}
+
+/* Black backdrop behind topper text, above media */
+.toper::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 100%;
+    /* Visible black (no blend) to ensure readability */
+    mix-blend-mode: normal;
+    pointer-events: none;
+    z-index: 0;
+    /* Semi-transparent black with 3px bottom fade */
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.7) 0%,
+        rgba(0, 0, 0, 0.7) calc(100% - 3px),
+        rgba(0, 0, 0, 0) 100%
+    );
+    /* Follow topper height exactly, no lag */
+    transition: none;
+}
+
+/* Ensure topper content renders above the backdrop */
+.toper__bio,
+.toper__title-group,
+.toper__tags,
+.toper__splitter {
+    position: relative;
+    z-index: 1;
 }
 
 .toper__bio,
@@ -188,7 +221,7 @@ body {
     width: 2px;
     height: 1em;
     background: currentColor;
-    mix-blend-mode: difference;
+    mix-blend-mode: inherit;
     align-self: baseline;
     margin: 0 5px;
     display: inline-block;
@@ -380,21 +413,21 @@ body {
     text-decoration: none;
 }
 
-/* Meta line under EN/FR: small, negative fusion, no white backgrounds */
+/* Meta line under EN/FR */
 #text_overlay_container_left .left-meta {
     font-size: var(--ui-font-size);
     line-height: var(--ui-bio-desc-line-height);
-    mix-blend-mode: difference;
+    mix-blend-mode: inherit;
     color: #ffffff;
     pointer-events: auto;
     -webkit-text-stroke: 0;
     text-shadow: none;
 }
 
-/* Ensure difference blending on the meta block and its descendants (no white background) */
+/* Inherit blending on meta and descendants */
 #text_overlay_container_left .left-meta,
 #text_overlay_container_left .left-meta * {
-    mix-blend-mode: difference;
+    mix-blend-mode: inherit;
 }
 
 #text_overlay_container_left .left-meta .word,

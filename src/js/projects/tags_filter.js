@@ -14,6 +14,27 @@
   const FILTERED_CLASS = 'is-filtered';
   const ACTIVE_CLASS = 'is-active';
 
+  const resolveAssetVersionToken = () => {
+    const scope = typeof window !== 'undefined' ? window : null;
+    if (!scope) return '';
+    const sv = scope.SiteVersion;
+    if (sv && typeof sv === 'object') {
+      if (typeof sv.cacheToken === 'string' && sv.cacheToken.trim()) return sv.cacheToken.trim();
+      if (typeof sv.updatedAt === 'string' && sv.updatedAt.trim()) return sv.updatedAt.trim();
+      if (typeof sv.timestamp === 'string' && sv.timestamp.trim()) return sv.timestamp.trim();
+      if (typeof sv.semantic === 'string' && sv.semantic.trim()) return sv.semantic.trim();
+    }
+    if (typeof scope.__assetVersion === 'string' && scope.__assetVersion.trim()) {
+      return scope.__assetVersion.trim();
+    }
+    return '';
+  };
+
+  const assetVersionSuffix = (() => {
+    const token = resolveAssetVersionToken();
+    return token ? `?v=${encodeURIComponent(token)}` : '';
+  })();
+
   const tagsHost = document.querySelector(TAGS_CONTAINER_SELECTOR);
   if (!tagsHost) return;
 
@@ -291,7 +312,7 @@
 
   const loader = (window.ProjectTexts && typeof window.ProjectTexts.load === 'function')
     ? window.ProjectTexts.load('en')
-    : fetch('data/projectTexts.json').then((r) => {
+    : fetch(`data/projectTexts.json${assetVersionSuffix}`).then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
       });

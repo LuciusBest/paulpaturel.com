@@ -62,7 +62,29 @@ document.addEventListener("DOMContentLoaded", () => {
     let siteVersion = {
       semantic: 'V1.00.00',
       timestamp: '1970/01/01/00/00',
-      updatedAt: ''
+      updatedAt: '',
+      cacheToken: ''
+    };
+    const resolveSiteVersionToken = () => {
+      if (!siteVersion || typeof siteVersion !== 'object') return '';
+      const candidates = [
+        siteVersion.cacheToken,
+        siteVersion.updatedAt,
+        siteVersion.timestamp,
+        siteVersion.semantic
+      ];
+      for (let i = 0; i < candidates.length; i += 1) {
+        const candidate = candidates[i];
+        if (typeof candidate === 'string' && candidate.trim()) {
+          return candidate.trim();
+        }
+      }
+      return '';
+    };
+    const buildSiteVersionUrl = () => {
+      const base = 'data/siteVersion.json';
+      const token = resolveSiteVersionToken();
+      return token ? `${base}?v=${encodeURIComponent(token)}` : base;
     };
     const states = ["PAUL", "PATUL", "PATURL", "PATUREL"];
     const highlightSet = new Set(["P", "A", "U", "L"]);
@@ -346,6 +368,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const semantic = typeof payload.semantic === 'string' ? payload.semantic.trim() : '';
       const timestamp = typeof payload.timestamp === 'string' ? payload.timestamp.trim() : '';
       const updatedAt = typeof payload.updatedAt === 'string' ? payload.updatedAt.trim() : '';
+      const cacheToken = typeof payload.cacheToken === 'string' ? payload.cacheToken.trim() : '';
       if (semantic) {
         siteVersion.semantic = semantic;
         changed = true;
@@ -358,11 +381,15 @@ document.addEventListener("DOMContentLoaded", () => {
         siteVersion.updatedAt = updatedAt;
         changed = true;
       }
+      if (cacheToken) {
+        siteVersion.cacheToken = cacheToken;
+        changed = true;
+      }
       if (changed) refreshBioWithVersion();
     };
     const fetchSiteVersion = () => {
       try {
-        fetch('data/siteVersion.json', { cache: 'no-store' })
+        fetch(buildSiteVersionUrl())
           .then((res) => {
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             return res.json();

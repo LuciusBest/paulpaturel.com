@@ -1,7 +1,28 @@
 // Centralized loader for project text overlays with shared caching.
 (function (global) {
-  const CACHE_KEY = 'en';
-  const ENDPOINT = 'data/projectTexts.json';
+  const resolveAssetVersion = () => {
+    if (!global) return '';
+    const fromSiteVersion = (() => {
+      const sv = global.SiteVersion;
+      if (!sv || typeof sv !== 'object') return '';
+      if (typeof sv.cacheToken === 'string' && sv.cacheToken.trim()) return sv.cacheToken.trim();
+      if (typeof sv.updatedAt === 'string' && sv.updatedAt.trim()) return sv.updatedAt.trim();
+      if (typeof sv.timestamp === 'string' && sv.timestamp.trim()) return sv.timestamp.trim();
+      if (typeof sv.semantic === 'string' && sv.semantic.trim()) return sv.semantic.trim();
+      return '';
+    })();
+    if (fromSiteVersion) return fromSiteVersion;
+    if (typeof global.__assetVersion === 'string' && global.__assetVersion.trim()) {
+      return global.__assetVersion.trim();
+    }
+    return '';
+  };
+
+  const assetVersionToken = resolveAssetVersion();
+  const CACHE_KEY = assetVersionToken ? `en-${assetVersionToken}` : 'en';
+  const ENDPOINT = assetVersionToken
+    ? `data/projectTexts.json?v=${encodeURIComponent(assetVersionToken)}`
+    : 'data/projectTexts.json';
 
   const cache = new Map(); // cache key -> Promise<Record<string, any>>
 
