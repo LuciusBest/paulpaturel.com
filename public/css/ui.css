@@ -70,8 +70,7 @@ body {
     align-items: flex-start;
     gap: var(--ui-space-unit);
     color: #ffffff;
-    mix-blend-mode: normal;
-    isolation: isolate;
+    mix-blend-mode: difference;
     pointer-events: none;
     box-sizing: border-box;
 }
@@ -197,7 +196,7 @@ body {
     width: 2px;
     height: 1em;
     background: currentColor;
-    mix-blend-mode: inherit;
+    mix-blend-mode: difference;
     align-self: baseline;
     margin: 0 5px;
     display: inline-block;
