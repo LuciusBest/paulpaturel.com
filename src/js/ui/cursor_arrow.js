@@ -7,7 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
     '.contact-chip[data-url]',
     '[data-link-cursor]',
     '.project_container[data-project-key=\"CamilleLeprinceWEB\"] video',
-    '.project_container[data-project=\"CamilleLeprinceWEB\"] video'
+    '.project_container[data-project=\"CamilleLeprinceWEB\"] video',
+    '.project_container[data-project-key=\"GRIME_INDEX\"] video',
+    '.project_container[data-project=\"GRIME_INDEX\"] video',
+    '.project_container[data-project=\"Grime Index\"] video'
   ].join(', ');
   let activeEl = null;
   let arrow = document.getElementById('cursor_arrow');

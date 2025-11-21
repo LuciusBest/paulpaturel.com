@@ -443,7 +443,7 @@ body {
     width: auto;
     max-width: 60vw;
     padding: 0;
-    margin: 0;
+    margin: 0 5px 0 0;
     color: inherit;
     mix-blend-mode: inherit;
     pointer-events: none;
@@ -454,7 +454,7 @@ body {
     vertical-align: baseline;
     flex: 0 1 auto;
     min-width: 0;
-    font-weight: 200;
+    font-weight: 300;
 }
 
 #text_overlay_container.is-open {

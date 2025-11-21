@@ -203,8 +203,9 @@ video.media-contain,
     display: none;
 }
 
-/* --- Camille Leprince video: enable interaction + hover scale --- */
-.project_container[data-project-key="CamilleLeprinceWEB"] video {
+/* --- Clickable video projects: enable interaction + hover scale --- */
+.project_container[data-project-key="CamilleLeprinceWEB"] video,
+.project_container[data-project-key="GRIME_INDEX"] video {
     pointer-events: auto;
     /* allow click */
     transition: transform 200ms ease-in-out;
@@ -212,14 +213,16 @@ video.media-contain,
     cursor: pointer;
 }
 
-.project_container[data-project-key="CamilleLeprinceWEB"] video:hover {
+.project_container[data-project-key="CamilleLeprinceWEB"] video:hover,
+.project_container[data-project-key="GRIME_INDEX"] video:hover {
     transform: scale(1.015);
     /* +1.5% on hover */
 }
 
 /* For Camille: shrink-wrap the video box to its rendered content
    so hover only triggers on the visible video, not the padded area */
-.project_container[data-project-key="CamilleLeprinceWEB"] .wrapper--centered video.media-contain {
+.project_container[data-project-key="CamilleLeprinceWEB"] .wrapper--centered video.media-contain,
+.project_container[data-project-key="GRIME_INDEX"] .wrapper--centered video.media-contain {
     width: auto;
     height: auto;
     max-width: calc(var(--viewport-inline) - 100px);
@@ -228,6 +231,11 @@ video.media-contain,
     object-fit: contain;
     background: transparent;
     /* avoid letterbox inside the element */
+}
+
+/* Grime Index: white backdrop */
+.project_container[data-project-key="GRIME_INDEX"] .wrapper--centered {
+    background-color: #ffffff;
 }
 
 /* COSMA: inherit default wrapper background (no override) */
