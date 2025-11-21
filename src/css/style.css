@@ -61,3 +61,62 @@ body::-webkit-scrollbar,
     padding: 0;
     margin: -1px;
 }
+
+/* Mobile maintenance overlay */
+#mobile-maintenance {
+    position: fixed;
+    inset: 0;
+    height: var(--viewport-block);
+    width: var(--viewport-inline);
+    min-height: 100vh;
+    min-width: 100vw;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 48px 24px;
+    box-sizing: border-box;
+    background: #000000;
+    color: #ffffff;
+    text-align: center;
+    z-index: 1200;
+}
+
+#mobile-maintenance .mobile-maintenance__name {
+    font-size: var(--ui-font-size);
+    line-height: var(--ui-line-height);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 300;
+}
+
+#mobile-maintenance .mobile-maintenance__message {
+    margin: 0;
+    max-width: 520px;
+    font-size: var(--ui-font-size);
+    line-height: var(--ui-line-height);
+    font-weight: 300;
+    color: #ffffff;
+}
+
+@media (max-width: 900px) {
+    body {
+        background: #000000;
+        color: #ffffff;
+        overflow: hidden;
+    }
+
+    #mobile-maintenance {
+        display: flex;
+    }
+
+    .toper,
+    .main_container,
+    .project-footer,
+    .project-vertical-rail,
+    #cursor_arrow,
+    #loading-mask {
+        display: none !important;
+    }
+}
