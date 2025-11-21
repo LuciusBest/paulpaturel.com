@@ -4,7 +4,7 @@ body {
     font-family: 'IS-ArzierVF', sans-serif;
     font-weight: 350;
     font-feature-settings: "ss03";
-    line-height: 1.2;
+    line-height: 1.3;
 }
 
 :root {
@@ -30,13 +30,15 @@ body {
     /* espacement standard entre éléments frères du topper (.toper__*) */
     --ui-chip-gap: var(--ui-space-unit);
     /* espacement entre les tags / chips interactifs (.toper__tags) */
+    --ui-padding-inline: var(--ui-space-1_5);
+    /* padding horizontal partagé par les tags et le nom du projet */
     --ui-font-size: 15px;
     /* corps de texte par défaut des éléments UI (.ui_text, rail, footer) */
-    --ui-line-height: 1.25;
+    --ui-line-height: 1.3;
     /* interlignage pour lisibilité du texte (toper, footer, rail) */
     --ui-font-weight: 300;
     /* graisse par défaut des textes UI (.ui_text et descendants) */
-    --ui-bio-desc-line-height: 1.18;
+    --ui-bio-desc-line-height: 1.3;
     /* interlignage spécifique pour bio/description (#text_overlay_container_*) */
 }
 
@@ -110,7 +112,7 @@ body {
     align-items: baseline;
     gap: var(--ui-space-unit);
     flex: 0 0 auto;
-    max-width: 30vw;
+    max-width: 60vw;
     width: auto;
     min-width: 0;
     mix-blend-mode: inherit;
@@ -198,10 +200,14 @@ body {
     background: currentColor;
     mix-blend-mode: difference;
     align-self: baseline;
-    margin: 0 5px;
     display: inline-block;
     pointer-events: none;
     flex: 0 0 2px;
+    margin: 0;
+}
+
+.toper__splitter:first-of-type {
+    margin-inline-start: var(--ui-space-unit);
 }
 
 .toper__tags {
@@ -435,7 +441,7 @@ body {
     position: static;
     display: inline-block;
     width: auto;
-    max-width: 30vw;
+    max-width: 60vw;
     padding: 0;
     margin: 0;
     color: inherit;
@@ -448,12 +454,13 @@ body {
     vertical-align: baseline;
     flex: 0 1 auto;
     min-width: 0;
+    font-weight: 200;
 }
 
 #text_overlay_container.is-open {
     pointer-events: auto;
     opacity: 1;
-    margin-left: 20px;
+    margin-left: 10px;
 }
 
 .project-footer {
@@ -487,7 +494,7 @@ body {
     color: #ffffff;
     font-size: var(--ui-font-size);
     font-weight: var(--ui-font-weight);
-    line-height: calc(var(--ui-font-size) * 0.9);
+    line-height: calc(var(--ui-font-size) * var(--ui-line-height));
     border-radius: 0px;
     margin: 0;
     mix-blend-mode: difference;
@@ -669,7 +676,7 @@ body.is-loading #cursor_arrow {
     font-weight: 400;
     font-size: 25px;
     /* cursor size */
-    line-height: 1;
+    line-height: 1.3;
     color: #ffffff;
     mix-blend-mode: difference;
     /* visible on any background without outlines */

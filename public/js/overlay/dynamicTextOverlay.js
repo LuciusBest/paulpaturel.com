@@ -218,11 +218,10 @@ document.addEventListener("DOMContentLoaded", () => {
         emailHTML,
         "<br>",
         instaHTML,
-        // Blank separation before meta paragraph
-        "<br>",
-        "<br>",
-        // Meta paragraph with font credits + last updated date
+        // Meta paragraph with font credits + last updated date (with leading blank line)
         '<span class="left-meta">',
+          '<br>',
+          '<br>',
           // Line 1: font credit
           wrapWords('Font → Arzier by '),
           // Linked author token
