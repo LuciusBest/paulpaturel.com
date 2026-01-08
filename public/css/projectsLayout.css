@@ -205,7 +205,8 @@ video.media-contain,
 
 /* --- Clickable video projects: enable interaction + hover scale --- */
 .project_container[data-project-key="CamilleLeprinceWEB"] video,
-.project_container[data-project-key="GRIME_INDEX"] video {
+.project_container[data-project-key="GRIME_INDEX"] video,
+.project_container[data-project-key="LAMANT"] .slide:nth-of-type(2) .wrapper--centered img {
     pointer-events: auto;
     /* allow click */
     transition: transform 200ms ease-in-out;
@@ -214,7 +215,8 @@ video.media-contain,
 }
 
 .project_container[data-project-key="CamilleLeprinceWEB"] video:hover,
-.project_container[data-project-key="GRIME_INDEX"] video:hover {
+.project_container[data-project-key="GRIME_INDEX"] video:hover,
+.project_container[data-project-key="LAMANT"] .slide:nth-of-type(2) .wrapper--centered img:hover {
     transform: scale(1.015);
     /* +1.5% on hover */
 }
@@ -236,6 +238,16 @@ video.media-contain,
 /* Grime Index: white backdrop */
 .project_container[data-project-key="GRIME_INDEX"] .wrapper--centered {
     background-color: #ffffff;
+}
+
+/* L'amant: full black background */
+.project_container[data-project-key="LAMANT"] .wrapper--centered {
+    background-color: #000000;
+}
+
+.project_container[data-project-key="LAMANT"] .wrapper--centered img {
+    max-width: 90%;
+    max-height: 90%;
 }
 
 /* COSMA: inherit default wrapper background (no override) */

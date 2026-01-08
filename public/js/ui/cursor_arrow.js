@@ -10,7 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
     '.project_container[data-project=\"CamilleLeprinceWEB\"] video',
     '.project_container[data-project-key=\"GRIME_INDEX\"] video',
     '.project_container[data-project=\"GRIME_INDEX\"] video',
-    '.project_container[data-project=\"Grime Index\"] video'
+    '.project_container[data-project=\"Grime Index\"] video',
+    '.project_container[data-project-key=\"LAMANT\"] .slide:nth-of-type(2) .wrapper--centered img'
   ].join(', ');
   let activeEl = null;
   let arrow = document.getElementById('cursor_arrow');
