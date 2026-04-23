@@ -201,8 +201,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const emailHTML = `<span class="word contact-chip" role="link" tabindex="0" data-no-custom-cursor="true" data-url="mailto:paulpaturel75@gmail.com">paulpaturel75@gmail.com</span>`;
       const instaHTML = `<span class="word contact-chip" role="link" tabindex="0" data-no-custom-cursor="true" data-url="https://www.instagram.com/_paul_pat_/">@_paul_pat_</span>`;
       const html = [
-        // Next line after name
-        "<br>",
         // Bio paragraph
         wrapWords(`${bioCopy.s1} ${bioCopy.s2}`),
         // Blank line after BIO

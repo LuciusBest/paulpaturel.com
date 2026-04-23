@@ -314,7 +314,7 @@ body {
 #text_overlay_container_left.bio-expanded #left_bio {
     display: block;
     opacity: 1;
-    margin-top: var(--ui-space-unit);
+    margin-top: 0;
 }
 
 /* Avoid nested spans capturing hover/leave on the name wrapper */
