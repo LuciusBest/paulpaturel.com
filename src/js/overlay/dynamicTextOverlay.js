@@ -203,12 +203,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const html = [
         // Next line after name
         "<br>",
-        // First sentence
-        wrapWords(bioCopy.s1),
-        // Next line
-        "<br>",
-        // Second sentence
-        wrapWords(bioCopy.s2),
+        // Bio paragraph
+        wrapWords(`${bioCopy.s1} ${bioCopy.s2}`),
         // Blank line after BIO
         "<br>",
         "<br>",
