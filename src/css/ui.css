@@ -659,6 +659,29 @@ body.is-loading #cursor_arrow {
     mix-blend-mode: inherit;
 }
 
+/* Black veil between media and UI when the left bio is expanded */
+#bio-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 890;
+    background: #000000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .25s ease, visibility 0s linear .25s;
+    pointer-events: none;
+}
+
+body.is-bio-open #bio-backdrop {
+    opacity: 0.6;
+    visibility: visible;
+    transition: opacity .25s ease;
+}
+
+body.is-loading #bio-backdrop {
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
 
 /* --- Custom Arrow Cursor (IS-Arzier) --- */
 .use-arrow-cursor {
