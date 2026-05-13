@@ -90,6 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const highlightSet = new Set(["P", "A", "U", "L"]);
     const dt = 80;
     const BIO_DELAY = 450; // ms gap between name and bio animations
+    const BIO_FADE_DURATION = 250;
     let currentIndex = 0;
     let targetExpanded = false;
     let isNameHovered = false;
@@ -139,6 +140,11 @@ document.addEventListener("DOMContentLoaded", () => {
       if (toperBioSlot) {
         try { toperBioSlot.classList[method]('bio-expanded'); } catch (_) {}
       }
+    };
+
+    const applyBioBackdropState = (expanded) => {
+      const method = expanded ? 'add' : 'remove';
+      try { document.body.classList[method]('is-bio-open'); } catch (_) {}
     };
 
     // Simple word/space wrapper (no highlight), matching right overlay tokenization
@@ -201,14 +207,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const emailHTML = `<span class="word contact-chip" role="link" tabindex="0" data-no-custom-cursor="true" data-url="mailto:paulpaturel75@gmail.com">paulpaturel75@gmail.com</span>`;
       const instaHTML = `<span class="word contact-chip" role="link" tabindex="0" data-no-custom-cursor="true" data-url="https://www.instagram.com/_paul_pat_/">@_paul_pat_</span>`;
       const html = [
-        // Next line after name
-        "<br>",
-        // First sentence
-        wrapWords(bioCopy.s1),
-        // Next line
-        "<br>",
-        // Second sentence
-        wrapWords(bioCopy.s2),
+        // Bio paragraph
+        wrapWords(`${bioCopy.s1} ${bioCopy.s2}`),
         // Blank line after BIO
         "<br>",
         "<br>",
@@ -304,7 +304,7 @@ document.addEventListener("DOMContentLoaded", () => {
           scheduleToperHeightRefresh();
         }, words.length * dt + 20);
         bioWordTimeouts.push(finalize);
-        return Math.max(words.length * dt, 250);
+        return Math.max(words.length * dt, BIO_FADE_DURATION);
       }
 
       const ordered = words.slice().reverse();
@@ -320,18 +320,18 @@ document.addEventListener("DOMContentLoaded", () => {
         bioWordTimeouts.push(id);
       });
 
-      const total = Math.max(ordered.length * dt, 250);
+      const total = Math.max(ordered.length * dt, BIO_FADE_DURATION);
       const fadeId = setTimeout(() => {
         bioEl.style.opacity = '0';
         const hide = setTimeout(() => {
           bioEl.style.display = 'none';
           hideAllBioTokens();
           scheduleToperHeightRefresh();
-        }, 250);
+        }, BIO_FADE_DURATION);
         bioTimeouts.push(hide);
       }, total);
       bioWordTimeouts.push(fadeId);
-      return total + 250;
+      return total + BIO_FADE_DURATION;
     };
 
     const renderState = (index) => {
@@ -441,6 +441,7 @@ document.addEventListener("DOMContentLoaded", () => {
     openLeftBio = () => {
       flagBioVisibility(true);
       applyBioLayoutState(true);
+      applyBioBackdropState(true);
       // If already expanded, ensure name is fully expanded and bail
       if (targetExpanded) {
         if (currentIndex !== states.length - 1) animateLettersTo(states.length - 1, 0);
@@ -499,6 +500,9 @@ document.addEventListener("DOMContentLoaded", () => {
       flagBioVisibility(false);
       // Hide the bio first
       const bioDuration = animateBio(false);
+      const backdropStart = Math.max(bioDuration - BIO_FADE_DURATION, 0);
+      const backdropReset = setTimeout(() => { applyBioBackdropState(false); }, backdropStart);
+      bioTimeouts.push(backdropReset);
       // After a gap, collapse the name only if not hovered
       if (!isNameHovered) {
         const start = setTimeout(() => { animateLettersTo(0, 0); }, bioDuration + BIO_DELAY);

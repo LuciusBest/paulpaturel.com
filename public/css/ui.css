@@ -26,6 +26,8 @@ body {
     /* équivalent horizontal de la marge commune (padding-inline UI) */
     --ui-shell-edge-block: var(--ui-shell-edge);
     /* équivalent vertical de la marge commune (padding-block UI) */
+    --ui-rail-footer-edge-block: 7px;
+    /* marge verticale dédiée au footer et au rail pour l'alignement bas */
     --ui-gap: var(--ui-space-double);
     /* espacement standard entre éléments frères du topper (.toper__*) */
     --ui-chip-gap: var(--ui-space-unit);
@@ -111,7 +113,7 @@ body {
     flex-direction: row;
     align-items: baseline;
     gap: var(--ui-space-unit);
-    flex: 0 0 auto;
+    flex: 0 1 auto;
     max-width: 60vw;
     width: auto;
     min-width: 0;
@@ -127,6 +129,7 @@ body {
     justify-content: flex-start;
     flex-wrap: nowrap;
     width: auto;
+    min-width: 0;
     background: transparent;
     border: 0;
     color: inherit;
@@ -212,9 +215,12 @@ body {
 
 .toper__tags {
     display: inline-flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: baseline;
     gap: var(--ui-space-unit);
+    flex: 0 0 auto;
+    white-space: nowrap;
+    min-width: max-content;
     mix-blend-mode: inherit;
     font: inherit;
     line-height: inherit;
@@ -314,7 +320,7 @@ body {
 #text_overlay_container_left.bio-expanded #left_bio {
     display: block;
     opacity: 1;
-    margin-top: var(--ui-space-unit);
+    margin-top: 0;
 }
 
 /* Avoid nested spans capturing hover/leave on the name wrapper */
@@ -476,7 +482,8 @@ body {
     pointer-events: none;
     z-index: 1000;
     box-sizing: border-box;
-    height: calc(var(--ui-font-size) * var(--ui-line-height) + 2 * var(--ui-shell-edge-block));
+    padding-block: var(--ui-rail-footer-edge-block);
+    height: calc(var(--ui-font-size) * var(--ui-line-height) + 2 * var(--ui-rail-footer-edge-block));
 }
 
 .project-footer-track {
@@ -485,23 +492,29 @@ body {
     height: calc(var(--ui-font-size) * 2);
 }
 
-.project-footer .pagination {
-    position: absolute;
-    left: 0;
+.project-footer .pagination,
+.project-vertical-rail .vertical-index,
+.project-vertical-rail .vertical-project-name {
     white-space: nowrap;
-    will-change: left;
     background: transparent;
     color: #ffffff;
     font-size: var(--ui-font-size);
     font-weight: var(--ui-font-weight);
     line-height: calc(var(--ui-font-size) * var(--ui-line-height));
-    border-radius: 0px;
     margin: 0;
+    border-radius: 0px;
+    padding: 0;
     mix-blend-mode: difference;
     display: inline-block;
+}
+
+.project-footer .pagination {
+    position: absolute;
+    left: 0;
+    will-change: left;
     transition: left 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease;
-    top: 50%;
-    transform: translateY(-50%);
+    top: 0;
+    transform: none;
 }
 
 .project-vertical-rail {
@@ -518,6 +531,7 @@ body {
     mix-blend-mode: difference;
     z-index: 1000;
     overflow: hidden;
+    padding-block: var(--ui-rail-footer-edge-block);
 }
 
 .project-vertical-rail .vertical-indicator-group {
@@ -531,17 +545,6 @@ body {
 
 .project-vertical-rail .vertical-index,
 .project-vertical-rail .vertical-project-name {
-    white-space: nowrap;
-    background: transparent;
-    color: #ffffff;
-    font-size: var(--ui-font-size);
-    font-weight: var(--ui-font-weight);
-    line-height: calc(var(--ui-font-size) * var(--ui-line-height));
-    margin: 0;
-    border-radius: 0px;
-    padding: 0;
-    mix-blend-mode: difference;
-    display: inline-block;
     transition: opacity 0.5s ease;
 }
 
@@ -654,6 +657,29 @@ body.is-loading #cursor_arrow {
     background: transparent;
     color: inherit;
     mix-blend-mode: inherit;
+}
+
+/* Black veil between media and UI when the left bio is expanded */
+#bio-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 890;
+    background: #000000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .25s ease, visibility 0s linear .25s;
+    pointer-events: none;
+}
+
+body.is-bio-open #bio-backdrop {
+    opacity: 0.6;
+    visibility: visible;
+    transition: opacity .25s ease;
+}
+
+body.is-loading #bio-backdrop {
+    opacity: 0 !important;
+    visibility: hidden !important;
 }
 
 
