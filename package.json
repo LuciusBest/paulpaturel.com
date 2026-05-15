@@ -5,7 +5,7 @@
   "scripts": {
     "prebuild": "node scripts/updateVersion.js none",
     "version:update": "node scripts/updateVersion.js",
-    "build": "rm -rf public && mkdir -p public && (cd src && find . -mindepth 1 -maxdepth 1 -exec cp -R {} ../public/ \\;) && node scripts/injectAssetVersion.js",
+    "build": "node scripts/build.js && node scripts/injectAssetVersion.js",
     "serve:src": "npx http-server src -p 3000 -c-1",
     "serve:public": "npx http-server public -p 4000 -c-1",
     "check:links:src": "npx linkinator http://localhost:3000 --silent --recurse",
