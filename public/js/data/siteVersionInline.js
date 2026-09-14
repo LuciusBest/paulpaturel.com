@@ -1,2 +1,2 @@
-window.SiteVersion = {"semantic":"V1.00.15","timestamp":"2026/09/14/55/05","updatedAt":"2026-09-14T18:55:05.632Z","cacheToken":"V1001520260914550520260914T185505632Z"};
-window.__assetVersion = 'V1001520260914550520260914T185505632Z';
+window.SiteVersion = {"semantic":"V1.00.16","timestamp":"2026/09/14/10/53","updatedAt":"2026-09-14T20:10:53.621Z","cacheToken":"V1001620260914105320260914T201053621Z"};
+window.__assetVersion = 'V1001620260914105320260914T201053621Z';

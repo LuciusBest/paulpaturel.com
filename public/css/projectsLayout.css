@@ -240,6 +240,11 @@ video.media-contain,
     background-color: #ffffff;
 }
 
+/* Bump Keyboard: white backdrop */
+.project_container[data-project-key="KEYBOARD_VIOLETA"] .wrapper--centered {
+    background-color: #ffffff;
+}
+
 /* L'amant: full black background */
 .project_container[data-project-key="LAMANT"] .wrapper--centered {
     background-color: #000000;

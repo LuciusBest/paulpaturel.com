@@ -121,8 +121,10 @@
     const applySizeAndLine = (fs) => {
       letter.style.fontSize = `${fs}px`;
       lastFontSize = fs;
-      // Map line-height: at min -> 1.05, at cap -> 0.95 (interpolate)
-      const lo = 1.05, hi = 0.95;
+      // Map line-height: at min -> 1.25, at cap -> 1.15 (interpolate)
+      // Values below ~1.1 let ascenders of one line collide with the
+      // descenders of the line above, making letters look cropped.
+      const lo = 1.25, hi = 1.15;
       const denom = Math.max(1, (cap - minPx));
       let t = (fs - minPx) / denom;
       t = Math.max(0, Math.min(1, t));
