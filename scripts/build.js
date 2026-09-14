@@ -25,7 +25,12 @@ const EXCLUDED_PUBLIC_ASSETS = new Set([
   'images/UV_OBISTRIPE/UV_OBISTRIPE_00.png',
   'images/UV_OBISTRIPE/UV_OBISTRIPE_01.png',
   'images/UV_OBISTRIPE/UV_OBISTRIPE_02.png',
-  'images/UV_OBISTRIPE/UV_OBISTRIPE_03.png'
+  'images/UV_OBISTRIPE/UV_OBISTRIPE_03.png',
+  'images/KEYBOARD_VIOLETA/Keyboard_3DRender_0.jpg',
+  'images/KEYBOARD_VIOLETA/Keyboard_3DRender_1.png',
+  'images/KEYBOARD_VIOLETA/Keyboard_3DRender_2.jpg',
+  'images/KEYBOARD_VIOLETA/Keyboard_3DRender_3.jpg',
+  'images/KEYBOARD_VIOLETA/Keyboard_3DRender_4.jpg'
 ]);
 
 function toPosix(relativePath) {
